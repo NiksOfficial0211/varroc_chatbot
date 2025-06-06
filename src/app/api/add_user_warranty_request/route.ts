@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
           const fileUploadResponse = await fileUploadURL.json() as FileUploadResponseType;
           console.log(fileUploadResponse);
           if (!fileUploadResponse || typeof fileUploadResponse !== 'object' || !('documentURL' in fileUploadResponse)) {
-  return NextResponse.json({ error: "Invalid file upload response" }, { status: 500 });
+  return NextResponse.json({ error: "Invalid file upload response" ,message:fileUploadResponse}, { status: 500 });
 }
            if(file.fieldName=='invoice'){
           fileURL.push({url:fileUploadResponse.documentURL,isInvoice:true})
