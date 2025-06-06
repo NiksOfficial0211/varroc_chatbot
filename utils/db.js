@@ -1,0 +1,11 @@
+import mysql from 'mysql2/promise';
+
+const pool = mysql.createPool({
+  host: process.env.NEXT_PUBLIC_DB_HOST || 'localhost',
+  user: process.env.NEXT_PUBLIC_DB_USER || 'root',
+  password: process.env.NEXT_PUBLIC_DB_PASSWORD || '',
+  database: process.env.NEXT_PUBLIC_DB_DATABASE,
+  port: process.env.NEXT_PUBLIC_DB_PORT ? parseInt(process.env.NEXT_PUBLIC_DB_PORT) : 3306,
+});
+
+export default pool;

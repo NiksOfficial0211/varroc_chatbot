@@ -1,0 +1,485 @@
+
+'use client'
+import React, { useEffect, useState } from 'react'
+import LoadingDialog from '../../components/PageLoader';
+import ShowAlertMessage from '../../components/alert';
+import { WarrantyRequestDataModel } from '../../datamodels/WarrantyReqestListDataModel';
+import { useGlobalContext } from '@/app/contextProviders/globalContext';
+import { WarrantyRequestDetailResponseModel } from '@/app/datamodels/WarrantyRequestDetailsModel';
+import PageErrorCenterContent from '@/app/components/pageError';
+import useSessionRedirect from '@/app/pro_utils/manage_session';
+import LeftPanelMenus from '@/app/components/leftPanel';
+import { getImageApiURL, staticIconsBaseURL, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
+import moment from 'moment';
+import { RejectMSGMasterDataModel, StatusMasterDataModel } from '@/app/datamodels/CommonDataModels';
+import { useRouter } from 'next/navigation';
+import { FileViewer } from '@/app/components/DocViewer';
+import DialogImagePop from '@/app/components/dialog_DocViewer';
+
+
+interface formValues {
+  status_id: any,
+  comments: any
+  rejection_id: any
+}
+
+
+const WarrantyRequestDetails = () => {
+  useSessionRedirect();
+
+  const [isLoading, setLoading] = useState(true);
+  const router = useRouter()
+  const { auth_id } = useGlobalContext()
+  const [showAlert, setShowAlert] = useState(false);
+  const [showImagePop, setShowImagePop] = useState(false);
+  const [imagePopURL, setImagePopURL] = useState('');
+  const [alertForSuccess, setAlertForSuccess] = useState(0);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertStartContent, setAlertStartContent] = useState('');
+  // const [pageNumber, setPageNumber] = useState(1);
+  // const [pageSize, setPageSize] = useState(10);
+  const [warrantyRequestData, setWarrantyRequestData] = useState<WarrantyRequestDetailResponseModel>();
+  const [statusMasterData, setStatusMasterData] = useState<StatusMasterDataModel[]>([]);
+  const [rejectionMasterData, setRejectionMasterData] = useState<RejectMSGMasterDataModel[]>([]);
+  const [formVal, setFormVal] = useState<formValues>({
+    status_id: 0, comments: "",rejection_id: 0
+  });
+  const { selectedViewID } = useGlobalContext()
+
+  useEffect(() => {
+    // fetchData(dataFilters.date, dataFilters.request_id, dataFilters.phone_no, dataFilters.name, dataFilters.status, dataFilters.page, dataFilters.limit);
+    fetchData();
+
+  }, [])
+
+  // const fetchData = async (date: any, request_id: any, phone_no: any, name: any, status: any, page: any, limit: any) => {
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/get_warranty_request_details", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // 🔥 Important for raw JSON
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
+        },
+        body: JSON.stringify({
+
+          request_id: selectedViewID,
+
+        }),
+      });
+
+      const response = await res.json();
+
+      if (response.status == 1) {
+
+        setWarrantyRequestData(response.data)
+        console.log('current status----------------->', response.data.request[0].status_id);
+
+        setFormVal({
+          status_id: response.data.request[0].status_id,
+          comments: '',
+          rejection_id:0
+        });
+      } else {
+        setLoading(false);
+        setShowAlert(true);
+        setAlertTitle("Error")
+        setAlertStartContent(response.message);
+        setAlertForSuccess(2)
+      }
+      const statusRes = await fetch("/api/get_status_master", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
+        },
+        
+      });
+      const statuses = await statusRes.json();
+
+      if (statuses.status == 1) {
+        setStatusMasterData(statuses.data)
+      }
+      const rejectionRes = await fetch("/api/get_rejection_msgs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
+        },
+        
+      });
+      const rejectres = await rejectionRes.json();
+
+      if (rejectres.status == 1) {
+        setRejectionMasterData(rejectres.data)
+      }
+
+      setLoading(false);
+    } catch (e) {
+      console.log(e);
+      setLoading(false);
+      setShowAlert(true);
+      setAlertTitle("Exception")
+      setAlertStartContent("Exception occured! Something went wrong.");
+      setAlertForSuccess(2)
+    }
+  }
+
+  const formatDateDDMMYYYY = (date: any, isTime = false) => {
+    if (!date) return '';
+    const parsedDate = moment(date);
+    return parsedDate.format('YYYY-MM-DD');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+
+    e.preventDefault()
+    setLoading(true);
+    console.log(auth_id);
+    // pk_request_id
+    try {
+      const response = await fetch("/api/update_warranty_request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
+        },
+        body: formVal.status_id==status_Rejected? JSON.stringify({
+          auth_id: auth_id,
+          pk_id: warrantyRequestData?.request[0].pk_request_id,
+          comments: formVal.comments,
+          status: formVal.status_id, 
+          request_type: warrantyRequestData?.request[0].request_type_id,
+          rejection_id:formVal.rejection_id,
+          rejection_other:formVal.comments
+        }):JSON.stringify({
+          auth_id: auth_id,
+          pk_id: warrantyRequestData?.request[0].pk_request_id,
+          comments: formVal.comments,
+          status: formVal.status_id, 
+          request_type: warrantyRequestData?.request[0].request_type_id
+        }),
+      });
+      const resJson = await response.json();
+      if (resJson && resJson.status == 1) {
+        setLoading(false);
+        setShowAlert(true);
+        setAlertTitle("Success")
+        setAlertStartContent(resJson.message);
+        setAlertForSuccess(1)
+
+      } else {
+        setLoading(false);
+        setShowAlert(true);
+        setAlertTitle("Error")
+        setAlertStartContent(resJson.message);
+        setAlertForSuccess(2)
+
+      }
+    } catch (e: any) {
+      setLoading(false);
+
+      setShowAlert(true);
+      setAlertTitle("Exception")
+      setAlertStartContent(e.message);
+      setAlertForSuccess(2)
+    }
+  }
+
+  const handleInputChange = async (e: any) => {
+    const { name, value } = e.target;
+    setFormVal((prev) => ({ ...prev, [name]: value }));
+  }
+
+  function formatDate(date: Date): string {
+    return date.toISOString().slice(0, 19).replace("T", " ");
+  }
+
+  return (
+    <div>
+
+      <LoadingDialog isLoading={isLoading} />
+      {showAlert && <ShowAlertMessage title={alertTitle} startContent={alertStartContent} onOkClicked={function (): void {
+        setShowAlert(false)
+        if (alertForSuccess == 1) {
+          router.back()
+        }
+
+      }} onCloseClicked={function (): void {
+        setShowAlert(false)
+      }} showCloseButton={false} successFailure={alertForSuccess} />}
+      <LeftPanelMenus selectedMenu={2} showLeftPanel={false} rightBoxUI={
+        <div className="container">
+          <div className="row mt-4 mb-5">
+
+            <div className="col-lg-12">
+              <div className="row" id="top">
+                <div className="col-lg-12 mb-5">
+                  <div className="heading25" style={{ paddingLeft: "20px" }}>Requests Details</div>
+                </div>
+
+              </div>
+
+
+              {warrantyRequestData && warrantyRequestData.addressedData && warrantyRequestData.request ?
+                <div className="grey_box request_details_mainbox">
+                  <div className='row'>
+                    <div className="col-lg-8">
+                      <div className="row">
+                        <div className="col-lg-12 mb-4">
+                          <div className="request_list_heading">
+                            Customer Name: <span style={{ color: "#D93731" }}>{warrantyRequestData.request[0].user_name}</span>
+                          </div>
+                          <div className="request_list_heading" style={{ margin: "-42px 0px 0px 20px", backgroundColor: "#e6f6ff" }}>
+                            Request ID: <span>{warrantyRequestData.request[0].request_id}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="row">
+                        {/* <div className="col-lg-4 mb-3">
+                          <div className="request_list">
+                            Request ID:
+                            <span>{warrantyRequestData.request[0].request_id}</span>
+                          </div>
+                        </div> */}
+                        <div className="col-lg-4 mb-3">
+                          <div className="request_list">
+                            Purcahase Date:
+                            <span>{formatDateDDMMYYYY(warrantyRequestData.request[0].product_purchase_date)}</span>
+                          </div>
+                        </div>
+                        <div className="col-lg-4 mb-3">
+                          <div className="request_list">
+                            Request Date:
+                            <span>{formatDateDDMMYYYY(warrantyRequestData.request[0].created_at)}</span>
+
+                          </div>
+                        </div>
+                        <div className="col-lg-4 mb-3">
+                          <div className="request_list">
+                            Customer Phone:
+                            <span>{warrantyRequestData.request[0].user_phone}</span>
+
+                          </div>
+                        </div>
+                        <div className="col-lg-4 mb-3">
+                          <div className="request_list">
+                            Request Type:
+                            <span>{warrantyRequestData.request[0].request_type}</span>
+
+                          </div>
+                        </div>
+
+                        <div className="col-lg-4 mb-3">
+                          <div className="request_list ">
+                            Serial Number:
+                            <span>{warrantyRequestData.request[0].product_serial_no}</span>
+                          </div>
+                        </div>
+                        <div className="col-lg-12"></div>
+                        <div className="col-lg-12">
+                          <div className="row">
+                            <div className="col-lg-12">
+                              <div className='masterrecord_heading'>Master Record</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }}>
+                          <div className="row">
+                            <div className="col-lg-4 mb-3">
+                              <div className="request_list">
+                                Request Status:
+                                <span>{warrantyRequestData.request[0].request_status}</span>
+
+                              </div>
+                            </div>
+                            <div className="col-lg-4 mb-3">
+                              <div className="request_list ">
+                                Battery Model
+                                <span>{warrantyRequestData.battery_details
+                                  && warrantyRequestData.battery_details.length > 0 ?
+                                  warrantyRequestData.battery_details[0].battery_model : "--"}</span>
+                              </div>
+                            </div>
+                            <div className="col-lg-4 mb-3">
+                              <div className="request_list ">
+                                Varroc Part Code
+                                <span>{warrantyRequestData.battery_details
+                                  && warrantyRequestData.battery_details.length > 0 ? warrantyRequestData.battery_details[0].varroc_part_code : "--"}</span>
+                              </div>
+                            </div>
+                            <div className="col-lg-4 mb-3">
+                              <div className="request_list ">
+                                Master Serial Number
+                                <span>{warrantyRequestData.battery_details
+                                  && warrantyRequestData.battery_details.length > 0 ? warrantyRequestData.battery_details[0].battery_serial_number : "--"}</span>
+                              </div>
+                            </div>
+                            <div className="col-lg-4 mb-3">
+                              <div className="request_list ">
+                                Manufacturing Date
+                                <span>{warrantyRequestData.battery_details
+                                  && warrantyRequestData.battery_details.length > 0 ? warrantyRequestData.battery_details[0].manufacturing_date : "--"}</span>
+                              </div>
+                            </div>
+                            <div className="col-lg-4 mb-3">
+                              <div className="request_list ">
+                                Proposed MRP
+                                <span>{warrantyRequestData.battery_details
+                                  && warrantyRequestData.battery_details.length > 0 ? warrantyRequestData.battery_details[0].proposed_mrp : "--"}</span>
+                              </div>
+                            </div>
+                            <div className="col-lg-12 mb-3">
+                              <div className="request_list ">
+                                Description
+                                <span>{warrantyRequestData.battery_details
+                                  && warrantyRequestData.battery_details.length > 0 ? warrantyRequestData.battery_details[0].battery_description : "--"}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {warrantyRequestData.battery_details.length == 0 && <div className="request_list_heading mb-4 ml-3" style={{ width: "auto", margin: "0" }}>
+                          <span style={{ color: "#D93731" }}>Serial Number does not match</span>
+                        </div>}
+
+                      </div>
+                      {warrantyRequestData.request[0].status_id != status_Pending ?
+                        <div>
+                          <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>
+                            <div className="row">
+                              <div className="col-lg-4 mb-3">
+                                <div className="request_list">
+                                  Request Status:
+                                  <span>{warrantyRequestData.addressedData[0].request_status}</span>
+                                </div>
+                              </div>
+                              <div className="col-lg-4 mb-3">
+                                <div className="request_list">
+                                  Updated By:
+                                  <span>{warrantyRequestData.addressedData[0].addressedBY}</span>
+                                </div>
+                              </div>
+                              <div className="col-lg-4 mb-3">
+                                <div className="request_list">
+                                  Updated Date:
+                                  <span>{formatDate(new Date(warrantyRequestData.addressedData[0].updated_at))}</span>
+                                </div>
+                              </div>
+                              {warrantyRequestData.addressedData[0].fk_rejection_id ? <div className="col-lg-4 mb-3">
+                                <div className="request_list">
+                                  Rejection message:
+                                  <span>{warrantyRequestData.addressedData[0].other_rejection && warrantyRequestData.addressedData[0].other_rejection.length > 0 ? warrantyRequestData.addressedData[0].other_rejection : warrantyRequestData.addressedData[0].rejection_msg}</span>
+                                </div>
+                              </div> : <></>}
+                              {warrantyRequestData.addressedData[0].other_rejection && warrantyRequestData.addressedData[0].other_rejection.length>0 && <div className="col-lg-4 mb-3">
+                                <div className="request_list">
+                                  Comments:
+                                  <span>{warrantyRequestData.addressedData[0].comments}</span>
+                                </div>
+                              </div>}
+                              {/* <div className="col-lg-4 mb-3">
+                            <div className="request_list">
+                              Rejected Reason:
+                              <span>{warrantyRequestData.addressedData[0]}</span>
+                            </div>
+                          </div> */}
+                            </div>
+                          </div>
+                        </div> : <></>
+
+                      }
+
+                      {warrantyRequestData.request[0].status_id == 1 || warrantyRequestData.request[0].status_id == 5 ?
+                        <div>
+                          <form onSubmit={handleSubmit}>
+                            <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>
+                              <div className="row">
+                                <div className="col-lg-6">
+
+
+                                  <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Status:</div>
+                                  <div className="col-lg-12 mb-3">
+                                    <div className='form_box'>
+                                      <select id="status_id" name="status_id" value={formVal.status_id} onChange={handleInputChange}>
+                                        <option value="">Select</option>
+                                        {statusMasterData.map((singleStatus) => (
+                                          <option value={singleStatus.status_id} key={singleStatus.status_id}>{singleStatus.status}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                                {formVal.status_id == status_Rejected &&
+                                  <div className="col-lg-5">
+                                    <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Rejection Cause:</div>
+                                    <div className="col-lg-12 mb-3">
+                                      <div className='form_box'>
+                                        <select id="rejection_id" name="rejection_id" onChange={handleInputChange}>
+                                          <option value="">Select</option>
+                                          {rejectionMasterData.map((rejectMSG) => (
+                                            <option value={rejectMSG.pk_reject_id} key={rejectMSG.pk_reject_id}>{rejectMSG.rejection_msg}</option>
+                                          ))}
+                                        </select>
+                                      </div>
+                                    </div>
+                                  </div>}
+                              </div>
+
+                              <div className="col-lg-12 mb-1 mt-3" style={{ fontFamily: "GothamMedium" }}>Any Comment:</div>
+                              <div className="col-lg-11 mb-2">
+                                <div className='form_box'>
+                                  <textarea name="comments" id="comments" value={formVal.comments} style={{ width: "100%", height: "75px" }} onChange={(e) => setFormVal((prev) => ({ ...prev, ["comments"]: e.target.value }))}></textarea>
+                                </div>
+                              </div>
+                              <div className="col-lg-11">
+                                <button type="submit" className="blue_btn">Submit</button>
+                                <button className="blue_btn m-2" onClick={() => {
+                                  router.back();
+                                }}>Back</button>
+                              </div>
+
+                            </div>
+                          </form>
+                        </div> : <></>
+                      }
+
+
+
+                    </div>
+                    <div className="col-lg-4 text-center">
+
+                      {warrantyRequestData?.images && warrantyRequestData?.images.length > 0 &&
+                        warrantyRequestData?.images.map((imageURL, index) =>
+                          <div className="invoice_attach_box">
+                            <FileViewer fileUrl={getImageApiURL + "/" + imageURL.image_url} isDialogView={false} set_height={150} key={index} /><br></br>
+                            <button className="blue_btn" onClick={() => { setShowImagePop(true); setImagePopURL(imageURL.image_url) }}>View</button>
+
+                          </div>
+                        )}
+                    </div>
+                  </div>
+                  {showImagePop && <DialogImagePop
+                    fileURL={imagePopURL} onDownloadClicked={function (): void {
+
+                    }} onCloseClicked={function (): void {
+                      setShowImagePop(false);
+                    }} />}
+                </div>
+
+                : <PageErrorCenterContent content={isLoading ? "" : "Failed to load data"} />}
+
+
+
+            </div>
+
+          </div>
+        </div>
+      } />
+
+    </div >
+  )
+}
+
+export default WarrantyRequestDetails
