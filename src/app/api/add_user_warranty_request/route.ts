@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
           if (!fileUploadResponse || typeof fileUploadResponse !== 'object' || !('documentURL' in fileUploadResponse)) {
   return NextResponse.json({ error: "Invalid file upload response" }, { status: 500 });
 }
-          else if(file.fieldName=='invoice'){
+           if(file.fieldName=='invoice'){
           fileURL.push({url:fileUploadResponse.documentURL,isInvoice:true})
           }else{
             fileURL.push({url:fileUploadResponse.documentURL,isInvoice:false})
