@@ -18,11 +18,6 @@ const pool = mysql.createPool({
   password: process.env.NEXT_PUBLIC_DB_PASSWORD,
   database: process.env.NEXT_PUBLIC_DB_DATABASE,
   port: process.env.NEXT_PUBLIC_DB_PORT ? parseInt(process.env.NEXT_PUBLIC_DB_PORT) : 3306,
-  ...(isProduction && {
-    ssl: {
-      rejectUnauthorized: false, // optional: change to `true` if your host supports verified SSL
-    },
-  }),
 });
 
 export default pool;
