@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
             type: file.headers['content-type'],
           });
 // const formData = new FormData();
-          // formData.append("file", fileBlob, file.originalFilename);
-          formData.append('file', fs.createReadStream(file.path), file.originalFilename);
+          formData.append("file", fileBlob, file.originalFilename);
+          // formData.append('file', fs.createReadStream(file.path), file.originalFilename);
 
           // formData.append("file", fileBlob, file.originalFilename);
           const fileUploadURL = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/upload_files", {
