@@ -15,8 +15,10 @@ export async function  POST(request:NextRequest){
   }
     const body = await request.json();
     const { date,battery_model,battery_serial_number,page=1,limit  } = body;
-    
-    const offset = (page - 1) * limit;
+
+    const parsedPage = Number(page);
+    const parsedLimit = Number(limit);
+    const offset = (parsedPage - 1) * parsedLimit;
     try{
         const connection = await pool.getConnection();
    
@@ -54,8 +56,7 @@ export async function  POST(request:NextRequest){
       query += ` WHERE ` + conditions.join(" AND ")
     }
 
-    query += ` ORDER BY pro.created_at DESC LIMIT ? OFFSET ?`
-    values.push(limit, offset);
+query += ` ORDER BY ua.created_at DESC LIMIT ${parsedLimit} OFFSET ${offset}`;
     
     const [userRequests] = await connection.execute<RowDataPacket[]>(query, values);
     

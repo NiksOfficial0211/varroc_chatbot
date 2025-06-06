@@ -17,8 +17,10 @@ export async function  POST(request:Request){
   }
     const body = await request.json();
     const { date,request_id,phone_no,name,status,reject_id,page=1,limit=10  } = body;
-    
-    const offset = (page - 1) * limit;
+    const parsedPage = Number(page);
+    const parsedLimit = Number(limit);
+    const offset = (parsedPage - 1) * parsedLimit;
+    // const offset = (page - 1) * limit;
     try{
         const connection = await pool.getConnection();
    
@@ -69,8 +71,10 @@ export async function  POST(request:Request){
       query += ` WHERE ` + conditions.join(" AND ");
     }
 
-    query += ` ORDER BY ua.created_at DESC LIMIT ? OFFSET ?`;
-    values.push(limit, offset);
+query += ` ORDER BY ua.created_at DESC LIMIT ${parsedLimit} OFFSET ${offset}`;
+    console.log("Limit:", parsedLimit, "Offset:", offset, "Types:", typeof parsedLimit, typeof offset);
+
+    // values.push(parsedLimit, offset);
     const [userRequests] = await connection.execute<RowDataPacket[]>(query, values);
     
     const enrichedRequests = await Promise.all(
