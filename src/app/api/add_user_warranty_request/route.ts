@@ -3,7 +3,11 @@ import pool from '../../../../utils/db';
 import { formatDateYYYYMMDD, generateMixedString, generateMixedStringWithNumbers, generateRequestID, parseForm } from '@/app/pro_utils/const_functions';
 import { AddUserRequestActivity } from '@/app/pro_utils/db_add_requests';
 import { ResultSetHeader } from 'mysql2';
-import fs from "fs/promises";
+import * as fs from 'fs'; // <-- standard fs (for streams)
+import { promises as fsPromises } from 'fs'; // <-- for promise-based methods like readFile
+
+import FormData from 'form-data';
+
 
 interface fileURLInter{
   url:any;
@@ -32,18 +36,26 @@ export async function POST(request: NextRequest) {
       for (const [fieldKey, fileArray] of Object.entries(files)) {
         for (const file of fileArray) {
 
-          const fileBuffer = await fs.readFile(file.path); // Read file from temp path
+          const fileBuffer = await fsPromises.readFile(file.path); // Read file from temp path
 
+          // const fileBlob = new Blob([new Uint8Array(fileBuffer)], {
+          //   type: file.headers['content-type'],
+          // });
+          const formData = new FormData();
+          formData.append("requestType", "1");
           const fileBlob = new Blob([new Uint8Array(fileBuffer)], {
             type: file.headers['content-type'],
           });
-          const formData = new FormData();
-          formData.append("requestType", "1");
-          formData.append("file", fileBlob, file.originalFilename);
+// const formData = new FormData();
+          // formData.append("file", fileBlob, file.originalFilename);
+          formData.append('file', fs.createReadStream(file.path), file.originalFilename);
+
+          // formData.append("file", fileBlob, file.originalFilename);
           const fileUploadURL = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/upload_files", {
             method: "POST",
+            headers: formData.getHeaders(),
             // headers:{"Content-Type":"multipart/form-data"},
-            body: formData,
+            body: formData as any,
           });
 
           const fileUploadResponse = await fileUploadURL.json();
