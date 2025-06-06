@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '../../../../utils/db';
-import { formatDateYYYYMMDD, generateMixedString, generateMixedStringWithNumbers, generateRequestID, parseForm } from '@/app/pro_utils/const_functions';
+import {generateRequestID, parseForm } from '@/app/pro_utils/const_functions';
 import { AddUserRequestActivity } from '@/app/pro_utils/db_add_requests';
 import { ResultSetHeader } from 'mysql2';
-import * as fs from 'fs'; // <-- standard fs (for streams)
 import { promises as fsPromises } from 'fs'; // <-- for promise-based methods like readFile
-
+import fetch from 'node-fetch';
+import fs from 'fs';
 import FormData from 'form-data';
 
 
@@ -13,6 +13,10 @@ interface fileURLInter{
   url:any;
   isInvoice:boolean
 }
+type FileUploadResponseType = {
+  documentURL: string;
+  error?: string;
+};
 
 export async function POST(request: NextRequest) {
 
@@ -43,24 +47,30 @@ export async function POST(request: NextRequest) {
           // });
           const formData = new FormData();
           formData.append("requestType", "1");
-          const fileBlob = new Blob([new Uint8Array(fileBuffer)], {
-            type: file.headers['content-type'],
-          });
-// const formData = new FormData();
-          formData.append("file", fileBlob, file.originalFilename);
+//           const fileBlob = new Blob([new Uint8Array(fileBuffer)], {
+//             type: file.headers['content-type'],
+//           });
+//           formData.append("file", fileBlob, file.originalFilename);
           // formData.append('file', fs.createReadStream(file.path), file.originalFilename);
 
           // formData.append("file", fileBlob, file.originalFilename);
+
+          formData.append("file", fs.createReadStream(file.path), {
+            filename: file.originalFilename,
+            contentType: file.headers['content-type'],
+          });
           const fileUploadURL = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/upload_files", {
-            method: "POST",
+            method: 'POST',
+            body: formData,
             headers: formData.getHeaders(),
-            // headers:{"Content-Type":"multipart/form-data"},
-            body: formData as any,
           });
 
-          const fileUploadResponse = await fileUploadURL.json();
+          const fileUploadResponse = await fileUploadURL.json() as FileUploadResponseType;
           console.log(fileUploadResponse);
-          if(file.fieldName=='invoice'){
+          if (!fileUploadResponse || typeof fileUploadResponse !== 'object' || !('documentURL' in fileUploadResponse)) {
+  return NextResponse.json({ error: "Invalid file upload response" }, { status: 500 });
+}
+          else if(file.fieldName=='invoice'){
           fileURL.push({url:fileUploadResponse.documentURL,isInvoice:true})
           }else{
             fileURL.push({url:fileUploadResponse.documentURL,isInvoice:false})
