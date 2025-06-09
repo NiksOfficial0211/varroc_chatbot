@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       query += ` WHERE ` + conditions.join(" AND ")
     }
 
-    query += ` ORDER BY battery_image.created_at DESC LIMIT ${parsedLimit} OFFSET ${offset}`;
+    query += ` ORDER BY pro.created_at DESC LIMIT ${parsedLimit} OFFSET ${offset}`;
 
     const [userRequests] = await connection.execute<RowDataPacket[]>(query, values);
 
