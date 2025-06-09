@@ -3,26 +3,26 @@ import pool from "../../../../utils/db";
 import { RowDataPacket } from "mysql2";
 
 interface CountResult extends RowDataPacket {
-    total: number;
-  }
+  total: number;
+}
 
-export async function  POST(request:NextRequest){
+export async function POST(request: NextRequest) {
   const authHeader = request.headers.get('authorization');
   const token = authHeader?.split(' ')[1]; // 'Bearer your-token'
 
   if (!token || token !== process.env.NEXT_PUBLIC_API_SECRET_TOKEN) {
-    return NextResponse.json({ error: 'Unauthorized',message:"You are unauthorized" }, { status: 403 });
+    return NextResponse.json({ error: 'Unauthorized', message: "You are unauthorized" }, { status: 403 });
   }
-    const body = await request.json();
-    const { date,battery_model,battery_serial_number,page=1,limit  } = body;
+  const body = await request.json();
+  const { date, battery_model, battery_serial_number, page = 1, limit } = body;
 
-    const parsedPage = Number(page);
-    const parsedLimit = Number(limit);
-    const offset = (parsedPage - 1) * parsedLimit;
-    try{
-        const connection = await pool.getConnection();
-   
-        let query = `
+  const parsedPage = Number(page);
+  const parsedLimit = Number(limit);
+  const offset = (parsedPage - 1) * parsedLimit;
+  try {
+    const connection = await pool.getConnection();
+
+    let query = `
       SELECT 
         pro.*, DATE_FORMAT(pro.manufacturing_date, '%Y-%m-%d') as manufacturing_date,
         created_by_user.username AS created_by_username,
@@ -56,18 +56,19 @@ export async function  POST(request:NextRequest){
       query += ` WHERE ` + conditions.join(" AND ")
     }
 
-query += ` ORDER BY ua.created_at DESC LIMIT ${parsedLimit} OFFSET ${offset}`;
-    
-    const [userRequests] = await connection.execute<RowDataPacket[]>(query, values);
-    
-   
+    query += ` ORDER BY battery_image.created_at DESC LIMIT ${parsedLimit} OFFSET ${offset}`;
 
-        connection.release();
-        return NextResponse.json({status:1,message:"Data Received",data:userRequests,pageNumber:page
-        });
-    }catch(e){
-        console.log(e);
-        
-        return NextResponse.json({status:0,error:"Exception Occured"})
-    }
+    const [userRequests] = await connection.execute<RowDataPacket[]>(query, values);
+
+
+
+    connection.release();
+    return NextResponse.json({
+      status: 1, message: "Data Received", data: userRequests, pageNumber: page
+    });
+  } catch (e) {
+    console.log(e);
+
+    return NextResponse.json({ status: 0, error: "Exception Occured" })
+  }
 }

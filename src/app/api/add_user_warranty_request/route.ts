@@ -7,6 +7,7 @@ import { promises as fsPromises } from 'fs'; // <-- for promise-based methods li
 import fetch from 'node-fetch';
 import fs from 'fs';
 import FormData from 'form-data';
+import { supabase } from '../../../../utils/supabaseClient';
 
 
 interface fileURLInter{
@@ -17,6 +18,13 @@ type FileUploadResponseType = {
   documentURL: string;
   error?: string;
 };
+interface MyUploadedFile {
+  originalFilename: string;
+  mimetype: string;
+  filepath: string;
+  size: number;
+  newFilename: string;
+}
 
 export async function POST(request: NextRequest) {
 
@@ -36,54 +44,83 @@ export async function POST(request: NextRequest) {
     const { fields, files } = await parseForm(request);
     console.log(files);
 
-    if (files) {
-      for (const [fieldKey, fileArray] of Object.entries(files)) {
-        for (const file of fileArray) {
+//     if (files) {
+//       for (const [fieldKey, fileArray] of Object.entries(files)) {
+//         for (const file of fileArray) {
 
-          const fileBuffer = await fsPromises.readFile(file.path); // Read file from temp path
+//           const fileBuffer = await fsPromises.readFile(file.path); // Read file from temp path
 
-          // const fileBlob = new Blob([new Uint8Array(fileBuffer)], {
-          //   type: file.headers['content-type'],
-          // });
-          const formData = new FormData();
-          formData.append("requestType", "1");
-//           const fileBlob = new Blob([new Uint8Array(fileBuffer)], {
-//             type: file.headers['content-type'],
+//           // const fileBlob = new Blob([new Uint8Array(fileBuffer)], {
+//           //   type: file.headers['content-type'],
+//           // });
+//           const formData = new FormData();
+//           formData.append("requestType", "1");
+// //           const fileBlob = new Blob([new Uint8Array(fileBuffer)], {
+// //             type: file.headers['content-type'],
+// //           });
+// //           formData.append("file", fileBlob, file.originalFilename);
+//           // formData.append('file', fs.createReadStream(file.path), file.originalFilename);
+
+//           // formData.append("file", fileBlob, file.originalFilename);
+
+//           formData.append("file", fs.createReadStream(file.path), {
+//             filename: file.originalFilename,
+//             contentType: file.headers['content-type'],
 //           });
-//           formData.append("file", fileBlob, file.originalFilename);
-          // formData.append('file', fs.createReadStream(file.path), file.originalFilename);
+//           const fileUploadURL = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/upload_files", {
+//             method: 'POST',
+//             body: formData,
+//             headers: formData.getHeaders(),
+//           });
 
-          // formData.append("file", fileBlob, file.originalFilename);
+//           const fileUploadResponse = await fileUploadURL.json() as FileUploadResponseType;
+//           console.log(fileUploadResponse);
+//           if (!fileUploadResponse || typeof fileUploadResponse !== 'object' || !('documentURL' in fileUploadResponse)) {
+//             return NextResponse.json({ status:0,error: "Invalid file upload response" ,message:fileUploadResponse}, { status: 500 });
+//           }
+//            if(file.fieldName=='invoice'){
+//           fileURL.push({url:fileUploadResponse.documentURL,isInvoice:true})
+//           }else{
+//             fileURL.push({url:fileUploadResponse.documentURL,isInvoice:false})
 
-          formData.append("file", fs.createReadStream(file.path), {
-            filename: file.originalFilename,
-            contentType: file.headers['content-type'],
-          });
-          const fileUploadURL = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/upload_files", {
-            method: 'POST',
-            body: formData,
-            headers: formData.getHeaders(),
-          });
-
-          const fileUploadResponse = await fileUploadURL.json() as FileUploadResponseType;
-          console.log(fileUploadResponse);
-          if (!fileUploadResponse || typeof fileUploadResponse !== 'object' || !('documentURL' in fileUploadResponse)) {
-  return NextResponse.json({ error: "Invalid file upload response" ,message:fileUploadResponse}, { status: 500 });
-}
-           if(file.fieldName=='invoice'){
-          fileURL.push({url:fileUploadResponse.documentURL,isInvoice:true})
-          }else{
-            fileURL.push({url:fileUploadResponse.documentURL,isInvoice:false})
-
-          }
-          if (fileUploadResponse.error) {
-            return NextResponse.json({ error: "File upload api call error",message: fileUploadResponse.error}, { status: 500 });
-          }
-        }
-      }
-    }
+//           }
+//           if (fileUploadResponse.error) {
+//             return NextResponse.json({ error: "File upload api call error",message: fileUploadResponse.error}, { status: 500 });
+//           }
+//         }
+//       }
+//     }
 
     // const formatPurchaseDate = formatDateYYYYMMDD(fields.product_purchase_date[0]);
+    
+    
+    // const uploadedFile = files.file[0] as unknown as MyUploadedFile;
+    //     const tempFilePath = uploadedFile.filepath;
+    //     const buffer = await fsPromises.readFile(tempFilePath); // Read temp file as Buffer
+    
+    //     const filename = `${Date.now()}-${uploadedFile.originalFilename}`;
+    //     // if (uploadedFile.size > 5 * 1024 * 1024) {
+    //     //   return NextResponse.json({ error: "File too large" }, { status: 400 });
+    //     // }
+    //     let bucket = "warranty";
+    //     if (fields.requestType[0] === "2") bucket = "complaint";
+    //     else if (fields.requestType[0] !== "1") bucket = "lead_req";
+    
+    //     const { data, error } = await supabase.storage
+    //       .from(bucket)
+    //       .upload(filename, buffer, {
+    //         contentType: uploadedFile.mimetype,
+    //         upsert: true,
+    //       });
+    
+    //     if (error) {
+    //       console.error("Upload error:", error);
+    //       return NextResponse.json({ message: "Upload failed", error: error.message }, { status: 500 });
+    //     }
+    
+    //     const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(filename);
+    
+
     const connection = await pool.getConnection();
     const [resultID] = await connection.execute<any[]>(`SELECT request_id FROM user_warranty_requests
                 WHERE DATE(created_at) = CURDATE()
@@ -137,6 +174,7 @@ export async function POST(request: NextRequest) {
     );
     const result = insertRequest as ResultSetHeader;
     console.log(result);
+    if(fileURL.length>0){
     for(let i=0;i<fileURL.length;i++){
       if(fileURL[i].url.length>0){
       const [insertImagesURL]= await connection.execute(
@@ -146,6 +184,7 @@ export async function POST(request: NextRequest) {
       )
     }
     }
+  }
    
     
     const activityAdded = await AddUserRequestActivity(cleanFieldValue(fields.user_name?.[0].trim()),parseInt(cleanFieldValue(fields.user_phone?.[0].trim())), 1, 1, requestIDstring, result.insertId)
