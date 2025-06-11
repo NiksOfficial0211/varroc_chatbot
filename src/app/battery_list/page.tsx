@@ -168,14 +168,15 @@ const formattedTime = `${year}-${month}-${day} ${String(hours).padStart(2, '0')}
 
               <div className="row" id="top">
                 <div className="col-lg-12 mb-3">
-                  <div className="heading25"> Battery Master</div>
-                  <div className="col-lg-2 mb-2" style={{ textAlign: "right" }}>
-                    <button className="blue_btn" onClick={()=>{
+                  <div className="heading25">
+                    Battery Master
+                    <button className="blue_btn" style={{float:"right"}} onClick={() => {
                       setAddProduct(true);
                       setShowUploadDialog(true);
                       setProductID(0);
                     }}>Add Product</button>
                   </div>
+                  
                 </div>
                 <div className="col-lg-12 mb-4 ">
                   <div className="attendance_filter_box" id="filter_whitebox_open">

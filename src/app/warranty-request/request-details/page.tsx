@@ -9,7 +9,7 @@ import { WarrantyRequestDetailResponseModel } from '@/app/datamodels/WarrantyReq
 import PageErrorCenterContent from '@/app/components/pageError';
 import useSessionRedirect from '@/app/pro_utils/manage_session';
 import LeftPanelMenus from '@/app/components/leftPanel';
-import { getImageApiURL, staticIconsBaseURL, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
+import { getImageApiURL, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
 import moment from 'moment';
 import { RejectMSGMasterDataModel, StatusMasterDataModel } from '@/app/datamodels/CommonDataModels';
 import { useRouter } from 'next/navigation';
@@ -277,7 +277,6 @@ const WarrantyRequestDetails = () => {
                             <span>{warrantyRequestData.request[0].product_serial_no}</span>
                           </div>
                         </div>
-                        <div className="col-lg-12"></div>
                         <div className="col-lg-12">
                           <div className="row">
                             <div className="col-lg-12">
@@ -340,6 +339,40 @@ const WarrantyRequestDetails = () => {
                           </div>
                         </div>
 
+                        <div className="col-lg-12">
+                          <div className="row">
+                            <div className="col-lg-12">
+                              <div className='masterrecord_heading'>Duplicate Record</div>
+                            </div>
+                          </div>
+                        </div>
+                        {warrantyRequestData.duplicate_data && warrantyRequestData.duplicate_data.map((duplicates,index)=>(
+                        <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }}>
+                          <div className="row">
+                            <div className="col-lg-4 mb-3">
+                              <div className="request_list">
+                                Request Status:
+                                <span>{duplicates.request_status}</span>
+
+                              </div>
+                            </div>
+                            <div className="col-lg-4 mb-3">
+                              <div className="request_list ">
+                                Updated By:
+                                <span>{duplicates.addressed_id}</span>
+                              </div>
+                            </div>
+                            
+                            <div className="col-lg-4 mb-3">
+                              <div className="request_list ">
+                                Comments
+                                <span>{warrantyRequestData.battery_details
+                                  && warrantyRequestData.battery_details.length > 0 ? warrantyRequestData.battery_details[0].battery_serial_number : "--"}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>))}
+
                         {warrantyRequestData.battery_details.length == 0 && <div className="request_list_heading mb-4 ml-3" style={{ width: "auto", margin: "0" }}>
                           <span style={{ color: "#D93731" }}>Serial Number does not match</span>
                         </div>}
@@ -391,7 +424,7 @@ const WarrantyRequestDetails = () => {
 
                       }
 
-                      {warrantyRequestData.request[0].status_id == 1 || warrantyRequestData.request[0].status_id == 5 ?
+                      {warrantyRequestData.request[0].status_id == status_Pending || warrantyRequestData.request[0].status_id == status_Duplicate ?
                         <div>
                           <form onSubmit={handleSubmit}>
                             <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>

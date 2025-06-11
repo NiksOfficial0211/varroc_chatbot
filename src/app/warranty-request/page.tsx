@@ -220,12 +220,10 @@ const WarrantyRequestListing = () => {
               <div className="row" id="top">
                 
                   <div className="col-lg-12 mb-3">
-                    <div className="heading25"> Requests</div>
-                    <div className="col-lg-2 mb-2" style={{ textAlign: "right" }}>
-                    <button className="blue_btn" onClick={downloadExport}>Export Data</button>
-                  </div>
-                  
-                  
+                    <div className="heading25">
+                      Requests
+                      <button className="blue_btn" style={{ float: "right" }} onClick={downloadExport}>Export Data</button>
+                    </div>
                 </div>
 
                 <div className="col-lg-12 mb-4 ">
@@ -283,8 +281,10 @@ const WarrantyRequestListing = () => {
                         </div>
                       </div>
 
-                      <div className="col-lg-2 pt-4">
-                        <a className="blue_btn" onClick={() => { fetchData(dataFilters.page); }}>Submit</a> <a className="blue_btn" onClick={() => resetFilter()}>Reset</a>
+                      <div className="col-lg-12 pt-4">
+                        <div style={{float:"right", margin:"0 0 -30px 0"}}>
+                          <a className="blue_btn" onClick={() => { fetchData(dataFilters.page); }}>Submit</a> <a className="blue_btn" onClick={() => resetFilter()}>Reset</a>
+                        </div>
                       </div>
 
                     </div>

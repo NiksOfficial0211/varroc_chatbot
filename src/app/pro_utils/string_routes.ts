@@ -5,5 +5,6 @@ export const pageURL_dashboard=baseUrl+"/dashboard";
 export const pageURL_ProductListing=baseUrl+"/dashboard";
 export const pageURL_WarrantyRequestList=baseUrl+"/warranty-request";
 export const pageURL_WarrantyRequestDetails=baseUrl+"/warranty-request/request-details";
-export const pageURL_BatteryListingPage=baseUrl+"/battery_list";
+export const pageURL_BatteryListingPage=baseUrl+"/battery-list";
+export const pageURL_ErrorLogsPage=baseUrl+"/error-logs";
 

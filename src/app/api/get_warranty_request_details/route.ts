@@ -62,7 +62,16 @@ export async function POST(request: Request) {
       [request_id]
     );
 
-    
+    const [duplicateDataRows]=await connection.execute(`
+      SELECT 
+        ua.*,
+        rt.request_type AS request_type,
+        rs.status AS request_status
+        FROM user_warranty_requests ua
+        JOIN request_types rt ON ua.request_type_id = rt.request_type_id 
+        JOIN request_status rs ON ua.status_id = rs.status_id
+        WHERE product_serial_no =?
+    `,[userRequests[0].product_serial_no]);
 
     // Example: Get battery info for each request
     const [images] = await connection.execute(
@@ -74,7 +83,7 @@ export async function POST(request: Request) {
            FROM user_request_attachements WHERE fk_request_id = ?`, [request_id]);
     connection.release();
     return NextResponse.json({
-      status: 1, message: "Data Received", data: { request: userRequests, addressedData: addressedData,battery_details:batteryData, images: images }
+      status: 1, message: "Data Received", data: { request: userRequests, addressedData: addressedData,battery_details:batteryData, images: images,duplicate_data:duplicateDataRows }
     });
   } catch (e) {
     console.log(e);
