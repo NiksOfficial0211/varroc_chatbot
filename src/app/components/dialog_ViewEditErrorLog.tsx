@@ -163,25 +163,25 @@ const ViewUpdateErrorLogs = ({error_log_id,   onClose }: {error_log_id: any, onC
             </div>
             <form>
                 <div className="row">
-                    <div className="col-lg-4" style={{fontFamily:"GothamMedium"}}>Customer Phone:</div>                    
-                    <div className="col-lg-8 mb-4">{errorLog?.user_phone}</div>
+                    <div className="col-lg-3" style={{fontFamily:"GothamMedium"}}>Customer Phone:</div>                    
+                    <div className="col-lg-9 mb-4">{errorLog?.user_phone}</div>
 
-                    <div className="col-lg-4" style={{fontFamily:"GothamMedium"}}>Input data:</div>
-                    <div className="col-lg-8 mb-4">{errorLog?.logged_json}</div>
+                    <div className="col-lg-3" style={{fontFamily:"GothamMedium"}}>Input data:</div>
+                    <div className="col-lg-9 mb-4">{errorLog?.logged_json}</div>
                     
-                    <div className="col-lg-4" style={{fontFamily:"GothamMedium"}}>Error Response:</div>
-                    <div className="col-lg-8 mb-4">{errorLog?.logged_json}</div>
+                    <div className="col-lg-3" style={{fontFamily:"GothamMedium"}}>Error Response:</div>
+                    <div className="col-lg-9 mb-4">{errorLog?.logged_json}</div>
                     
-                    {errorLog && errorLog.auth_id && errorLog.changed_json_log ?<>
-                    <div className="col-lg-4" style={{fontFamily:"GothamMedium"}}>Admin Name:</div>
-                    <div className="col-lg-8 mb-4">{errorLog?.username}</div>
+                    {errorLog?.auth_id && errorLog.changed_json_log ?<>
+                    <div className="col-lg-3" style={{fontFamily:"GothamMedium"}}>Admin Name:</div>
+                    <div className="col-lg-9 mb-4">{errorLog?.username}</div>
 
-                    <div className="col-lg-4" style={{fontFamily:"GothamMedium"}}>Updated Data:</div>
-                    <div className="col-lg-8 mb-4">{errorLog?.changed_json_log}</div>
+                    <div className="col-lg-3" style={{fontFamily:"GothamMedium"}}>Updated Data:</div>
+                    <div className="col-lg-9 mb-4">{errorLog?.changed_json_log}</div>
                     </>:
                     <div className="row">
-                        <div className="col-lg-4" style={{fontFamily:"GothamMedium"}}>Comments*:</div>
-                        <div className="col-lg-8 mb-4">
+                        <div className="col-lg-3" style={{fontFamily:"GothamMedium"}}>Comments*:</div>
+                        <div className="col-lg-9 mb-4 form_box">
                             <textarea name="comments" id="comments" value={formValues.comments} style={{ width: "100%", height: "75px" }} onChange={handleInputChange}></textarea>
                             {errors.comments && <span className="error" style={{ color: "red" }}>{errors.comments}</span>}
                         </div>
@@ -189,14 +189,11 @@ const ViewUpdateErrorLogs = ({error_log_id,   onClose }: {error_log_id: any, onC
                     }
 
                 </div>
-                {errorLog && !errorLog?.auth_id && !errorLog.changed_json_log  && <div className="row">
-                    <div className="col-lg-7"></div>
-                    <div className="col-lg-5" style={{float:"right"}}>
-
+                <div className="row">
+                    <div className="col-lg-12" style={{textAlign:"right"}}>
                         <a className="blue_btn " style={{ cursor: "pointer", }} onClick={handleSubmit}>Update</a> <a className="blue_btn" style={{ cursor: "pointer", }} onClick={()=>onClose(false)}>Close</a>
-
                     </div>
-                </div>}
+                </div>
             </form>
         </div>
 

@@ -269,7 +269,7 @@ const AddEditProductDetail = ({ isAddProduct, product_id, onClose }: { isAddProd
 
                 </div>
                 <div className="row">
-                    <div className="col-lg-12 ">
+                    <div className="col-lg-12" style={{textAlign:"right"}}>
 
                         <a className="blue_btn " style={{ cursor: "pointer", }} onClick={handleSubmit}>{isAddProduct?"Add":"Update"}</a> <a className="blue_btn" style={{ cursor: "pointer", }} onClick={()=>onClose(false)}>Close</a>
 
@@ -285,7 +285,6 @@ const AddEditProductDetail = ({ isAddProduct, product_id, onClose }: { isAddProd
 }
 
 export default AddEditProductDetail;
-
 
 
 

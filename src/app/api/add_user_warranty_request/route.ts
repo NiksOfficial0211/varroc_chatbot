@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     const { fields, files } = await parseForm(request);
     console.log(files);
 
-    if (files) {
+    if (files && files.invoice && files.battery_image) {
 
 
       const invoiceFile = files.invoice?.[0] as unknown as MyUploadedFile;

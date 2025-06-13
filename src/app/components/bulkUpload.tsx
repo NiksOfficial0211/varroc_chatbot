@@ -149,15 +149,15 @@ const BulkUploadForm = ({ onClose }: { onClose: () => void }) => {
             </div>
 
             <div className="row">
-                <div className="col-lg-12 mb-4 inner_heading25">Select a .csv/ .xlsx File.</div>
+                <div className="col-lg-12 mb-5 inner_heading25">Select a .csv/ .xlsx File.</div>
             </div>
             <div className="row">
                 <div className="col-lg-12">
                     <div className="download_btn" onClick={() => downloadFile('csv')}>
-                    Download<br></br>Sample .csv
+                    Download<br></br><span style={{fontFamily:"GothamMedium"}}>Sample .csv</span>
                     </div>
                     
-                    <div className='download_btn' onClick={() => downloadFile('xlsx')}>Download<br></br>Sample .xlsx</div>
+                    <div className='download_btn' onClick={() => downloadFile('xlsx')}>Download<br></br><span style={{ fontFamily: "GothamMedium" }}>Sample .xlsx</span></div>
                 </div>
             </div>
             <div className="row mb-5">
@@ -166,7 +166,7 @@ const BulkUploadForm = ({ onClose }: { onClose: () => void }) => {
                         <div className="row">
                             
                             <div className="col-lg-12">
-                                <div className="form_box mt-4">
+                                <div className="form_box mt-5">
 
                                     <input
                                         type="file"
@@ -189,10 +189,8 @@ const BulkUploadForm = ({ onClose }: { onClose: () => void }) => {
 
             </div>
             <div className="row mb-5 ">
-                <div className="col-lg-12 ">
-
+                <div className="col-lg-12" style={{ textAlign: "right" }}>
                     <a className="blue_btn " onClick={uploadData} style={{ cursor: "pointer", }}>Upload</a> <a className="blue_btn" onClick={onClose} style={{ cursor: "pointer", }}>Close</a>
-
                 </div>
             </div>
         </div>
@@ -508,6 +506,5 @@ function formatDateYYYYMMDD(inputDate:string){
 function formatDateToMySQL(date: Date): string {
     return date.toISOString().slice(0, 19).replace("T", " ");
   }
-
 
 

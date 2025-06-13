@@ -213,7 +213,7 @@ const WarrantyRequestListing = () => {
       }} showCloseButton={false} successFailure={alertForSuccess} />}
 
       <LeftPanelMenus selectedMenu={2} showLeftPanel={false} rightBoxUI={
-        <div className="container">
+        <div className="container warranty_mainbox">
           <div className="row mt-4">
             <div className="col-lg-12">
 
@@ -294,37 +294,38 @@ const WarrantyRequestListing = () => {
               </div>
               <div className="row mb-3">
                 <div className="col-lg-12">
-                  <div className="grey_box" style={{ backgroundColor: "#fff" }}>
+                  <div className="grey_box" style={{ backgroundColor: "#fff", position:"relative", padding:"20px 60px 20px 30px" }}>
                     <div className="row list_label mb-4">
-                      <div className="col-lg-2 text-center"><div className="label">Reference ID</div></div>
-                      <div className="col-lg-1 text-center"><div className="label">Reference Date</div></div>
-                      <div className="col-lg-2 text-center"><div className="label">Customer Name</div></div>
-                      <div className="col-lg-2 text-center"><div className="label">Customer Phone</div></div>
+                      <div className="col-lg-3 text-center"><div className="label">Reference <br></br>ID</div></div>
+                      <div className="col-lg-2 text-center"><div className="label">Reference <br></br>Date</div></div>
+                      <div className="col-lg-1 text-center"><div className="label">Customer <br></br>Name</div></div>
+                      <div className="col-lg-2 text-center"><div className="label">Customer <br></br>Phone</div></div>
                       <div className="col-lg-2 text-center"><div className="label">Comments</div></div>
                       <div className="col-lg-1 text-center"><div className="label">Status</div></div>
                       <div className="col-lg-1 text-center"><div className="label">Reason </div></div>
-                      <div className="col-lg-1 text-center"><div className="label">Action</div></div>
+                      {/* <div className="col-lg-1 text-center"><div className="label">Action</div></div> */}
 
                     </div>
 
                     {warrantyRequestData && warrantyRequestData.length > 0 &&
                       warrantyRequestData.map((request) => (
                         <div className="row list_listbox" style={{ alignItems: "center", cursor: "pointer" }} key={request.pk_request_id} onClick={() => { }}>
-                          <div className="col-lg-2 text-center"><div className="label">{request.request_id}</div></div>
-                          <div className="col-lg-1 text-center"><div className="label">{formatDateYYYYMMDD(request.created_at)}</div></div>
-                          <div className="col-lg-2 text-center"><div className="label">{request.user_name}</div></div>
+                          <div className="col-lg-3 text-center"><div className="label">{request.request_id}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{formatDateYYYYMMDD(request.created_at)}</div></div>
+                          <div className="col-lg-1 text-center"><div className="label">{request.user_name}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{request.user_phone}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{request.addressedDetails && request.addressedDetails.length > 0 ? request.addressedDetails[0].comments : "--"}</div></div>
                           <div className="col-lg-1 text-center"><div className="label">{request.addressedDetails && request.addressedDetails.length > 0 ? request.addressedDetails[0].request_status : request.request_status}</div></div>
                           <div className="col-lg-1 text-center"><div className="label">{request.addressedDetails && request.addressedDetails.length > 0 && request.status_id == status_Rejected ? request.addressedDetails[0].rejection_msg && request.addressedDetails[0].rejection_msg.length > 0 ? request.addressedDetails[0].rejection_msg : request.addressedDetails[0].other_rejection : "--"}</div></div>
-                          <div className="col-lg-1 text-center"><div className="label" onClick={() => {
+                          <div className=""><div className="label viewbtn" onClick={() => {
                             setGlobalState({
                               selectedViewID: request.pk_request_id + '',
                               auth_id: auth_id,
                               userName: userName
                             });
                             router.push(pageURL_WarrantyRequestDetails);
-                          }}><img src={staticIconsBaseURL + "/images/view_icon.png"} alt="Varroc Excellence" className="img-fluid" style={{ maxHeight: "18px" }} /></div></div>
+                          }}><img src={staticIconsBaseURL + "/images/view_icon.png"} alt="Varroc Excellence" className="img-fluid" style={{ maxHeight: "18px" }} /></div>
+                          </div>
                         </div>
                       ))}
                   </div>
