@@ -26,10 +26,10 @@ export async function POST(request: NextRequest) {
     let isSuccess = false;
     if (isProductAdd) {
       const [insertResult] = await db.query<ResultSetHeader>(
-        `INSERT INTO product_info 
+  `INSERT INTO product_info 
     (created_by, updated_by, battery_model, varroc_part_code, battery_serial_number, 
-     manufacturing_date, battery_description, proposed_mrp, warranty, is_sold, created_at)
-   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     manufacturing_date, battery_description, proposed_mrp, warranty, is_sold, created_at, updated_at)
+   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
    ON DUPLICATE KEY UPDATE
      created_by = VALUES(created_by),
      updated_by = VALUES(updated_by),
@@ -40,22 +40,25 @@ export async function POST(request: NextRequest) {
      proposed_mrp = VALUES(proposed_mrp),
      warranty = VALUES(warranty),
      is_sold = VALUES(is_sold),
-     created_at = VALUES(created_at)
-  `,
-        [
-          auth_id,
-          auth_id,
-          model_no,
-          varroc_part_code,
-          serial_no,
-          manufacturing_date,
-          description,
-          proposed_mrp,
-          24,
-          0,
-          formatDateToMySQL(new Date()),
-        ]
-      );
+     created_at = VALUES(created_at),
+     updated_at = ?`,
+  [
+    auth_id,                      // created_by
+    auth_id,                      // updated_by
+    model_no,
+    varroc_part_code,
+    serial_no,
+    manufacturing_date,
+    description,
+    proposed_mrp,
+    24,                           // warranty
+    0,                            // is_sold
+    formatDateToMySQL(new Date()), // created_at
+    formatDateToMySQL(new Date()), // updated_at for VALUES
+    formatDateToMySQL(new Date())  // updated_at for ON DUPLICATE
+  ]
+);
+
 
       console.log("insert result array", insertResult);
 
@@ -73,11 +76,8 @@ export async function POST(request: NextRequest) {
                   varroc_part_code = ?, 
                   manufacturing_date = ?, 
                   battery_description = ?, 
-                  proposed_mrp = ?, 
-                  warranty = ?, 
-                  is_sold = ?, 
-                  
-                WHERE pk_id = ?`,
+                  proposed_mrp = ?
+                  WHERE pk_id = ?`,
         [
           auth_id,               // updated_by
           model_no,              // battery_model
@@ -85,10 +85,7 @@ export async function POST(request: NextRequest) {
           manufacturing_date,    // manufacturing_date
           description,           // battery_description
           proposed_mrp,          // proposed_mrp
-          24,                    // warranty
-          0,                     // is_sold
-
-          pk_id // WHERE condition
+          pk_id                  // WHERE condition
         ]
       );
       console.log(updateResult);

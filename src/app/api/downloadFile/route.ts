@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
             contentType = "text/csv";
             
         } else {
-            filePath = path.join(process.cwd(), 'sampleFiles/', 'bat_sample_excel.xlsx');
+            filePath = path.join(process.cwd(), 'sample_files/', 'bat_sample_excel.xlsx');
                 fileName = "bat_sample_excel.xlsx";
                 contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
             

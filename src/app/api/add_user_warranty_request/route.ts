@@ -351,42 +351,71 @@ export async function POST(request: NextRequest) {
         user_address,
         product_serial_no,product_purchase_date } = body;
 
-     const rawDate = (product_purchase_date)
+        const cleanedUserCompanyName =
+  user_company_name?.trim() !== '' ? user_company_name.trim() : null;
+
+const cleanedUserEmail =
+  user_email?.trim() !== '' ? user_email.trim() : null;
+
+const cleanedUserAddress =
+  user_address?.trim() !== '' ? user_address.trim() : null;
+
+// const cleanedUserName =
+//   user_name?.trim() !== '' ? user_name.trim() : null;
+
+const cleanedSerialNo =
+  product_serial_no?.trim() !== '' ? product_serial_no.trim() : null;
+
+const cleanedDate =
+  product_purchase_date?.trim() !== ''
+    ? product_purchase_date.trim()
+    : null;
+
+const cleanedPhone =
+  user_phone !== undefined && user_phone !== null ? parseInt(user_phone) : null;
+
+
+     let rawDate ;
+
+    
+      if(product_purchase_date.in){
+rawDate = (product_purchase_date)
       .trim()
       .replace(/['",]/g, '')  // remove ' " and , characters
       .replaceAll('/', '-');
-    const cleanedDate = convertDDMMYYYYtoYYYYMMDD(rawDate);
+      }
+    // const cleanedDate = convertDDMMYYYYtoYYYYMMDD(product_purchase_date.trim());
        const [insertRequest] = await connection.execute(
-      `INSERT INTO user_warranty_requests 
-         (request_id,
-         user_name, 
-         user_company_name, 
-         user_email, 
-         user_phone, 
-         user_address, 
-         product_serial_no, 
-         product_purchase_date, 
-         request_type_id,
-         status_id,
-         created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      // [
-      //   requestIDstring,
-      //   cleanFieldValue(user_name),
-      //   user_company_name && user_company_name.length>0? cleanFieldValue(user_company_name): null,
-      //   user_email && user_email.length>0 ? cleanFieldValue(user_email): null,
-      //   parseInt(cleanFieldValue(user_phone)), // 
-      //   user_address && user_address.length>0? cleanFieldValue(user_address) : null,
-      //   product_serial_no? cleanFieldValue(product_serial_no.trim()):null,
-      //   cleanedDate,
-      //   1,//(New request goes in pending state)
-      //   1,//pending status
-      //   new Date()//for created at date
-      // ]
-      [
-        requestIDstring,user_name,user_company_name,user_email,user_phone,user_address,product_serial_no,cleanedDate,1,1,new Date()
-      ]
-    );
+  `INSERT INTO user_warranty_requests 
+     (request_id,
+      user_name, 
+      user_company_name, 
+      user_email, 
+      user_phone, 
+      user_pin_code,
+      city, 
+      product_serial_no, 
+      product_purchase_date, 
+      request_type_id,
+      status_id,
+      created_at)
+   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  [
+    requestIDstring,
+    "Nikhil Tekawade",
+    cleanedUserCompanyName,
+    cleanedUserEmail,
+    cleanedPhone,
+    cleanedUserAddress,
+    "pune",
+    cleanedSerialNo,
+    cleanedDate,
+    1, // request_type_id
+    1, // status_id (pending)
+    new Date(), // created_at
+  ]
+);
+
     const result = insertRequest as ResultSetHeader;
     console.log(result);
     for(let i=0;i<fileURL.length;i++){
@@ -400,7 +429,7 @@ export async function POST(request: NextRequest) {
     }
    
     
-    const activityAdded = await AddUserRequestActivity(user_name,parseInt(user_phone), 1, 1, requestIDstring, result.insertId)
+    const activityAdded = await AddUserRequestActivity("Nikhil Tekawade",parseInt(user_phone), 1, 1, requestIDstring, result.insertId)
     if (!activityAdded) {
       return NextResponse.json({ status: 0, message: "Failed to add user activity" });
     }
