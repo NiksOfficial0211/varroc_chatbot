@@ -205,10 +205,16 @@ import { formatDateYYYYMMDD, generateMixedString, generateMixedStringWithNumbers
 import { AddUserRequestActivity } from '@/app/pro_utils/db_add_requests';
 import { ResultSetHeader } from 'mysql2';
 import fs from "fs/promises";
+import { writeFile } from "fs/promises";
+import path from "path";
+import { headers } from 'next/headers';
+import { promises as fsPromises } from 'fs'; // <-- for promise-based methods like readFile
+import { supabase } from '../../../../utils/supabaseClient';
 
-interface fileURLInter{
-  url:any;
-  isInvoice:boolean
+
+interface fileURLInter {
+  url: any;
+  isInvoice: boolean
 }
 
 export async function POST(request: NextRequest) {
@@ -217,10 +223,10 @@ export async function POST(request: NextRequest) {
   const token = authHeader?.split(' ')[1]; // 'Bearer your-token'
 
   if (!token || token !== process.env.NEXT_PUBLIC_API_SECRET_TOKEN) {
-    return NextResponse.json({ error: 'Unauthorized',message:"You are unauthorized" }, { status: 403 });
+    return NextResponse.json({ error: 'Unauthorized', message: "You are unauthorized" }, { status: 403 });
   }
 
-  let fileURL:fileURLInter[]=[{
+  let fileURL: fileURLInter[] = [{
     url: '',
     isInvoice: false
   }];
@@ -270,10 +276,10 @@ export async function POST(request: NextRequest) {
   //               LIMIT 1`);
   //   // return NextResponse.json({ status: 1, message: "Request Received", data: request_id });
   //   console.log(resultID);
-    
+
   //   const requestIDstring = generateRequestID(resultID)
   //   console.log("dkjahdhgaq-a-dfs-af-adf-as-f-asf-as-d",requestIDstring);
-    
+
   //   const rawDate = (fields.product_purchase_date?.[0] ?? '')
   //     .trim()
   //     .replace(/['",]/g, '')  // remove ' " and , characters
@@ -285,7 +291,7 @@ export async function POST(request: NextRequest) {
   //   cleanFieldValue(fields.user_email?.[0].trim() ?? ''),
   //   cleanFieldValue(fields.user_address?.[0].trim() ?? ''),
   //   cleanFieldValue(fields.product_serial_no?.[0].trim()),);
-    
+
   //   const [insertRequest] = await connection.execute(
   //     `INSERT INTO user_warranty_requests 
   //        (request_id,
@@ -325,8 +331,8 @@ export async function POST(request: NextRequest) {
   //     )
   //   }
   //   }
-   
-    
+
+
   //   const activityAdded = await AddUserRequestActivity(cleanFieldValue(fields.user_name?.[0].trim()),parseInt(cleanFieldValue(fields.user_phone?.[0].trim())), 1, 1, requestIDstring, result.insertId)
   //   if (!activityAdded) {
   //     return NextResponse.json({ status: 0, message: "Failed to add user activity" });
@@ -334,110 +340,237 @@ export async function POST(request: NextRequest) {
   //   return NextResponse.json({ status: 1, message: "Request Received" });
 
   // } 
-  
-  try{
-    const body = await request.json();
-        const connection = await pool.getConnection();
+
+  const body = await request.json();
+
+  const { whatsapp_number, user_name,
+      retailer_shop_name,
+      user_email,
+      user_phone,
+      user_pin_code,
+      product_serial_no, product_purchase_date, invoice, battery_image,documents } = body;
+
+  try {
+   
+    const connection = await pool.getConnection();
+    await connection.beginTransaction();
 
     const [resultID] = await connection.execute<any[]>(`SELECT request_id FROM user_warranty_requests
                 WHERE DATE(created_at) = CURDATE()
                 ORDER BY created_at DESC
                 LIMIT 1`);
     const requestIDstring = generateRequestID(resultID)
-    const {user_name,
-        user_company_name,
-        user_email,
-        user_phone,
-        user_address,
-        product_serial_no,product_purchase_date } = body;
-
-        const cleanedUserCompanyName =
-  user_company_name?.trim() !== '' ? user_company_name.trim() : null;
-
-const cleanedUserEmail =
-  user_email?.trim() !== '' ? user_email.trim() : null;
-
-const cleanedUserAddress =
-  user_address?.trim() !== '' ? user_address.trim() : null;
-
-// const cleanedUserName =
-//   user_name?.trim() !== '' ? user_name.trim() : null;
-
-const cleanedSerialNo =
-  product_serial_no?.trim() !== '' ? product_serial_no.trim() : null;
-
-const cleanedDate =
-  product_purchase_date?.trim() !== ''
-    ? product_purchase_date.trim()
-    : null;
-
-const cleanedPhone =
-  user_phone !== undefined && user_phone !== null ? parseInt(user_phone) : null;
-
-
-     let rawDate ;
-
     
-      if(product_purchase_date.in){
-rawDate = (product_purchase_date)
-      .trim()
-      .replace(/['",]/g, '')  // remove ' " and , characters
-      .replaceAll('/', '-');
-      }
+
+    const cleanedRetailerShopName =
+      retailer_shop_name?.trim() !== '' ? retailer_shop_name.trim() : null;
+
+    // const cleanedUserEmail =
+    //   user_email?.trim() !== '' ? user_email.trim() : null;
+
+    const cleanedPinCode =
+      user_pin_code?.trim() !== '' ? user_pin_code.trim() : null;
+
+    const res = await fetch(`https://api.postalpincode.in/pincode/${cleanedPinCode}`);
+    const data = await res.json();
+    let cleanedCityName = null;
+
+    if (data[0]?.Status === "Success") {
+      cleanedCityName = data[0].PostOffice?.[0]?.District;
+    }
+    const cleanedWhatsAppNumber =
+      whatsapp_number?.trim() !== '' ? whatsapp_number.trim() : null;
+
+    const cleanedUserName =
+      user_name?.trim() !== '' ? user_name.trim() : null;
+
+    const cleanedSerialNo =
+      product_serial_no?.trim() !== '' ? product_serial_no.trim() : null;
+
+    const cleanedDate =
+      product_purchase_date?.trim() !== ''
+        ? product_purchase_date.trim()
+        : null;
+
+    const cleanedPhone =
+      user_phone !== undefined && user_phone !== null ? parseInt(user_phone) : null;
+
+
     // const cleanedDate = convertDDMMYYYYtoYYYYMMDD(product_purchase_date.trim());
-       const [insertRequest] = await connection.execute(
-  `INSERT INTO user_warranty_requests 
+    const [insertRequest] = await connection.execute(
+      `INSERT INTO user_warranty_requests 
      (request_id,
       user_name, 
-      user_company_name, 
-      user_email, 
-      user_phone, 
+      retailer_shop_name, 
+      
+      user_phone,
+      raised_whatsapp_number, 
       user_pin_code,
-      city, 
+      retailer_city_name, 
       product_serial_no, 
       product_purchase_date, 
       request_type_id,
       status_id,
       created_at)
-   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-  [
-    requestIDstring,
-    "Nikhil Tekawade",
-    cleanedUserCompanyName,
-    cleanedUserEmail,
-    cleanedPhone,
-    cleanedUserAddress,
-    "pune",
-    cleanedSerialNo,
-    cleanedDate,
-    1, // request_type_id
-    1, // status_id (pending)
-    new Date(), // created_at
-  ]
-);
+   VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
+
+      [
+        requestIDstring,
+        cleanedUserName,
+        cleanedRetailerShopName,
+        
+        cleanedPhone,
+        cleanedWhatsAppNumber,
+        cleanedPinCode,
+        cleanedCityName,
+        cleanedSerialNo,
+        cleanedDate,
+        1, // request_type_id
+        1, // status_id (pending)
+        new Date(), // created_at
+      ]
+    );
 
     const result = insertRequest as ResultSetHeader;
     console.log(result);
-    for(let i=0;i<fileURL.length;i++){
-      if(fileURL[i].url.length>0){
-      const [insertImagesURL]= await connection.execute(
-        `INSERT INTO user_request_attachements (
-        fk_request_id,image_url,is_invoice,created_at
-         ) VALUES (?, ?, ?, ?)`,[result.insertId,fileURL[i].url,fileURL[i].isInvoice,new Date()]
-      )
-    }
-    }
-   
     
-    const activityAdded = await AddUserRequestActivity("Nikhil Tekawade",parseInt(user_phone), 1, 1, requestIDstring, result.insertId)
+
+
+    if (documents) {
+
+
+      // const [insertImagesURL] = await connection.execute(
+      //   `INSERT INTO user_request_attachements (
+      //         fk_request_id,image_url,is_invoice,created_at
+      //         ) VALUES (?, ?, ?, ?)`, [result.insertId, invoice, true, new Date()]
+      // )
+
+      for(let i=0 ;i<documents.length;i++){
+        const mediaRes=await fetch("https://apis.aisensy.com/project-apis/v1/project/6835984c7ce8780c0854abb2/get-media",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(
+                      {
+                        "id": documents[i].id,//"1344347393330195",
+                        "response_type": "stream"
+                      }
+                    ),
+              }
+              );
+        if(mediaRes){
+          const buffer = await mediaRes.arrayBuffer();
+          const fileBuffer = Buffer.from(buffer);
+
+          // Optional: detect MIME type if needed
+          const mime = mediaRes.headers.get("Content-Type"); // e.g. 'image/jpeg', 'application/pdf'
+          const filename = `${documents[i].id}_${Date.now()}.${mime?.includes("pdf") ? "pdf" : "jpg"}`;
+
+          // const currentMonthShort = new Date().toLocaleString('default', { month: 'short' });
+          // const currentDate = getCurrentDateFormatted();
+
+          // const filePath = path.join(process.cwd(), "/uploads/warranty", `${currentMonthShort}/${currentDate}`, filename);
+          // await writeFile(filePath, fileBuffer);
+
+          let bucket = "warranty";
+          const contentType = mime || 'application/octet-stream';
+
+         const { data, error } = await supabase.storage
+          .from(bucket)
+          .upload(filename, fileBuffer, {
+            contentType,
+            upsert: true,
+          });
+
+        if (error) {
+          console.error("Upload error:", error);
+        }
+        const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(filename);
+        console.log("this is the supabase upload url",publicUrlData);
+        
+        const [insertImagesURL] = await connection.execute(
+          `INSERT INTO user_request_attachements (
+                fk_request_id,aisensy_image_id,image_url,is_invoice,created_at
+                ) VALUES (?,?, ?, ?, ?)`, [result.insertId,documents[i].id, publicUrlData.publicUrl, false, new Date()]
+        );
+        }      
+      }
+      
+    }
+    
+
+
+
+    const activityAdded = await AddUserRequestActivity(cleanedUserName, cleanedPhone, 1, 1, requestIDstring, result.insertId)
     if (!activityAdded) {
       return NextResponse.json({ status: 0, message: "Failed to add user activity" });
     }
-    return NextResponse.json({ status: 1, message: "Request Received" });
+    
+
+    const aisensyPayload = {
+
+      "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
+      "campaignName": "reference_id_message",
+      "destination": `${cleanedWhatsAppNumber}`,
+      "userName": "Varroc Aftermarket",
+      "templateParams": [
+        `${requestIDstring}`
+      ],
+      "source": "new-landing-page form",
+      "media": {},
+      "buttons": [],
+      "carouselCards": [],
+      "location": {},
+      "attributes": {},
+      "paramsFallbackValue": {
+        "FirstName": "user"
+      }
+    }
+    console.log(aisensyPayload);
+    
+    const aisensyApiRes = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(aisensyPayload),
+    });
+
+    const aisensyApiJson = await aisensyApiRes.json();
+    console.log("Aisensy response:", result);
+    await connection.commit();
+    if (aisensyApiJson.success == 'true') {
+      return NextResponse.json({ status: 1, message: "Request Updated reference id sent to customer" });
+    } 
+    else {
+      return NextResponse.json({ status: 1, message: "Request Updated but message delivery failed to customer" });
+
+    }
+
+    
 
   }
   catch (err) {
     console.error('DB Error:', err);
+     const cleanedWhatsAppNumber =
+      whatsapp_number?.trim() !== '' ? whatsapp_number.trim() : null;
+    const failedAisensyPayload={
+    "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
+    "campaignName": "form_failed_warranty_reg",
+    "destination": `${cleanedWhatsAppNumber}`,
+    "userName": "Varroc Aftermarket",
+    "templateParams": [],
+    "source": "new-landing-page form",
+    "media": {},
+    "buttons": [],
+    "carouselCards": [],
+    "location": {},
+    "attributes": {},
+    "paramsFallbackValue": {}
+  }
+const aisensyApiRes = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(failedAisensyPayload),
+    });
     return NextResponse.json({ status: 0, error: 'Database error' }, { status: 500 });
   }
 
@@ -445,8 +578,8 @@ rawDate = (product_purchase_date)
 
 
 function convertDDMMYYYYtoYYYYMMDD(dateStr: string): string {
-  console.log("thijfojsdnfjlnsdf ----------------",dateStr);
-  
+  console.log("thijfojsdnfjlnsdf ----------------", dateStr);
+
   if (!/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) return ''; // expect 27-06-2025
   const [day, month, year] = dateStr.split('-');
   return `${year}-${month}-${day}`;
@@ -458,6 +591,15 @@ function cleanFieldValue(value?: string): string {
     .trim()
     .replace(/^["',]+|["',]+$/g, '') // Removes leading/trailing quotes and commas
     .trim();
+}
+
+function getCurrentDateFormatted(): string {
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, '0');
+  const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+  const yyyy = today.getFullYear();
+
+  return `${dd}-${mm}-${yyyy}`;
 }
 
 

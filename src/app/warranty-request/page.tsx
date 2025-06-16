@@ -262,7 +262,7 @@ const WarrantyRequestListing = () => {
                           {/* <input type="text" id="status" name="status" value={dataFilters.status} onChange={handleInputChange} /> */}
                         </div>
                       </div>
-                      <div className="col-lg-2">
+                      {dataFilters.status && dataFilters.status==status_Rejected && <div className="col-lg-2">
                         <div className="form_box ">
                           <label htmlFor="formFile" className="form-label"> Rejection Reason: </label>
                           <select id="reject_id" name="reject_id" onChange={handleInputChange}>
@@ -273,7 +273,7 @@ const WarrantyRequestListing = () => {
                           </select>
                           {/* <input type="text" id="status" name="status" value={dataFilters.status} onChange={handleInputChange} /> */}
                         </div>
-                      </div>
+                      </div>}
                       <div className="col-lg-2">
                         <div className="form_box ">
                           <label htmlFor="formFile" className="form-label">Date: </label>

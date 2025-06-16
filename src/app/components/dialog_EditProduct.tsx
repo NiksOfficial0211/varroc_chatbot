@@ -20,7 +20,7 @@ interface FormValues {
 }
 
 
-const AddEditProductDetail = ({ isAddProduct, product_id, onClose }: { isAddProduct: boolean, product_id: any, onClose: (loadData:boolean) => void }) => {
+const AddEditProductDetail = ({ isAddProduct, product_id, onClose }: { isAddProduct: boolean, product_id: any, onClose: (loadData: boolean) => void }) => {
     const [uploadFile, setUploadFile] = useState<File | null>(null);
     const [isLoading, setLoading] = useState(false);
 
@@ -95,8 +95,16 @@ const AddEditProductDetail = ({ isAddProduct, product_id, onClose }: { isAddProd
     }
     const handleInputChange = async (e: any) => {
         const { name, value } = e.target;
+        
         // console.log("Form values updated:", formValues);
-        setFormValues((prev) => ({ ...prev, [name]: value }));
+        if (name=="proposed_mrp" && /^[0-9]*\.?[0-9]*$/.test(value)) {
+            setFormValues((prev) => ({
+                ...prev,
+                [name]: value,
+            }));
+        } else  if(name !="proposed_mrp"){
+            setFormValues((prev) => ({ ...prev, [name]: value }));
+        }
     }
     const validate = () => {
         const newErrors: Partial<FormValues> = {};
@@ -115,64 +123,64 @@ const AddEditProductDetail = ({ isAddProduct, product_id, onClose }: { isAddProd
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log("handle submit is called");
-        
+
         if (!validate()) return;
-        try{
-        const res = await fetch('api/add_update_battery_info', {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json", // 🔥 Important for raw JSON
-                        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
-                    },
-                    body: isAddProduct?JSON.stringify({
-                        auth_id:auth_id,
-                        model_no:formValues.model_no,
-                        varroc_part_code:formValues.varroc_part_code,
-                        serial_no:formValues.serial_no,
-                        manufacturing_date:formValues.manufacturing_date,
-                        description:formValues.description,
-                        proposed_mrp:formValues.proposed_mrp,
-                        isProductAdd:isAddProduct
-                    }):JSON.stringify({
-                        auth_id:auth_id,
-                        model_no:formValues.model_no,
-                        varroc_part_code:formValues.varroc_part_code,
-                        serial_no:formValues.serial_no,
-                        manufacturing_date:formValues.manufacturing_date,
-                        description:formValues.description,
-                        proposed_mrp:formValues.proposed_mrp,
-                        isProductAdd:isAddProduct,
-                        pk_id:product_id
-                    })
-                });
-                const responseJson = await res.json();
-                if(responseJson.status==1){
-                    console.log(e);
-
-                    setLoading(false);
-                    setShowAlert(true);
-                    setAlertTitle("Success")
-                    setAlertStartContent(isAddProduct?"Data added Successfully":"Data Updated Successfully");
-                    setAlertForSuccess(1)
-                }else{
-                    console.log(e);
-
-                    setLoading(false);
-                    setShowAlert(true);
-                    setAlertTitle("Error")
-                    setAlertStartContent(responseJson.message);
-                    setAlertForSuccess(2)
-                }
-            }catch(e){
+        try {
+            const res = await fetch('api/add_update_battery_info', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json", // 🔥 Important for raw JSON
+                    "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
+                },
+                body: isAddProduct ? JSON.stringify({
+                    auth_id: auth_id,
+                    model_no: formValues.model_no,
+                    varroc_part_code: formValues.varroc_part_code,
+                    serial_no: formValues.serial_no,
+                    manufacturing_date: formValues.manufacturing_date,
+                    description: formValues.description,
+                    proposed_mrp: formValues.proposed_mrp,
+                    isProductAdd: isAddProduct
+                }) : JSON.stringify({
+                    auth_id: auth_id,
+                    model_no: formValues.model_no,
+                    varroc_part_code: formValues.varroc_part_code,
+                    serial_no: formValues.serial_no,
+                    manufacturing_date: formValues.manufacturing_date,
+                    description: formValues.description,
+                    proposed_mrp: formValues.proposed_mrp,
+                    isProductAdd: isAddProduct,
+                    pk_id: product_id
+                })
+            });
+            const responseJson = await res.json();
+            if (responseJson.status == 1) {
                 console.log(e);
 
                 setLoading(false);
                 setShowAlert(true);
-                setAlertTitle("Exception")
-                setAlertStartContent("Exception occured! Something went wrong.");
+                setAlertTitle("Success")
+                setAlertStartContent(isAddProduct ? "Data added Successfully" : "Data Updated Successfully");
+                setAlertForSuccess(1)
+            } else {
+                console.log(e);
+
+                setLoading(false);
+                setShowAlert(true);
+                setAlertTitle("Error")
+                setAlertStartContent(responseJson.message);
                 setAlertForSuccess(2)
             }
-        
+        } catch (e) {
+            console.log(e);
+
+            setLoading(false);
+            setShowAlert(true);
+            setAlertTitle("Exception")
+            setAlertStartContent("Exception occured! Something went wrong.");
+            setAlertForSuccess(2)
+        }
+
 
     }
 
@@ -183,13 +191,13 @@ const AddEditProductDetail = ({ isAddProduct, product_id, onClose }: { isAddProd
             <LoadingDialog isLoading={isLoading} />
             {showAlert && <ShowAlertMessage title={alertTitle} startContent={alertStartContent} onOkClicked={function (): void {
                 setShowAlert(false)
-                if(alertForSuccess==1){
+                if (alertForSuccess == 1) {
                     onClose(true);
                 }
             }} onCloseClicked={function (): void {
                 setShowAlert(false)
             }} showCloseButton={false} successFailure={alertForSuccess} />}
-            <div className='rightpoup_close' onClick={()=>onClose(false)}>
+            <div className='rightpoup_close' onClick={() => onClose(false)}>
                 <img src={staticIconsBaseURL + "/images/remove.png"} alt="Search Icon" title='Close' />
             </div>
 
@@ -269,9 +277,9 @@ const AddEditProductDetail = ({ isAddProduct, product_id, onClose }: { isAddProd
 
                 </div>
                 <div className="row">
-                    <div className="col-lg-12" style={{textAlign:"right"}}>
+                    <div className="col-lg-12" style={{ textAlign: "right" }}>
 
-                        <a className="blue_btn " style={{ cursor: "pointer", }} onClick={handleSubmit}>{isAddProduct?"Add":"Update"}</a> <a className="blue_btn" style={{ cursor: "pointer", }} onClick={()=>onClose(false)}>Close</a>
+                        <a className="blue_btn " style={{ cursor: "pointer", }} onClick={handleSubmit}>{isAddProduct ? "Add" : "Update"}</a> <a className="blue_btn" style={{ cursor: "pointer", }} onClick={() => onClose(false)}>Close</a>
 
                     </div>
                 </div>

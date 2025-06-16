@@ -78,7 +78,7 @@ const BatteryListing = () => {
         }
       } else if (response.status == 1 && response.data.length == 0) {
         setLoading(false);
-        // setBatteryListData([])
+        setBatteryListData([])
         setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page }))
         setHasMoreData(false);
       }

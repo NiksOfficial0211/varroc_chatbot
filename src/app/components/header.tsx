@@ -8,7 +8,8 @@ const HeaderComponent = () => {
 
     const handleLogout = () => {
         // Clear sessionStorage
-        sessionStorage.removeItem("userSession");
+        sessionStorage.removeItem("session");
+        sessionStorage.removeItem("globalState");
         
         // Optional: Clear all session storage
         // sessionStorage.clear();
@@ -25,7 +26,7 @@ const HeaderComponent = () => {
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-11 welcome_text">
-                            Battery Warranty Dashboard
+                            Battery Dashboard
                         </div>
                         <div className="col-lg-1 text-center">
                             <a onClick={()=>handleLogout()}>

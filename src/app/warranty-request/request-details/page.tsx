@@ -45,6 +45,8 @@ const WarrantyRequestDetails = () => {
     status_id: 0, comments: "",rejection_id: 0
   });
   const { selectedViewID } = useGlobalContext()
+      const [errors, setErrors] = useState<Partial<formValues>>({});
+  
 
   useEffect(() => {
     // fetchData(dataFilters.date, dataFilters.request_id, dataFilters.phone_no, dataFilters.name, dataFilters.status, dataFilters.page, dataFilters.limit);
@@ -132,9 +134,23 @@ const WarrantyRequestDetails = () => {
     return parsedDate.format('YYYY-MM-DD');
   };
 
+  const validate = () => {
+        const newErrors: Partial<formValues> = {};
+
+        if (!formVal.status_id) newErrors.status_id = "Status is required";
+        if (formVal.status_id && formVal.status_id==status_Pending) newErrors.status_id = "Please change status";
+        if (formVal.status_id && formVal.status_id==status_Rejected && !formVal.rejection_id)  newErrors.rejection_id = "Please select rejection reason";
+        if (formVal.rejection_id && formVal.rejection_id==1 && !formVal.comments) newErrors.comments = "Please enter rejection reason";// here 1 is for other and need to add comments also
+       
+        console.log(newErrors);
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    }
   const handleSubmit = async (e: React.FormEvent) => {
 
     e.preventDefault()
+  console.log(formVal);
+    if (!validate()) return;
     setLoading(true);
     console.log(auth_id);
     // pk_request_id
@@ -152,13 +168,18 @@ const WarrantyRequestDetails = () => {
           status: formVal.status_id, 
           request_type: warrantyRequestData?.request[0].request_type_id,
           rejection_id:formVal.rejection_id,
-          rejection_other:formVal.comments
+          rejection_other:formVal.comments,
+          isRejected:true,
+          customer_phone:warrantyRequestData?.request[0].user_phone
         }):JSON.stringify({
           auth_id: auth_id,
           pk_id: warrantyRequestData?.request[0].pk_request_id,
           comments: formVal.comments,
-          status: formVal.status_id, 
-          request_type: warrantyRequestData?.request[0].request_type_id
+          status: formVal.status_id,
+          
+          request_type: warrantyRequestData?.request[0].request_type_id,
+          isRejected:false,
+          customer_phone:warrantyRequestData?.request[0].user_phone
         }),
       });
       const resJson = await response.json();
@@ -189,6 +210,8 @@ const WarrantyRequestDetails = () => {
 
   const handleInputChange = async (e: any) => {
     const { name, value } = e.target;
+    
+    
     setFormVal((prev) => ({ ...prev, [name]: value }));
   }
 
@@ -339,16 +362,23 @@ const WarrantyRequestDetails = () => {
                           </div>
                         </div>
 
-                        <div className="col-lg-12">
+                        {warrantyRequestData.duplicate_data && warrantyRequestData.duplicate_data.length>0 && <div className="col-lg-12">
                           <div className="row">
                             <div className="col-lg-12">
                               <div className='masterrecord_heading'>Duplicate Record</div>
                             </div>
                           </div>
-                        </div>
+                        </div>}
                         {warrantyRequestData.duplicate_data && warrantyRequestData.duplicate_data.map((duplicates,index)=>(
                         <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }}>
+                          
                           <div className="row">
+                            <div className="col-lg-4 mb-3">
+                              <div className="request_list">
+                                Reference ID
+                                <span>{duplicates.request_id}</span>
+                              </div>
+                            </div>
                             <div className="col-lg-4 mb-3">
                               <div className="request_list">
                                 Request Status:
@@ -359,17 +389,11 @@ const WarrantyRequestDetails = () => {
                             <div className="col-lg-4 mb-3">
                               <div className="request_list ">
                                 Updated By:
-                                <span>{duplicates.addressed_id}</span>
+                                <span>{duplicates.addressed_id || "--"}</span>
                               </div>
                             </div>
                             
-                            <div className="col-lg-4 mb-3">
-                              <div className="request_list ">
-                                Comments
-                                <span>{warrantyRequestData.battery_details
-                                  && warrantyRequestData.battery_details.length > 0 ? warrantyRequestData.battery_details[0].battery_serial_number : "--"}</span>
-                              </div>
-                            </div>
+                            
                           </div>
                         </div>))}
 
@@ -441,6 +465,8 @@ const WarrantyRequestDetails = () => {
                                           <option value={singleStatus.status_id} key={singleStatus.status_id}>{singleStatus.status}</option>
                                         ))}
                                       </select>
+                                    {errors.status_id && <span className="error" style={{ color: "red" }}>{errors.status_id}</span>}
+
                                     </div>
                                   </div>
                                 </div>
@@ -455,6 +481,8 @@ const WarrantyRequestDetails = () => {
                                             <option value={rejectMSG.pk_reject_id} key={rejectMSG.pk_reject_id}>{rejectMSG.rejection_msg}</option>
                                           ))}
                                         </select>
+                                      {errors.rejection_id && <span className="error" style={{ color: "red" }}>{errors.rejection_id}</span>}
+
                                       </div>
                                     </div>
                                   </div>}
@@ -464,6 +492,8 @@ const WarrantyRequestDetails = () => {
                               <div className="col-lg-11 mb-2">
                                 <div className='form_box'>
                                   <textarea name="comments" id="comments" value={formVal.comments} style={{ width: "100%", height: "75px" }} onChange={(e) => setFormVal((prev) => ({ ...prev, ["comments"]: e.target.value }))}></textarea>
+                                  {errors.comments && <span className="error" style={{ color: "red" }}>{errors.comments}</span>}
+
                                 </div>
                               </div>
                               <div className="col-lg-11">

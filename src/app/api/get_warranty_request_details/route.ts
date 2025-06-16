@@ -70,8 +70,8 @@ export async function POST(request: Request) {
         FROM user_warranty_requests ua
         JOIN request_types rt ON ua.request_type_id = rt.request_type_id 
         JOIN request_status rs ON ua.status_id = rs.status_id
-        WHERE product_serial_no =?
-    `,[userRequests[0].product_serial_no]);
+        WHERE product_serial_no = ? && request_id != ?
+    `,[userRequests[0].product_serial_no,userRequests[0].request_id]);
 
     // Example: Get battery info for each request
     const [images] = await connection.execute(
