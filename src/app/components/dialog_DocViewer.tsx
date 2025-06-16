@@ -16,14 +16,14 @@ const DialogImagePop = ({ fileURL, onDownloadClicked, onCloseClicked }: { fileUR
           </div>
           <div className="row text-center">
             <div className="col-lg-12 mb-3">
-              <a href={getImageApiURL + "/" + fileURL} download>
+              <a href={fileURL.includes("uploads")? getImageApiURL + "/" + fileURL:fileURL} download>
                 <input type="button" value="Download" className="blue_btn" onClick={() => onDownloadClicked()} />
               </a>
               {/* <input type="button" value="Close" className="blue_btn" onClick={onCloseClicked} /> */}
             </div>
             <div className="col-lg-12 mb-4">
               <div className=''>
-                <FileViewer fileUrl={getImageApiURL + "/" + fileURL} isDialogView={true} set_height={350} />
+                <FileViewer fileUrl={fileURL.includes("uploads")? getImageApiURL + "/" + fileURL: fileURL} isDialogView={true} set_height={350} />
               </div>
             </div>
 

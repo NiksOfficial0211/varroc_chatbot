@@ -349,10 +349,10 @@ export async function POST(request: NextRequest) {
       user_phone,
       user_pin_code,
       product_serial_no, product_purchase_date, invoice, battery_image,documents } = body;
-
+let connection;
   try {
    
-    const connection = await pool.getConnection();
+     connection = await pool.getConnection();
     await connection.beginTransaction();
 
     const [resultID] = await connection.execute<any[]>(`SELECT request_id FROM user_warranty_requests
@@ -402,7 +402,6 @@ export async function POST(request: NextRequest) {
      (request_id,
       user_name, 
       retailer_shop_name, 
-      
       user_phone,
       raised_whatsapp_number, 
       user_pin_code,
@@ -418,7 +417,6 @@ export async function POST(request: NextRequest) {
         requestIDstring,
         cleanedUserName,
         cleanedRetailerShopName,
-        
         cleanedPhone,
         cleanedWhatsAppNumber,
         cleanedPinCode,
@@ -433,23 +431,15 @@ export async function POST(request: NextRequest) {
 
     const result = insertRequest as ResultSetHeader;
     console.log(result);
-    
-
-
+  
     if (documents) {
-
-
-      // const [insertImagesURL] = await connection.execute(
-      //   `INSERT INTO user_request_attachements (
-      //         fk_request_id,image_url,is_invoice,created_at
-      //         ) VALUES (?, ?, ?, ?)`, [result.insertId, invoice, true, new Date()]
-      // )
 
       for(let i=0 ;i<documents.length;i++){
         const mediaRes=await fetch("https://apis.aisensy.com/project-apis/v1/project/6835984c7ce8780c0854abb2/get-media",
                 {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json",
+                      "X-AiSensy-Project-API-Pwd":"85b4ec6a26590dbbbc7ee" },
                     body: JSON.stringify(
                       {
                         "id": documents[i].id,//"1344347393330195",
@@ -457,9 +447,13 @@ export async function POST(request: NextRequest) {
                       }
                     ),
               }
-              );
+            );
+        console.log("this is the rsponse from aisensy api media",mediaRes);
+            
         if(mediaRes){
           const buffer = await mediaRes.arrayBuffer();
+          console.log("this is the buffer from image",buffer);
+          
           const fileBuffer = Buffer.from(buffer);
 
           // Optional: detect MIME type if needed
@@ -497,10 +491,7 @@ export async function POST(request: NextRequest) {
       }
       
     }
-    
-
-
-
+  
     const activityAdded = await AddUserRequestActivity(cleanedUserName, cleanedPhone, 1, 1, requestIDstring, result.insertId)
     if (!activityAdded) {
       return NextResponse.json({ status: 0, message: "Failed to add user activity" });
@@ -571,6 +562,10 @@ const aisensyApiRes = await fetch("https://backend.aisensy.com/campaign/t1/api/v
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(failedAisensyPayload),
     });
+    if (connection) {
+      await connection.rollback();
+      connection.release();
+    }
     return NextResponse.json({ status: 0, error: 'Database error' }, { status: 500 });
   }
 

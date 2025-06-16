@@ -83,13 +83,11 @@ export async function POST(request: Request) {
 
     const result = await res.json();
     console.log("Aisensy response:", result);
-    if(result.success=='true'){
-      return NextResponse.json({ status: 1, message: "Request Updated but message delivery failed to customer" });
+    if(result.success==='true'){
+      return NextResponse.json({ status: 1, message: "Request updated message sent to customer" });
     }{
-      return NextResponse.json({ status: 1, message: "Request Updated" });
+      return NextResponse.json({ status: 1, message: "Request updated but message delivery failed to customer"});
     }
-    
-
   } catch (e: any) {
     if (connection) {
       await connection.rollback();

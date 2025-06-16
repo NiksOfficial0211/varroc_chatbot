@@ -370,7 +370,7 @@ const WarrantyRequestDetails = () => {
                           </div>
                         </div>}
                         {warrantyRequestData.duplicate_data && warrantyRequestData.duplicate_data.map((duplicates,index)=>(
-                        <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }}>
+                        <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }} key={index}>
                           
                           <div className="row">
                             <div className="col-lg-4 mb-3">
@@ -395,7 +395,8 @@ const WarrantyRequestDetails = () => {
                             
                             
                           </div>
-                        </div>))}
+                        </div>
+                      ))}
 
                         {warrantyRequestData.battery_details.length == 0 && <div className="request_list_heading mb-4 ml-3" style={{ width: "auto", margin: "0" }}>
                           <span style={{ color: "#D93731" }}>Serial Number does not match</span>
@@ -515,8 +516,9 @@ const WarrantyRequestDetails = () => {
 
                       {warrantyRequestData?.images && warrantyRequestData?.images.length > 0 &&
                         warrantyRequestData?.images.map((imageURL, index) =>
-                          <div className="invoice_attach_box">
-                            <FileViewer fileUrl={getImageApiURL + "/" + imageURL.image_url} isDialogView={false} set_height={150} key={index} /><br></br>
+                          <div className="invoice_attach_box" key={index}>
+
+                            <FileViewer fileUrl={imageURL.image_url.includes("uploads")? getImageApiURL + "/" + imageURL.image_url:imageURL.image_url} isDialogView={false} set_height={150} key={index} /><br></br>
                             <button className="blue_btn" onClick={() => { setShowImagePop(true); setImagePopURL(imageURL.image_url) }}>View</button>
 
                           </div>
