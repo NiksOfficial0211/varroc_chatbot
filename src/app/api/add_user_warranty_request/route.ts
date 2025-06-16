@@ -344,15 +344,15 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
 
   const { whatsapp_number, user_name,
-      retailer_shop_name,
-      user_email,
-      user_phone,
-      user_pin_code,
-      product_serial_no, product_purchase_date, invoice, battery_image,documents } = body;
-let connection;
+    retailer_shop_name,
+    user_email,
+    user_phone,
+    user_pin_code,
+    product_serial_no, product_purchase_date, invoice, battery_image, documents } = body;
+  let connection;
   try {
-   
-     connection = await pool.getConnection();
+
+    connection = await pool.getConnection();
     await connection.beginTransaction();
 
     const [resultID] = await connection.execute<any[]>(`SELECT request_id FROM user_warranty_requests
@@ -360,7 +360,7 @@ let connection;
                 ORDER BY created_at DESC
                 LIMIT 1`);
     const requestIDstring = generateRequestID(resultID)
-    
+
 
     const cleanedRetailerShopName =
       retailer_shop_name?.trim() !== '' ? retailer_shop_name.trim() : null;
@@ -385,7 +385,7 @@ let connection;
       user_name?.trim() !== '' ? user_name.trim() : null;
 
     const cleanedSerialNo =
-      product_serial_no?.trim() !== '' ? product_serial_no.trim() : null;
+      product_serial_no?.trim() !== '' ? product_serial_no.trim().toUpperCase() : null;
 
     const cleanedDate =
       product_purchase_date?.trim() !== ''
@@ -431,29 +431,31 @@ let connection;
 
     const result = insertRequest as ResultSetHeader;
     console.log(result);
-  
+
     if (documents) {
 
-      for(let i=0 ;i<documents.length;i++){
-        const mediaRes=await fetch("https://apis.aisensy.com/project-apis/v1/project/6835984c7ce8780c0854abb2/get-media",
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json",
-                      "X-AiSensy-Project-API-Pwd":"85b4ec6a26590dbbbc7ee" },
-                    body: JSON.stringify(
-                      {
-                        "id": documents[i].id,//"1344347393330195",
-                        "response_type": "stream"
-                      }
-                    ),
+      for (let i = 0; i < documents.length; i++) {
+        const mediaRes = await fetch("https://apis.aisensy.com/project-apis/v1/project/6835984c7ce8780c0854abb2/get-media",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-AiSensy-Project-API-Pwd": "85b4ec6a26590dbbbc7ee"
+            },
+            body: JSON.stringify(
+              {
+                "id": documents[i].id,//"1344347393330195",
+                "response_type": "stream"
               }
-            );
-        console.log("this is the rsponse from aisensy api media",mediaRes);
-            
-        if(mediaRes){
+            ),
+          }
+        );
+        console.log("this is the rsponse from aisensy api media", mediaRes);
+
+        if (mediaRes && mediaRes.ok) {
           const buffer = await mediaRes.arrayBuffer();
-          console.log("this is the buffer from image",buffer);
-          
+          console.log("this is the buffer from image", buffer);
+
           const fileBuffer = Buffer.from(buffer);
 
           // Optional: detect MIME type if needed
@@ -469,34 +471,56 @@ let connection;
           let bucket = "warranty";
           const contentType = mime || 'application/octet-stream';
 
-         const { data, error } = await supabase.storage
-          .from(bucket)
-          .upload(filename, fileBuffer, {
-            contentType,
-            upsert: true,
-          });
+          const { data, error } = await supabase.storage
+            .from(bucket)
+            .upload(filename, fileBuffer, {
+              contentType,
+              upsert: true,
+            });
 
-        if (error) {
-          console.error("Upload error:", error);
-        }
-        const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(filename);
-        console.log("this is the supabase upload url",publicUrlData);
-        
-        const [insertImagesURL] = await connection.execute(
-          `INSERT INTO user_request_attachements (
+          if (error) {
+            console.error("Upload error:", error);
+          }
+          const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(filename);
+          console.log("this is the supabase upload url", publicUrlData);
+
+          const [insertImagesURL] = await connection.execute(
+            `INSERT INTO user_request_attachements (
                 fk_request_id,aisensy_image_id,image_url,is_invoice,created_at
-                ) VALUES (?,?, ?, ?, ?)`, [result.insertId,documents[i].id, publicUrlData.publicUrl, false, new Date()]
-        );
-        }      
+                ) VALUES (?,?, ?, ?, ?)`, [result.insertId, documents[i].id, publicUrlData.publicUrl, false, new Date()]
+          );
+        } else {
+          await connection.rollback();
+          connection.release();
+          const failedAisensyPayload = {
+            "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
+            "campaignName": "form_failed_warranty_reg",
+            "destination": `${cleanedWhatsAppNumber}`,
+            "userName": "Varroc Aftermarket",
+            "templateParams": [],
+            "source": "new-landing-page form",
+            "media": {},
+            "buttons": [],
+            "carouselCards": [],
+            "location": {},
+            "attributes": {},
+            "paramsFallbackValue": {}
+          }
+          const aisensyApiRes = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(failedAisensyPayload),
+          });
+        }
       }
-      
+
     }
-  
+
     const activityAdded = await AddUserRequestActivity(cleanedUserName, cleanedPhone, 1, 1, requestIDstring, result.insertId)
     if (!activityAdded) {
       return NextResponse.json({ status: 0, message: "Failed to add user activity" });
     }
-    
+
 
     const aisensyPayload = {
 
@@ -518,7 +542,7 @@ let connection;
       }
     }
     console.log(aisensyPayload);
-    
+
     const aisensyApiRes = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -529,44 +553,44 @@ let connection;
     console.log("Aisensy response:", result);
     await connection.commit();
     if (aisensyApiJson.success == 'true') {
-      return NextResponse.json({ status: 1, message: "Request Updated reference id sent to customer" });
-    } 
+      return NextResponse.json({ status: 1, message: "Request received reference id sent to customer" });
+    }
     else {
-      return NextResponse.json({ status: 1, message: "Request Updated but message delivery failed to customer" });
+      return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" });
 
     }
 
-    
+
 
   }
   catch (err) {
-     if (connection) {
+    if (connection) {
       await connection.rollback();
       connection.release();
     }
     console.error('DB Error:', err);
-     const cleanedWhatsAppNumber =
+    const cleanedWhatsAppNumber =
       whatsapp_number?.trim() !== '' ? whatsapp_number.trim() : null;
-    const failedAisensyPayload={
-    "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-    "campaignName": "form_failed_warranty_reg",
-    "destination": `${cleanedWhatsAppNumber}`,
-    "userName": "Varroc Aftermarket",
-    "templateParams": [],
-    "source": "new-landing-page form",
-    "media": {},
-    "buttons": [],
-    "carouselCards": [],
-    "location": {},
-    "attributes": {},
-    "paramsFallbackValue": {}
-  }
-const aisensyApiRes = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(failedAisensyPayload),
-    });
-   
+    const failedAisensyPayload = {
+      "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
+      "campaignName": "form_failed_warranty_reg",
+      "destination": `${cleanedWhatsAppNumber}`,
+      "userName": "Varroc Aftermarket",
+      "templateParams": [],
+      "source": "new-landing-page form",
+      "media": {},
+      "buttons": [],
+      "carouselCards": [],
+      "location": {},
+      "attributes": {},
+      "paramsFallbackValue": {}
+    }
+    // const aisensyApiRes = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
+    //       method: "POST",
+    //       headers: { "Content-Type": "application/json" },
+    //       body: JSON.stringify(failedAisensyPayload),
+    //     });
+
     return NextResponse.json({ status: 0, error: 'Database error' }, { status: 500 });
   }
 

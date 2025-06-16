@@ -28,8 +28,8 @@ export async function POST(request: Request) {
 
     // Step 2: Update user_warranty_requests
     await connection.query(
-      `UPDATE user_warranty_requests 
-       SET status_id = ?, addressed_id = ?, fk_reject_id = ?
+      `UPDATE user_activities 
+       SET status_id = ?,
        WHERE go_activity_id = ?`,
       [status,pk_id]
     );
@@ -50,8 +50,8 @@ export async function POST(request: Request) {
     };
 
     await connection.query(
-      `INSERT INTO logs (activity_type, change_json, created_at) VALUES (?, ?, ?)`,
-      ["Update Warranty Request", JSON.stringify(createdJson), new Date()]
+      `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?)`,
+      ["Update Warranty Request",pk_id,1, JSON.stringify(createdJson), new Date()]
     );
 
     // ✅ COMMIT after all DB operations are successful

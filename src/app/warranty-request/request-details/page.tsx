@@ -300,6 +300,12 @@ const WarrantyRequestDetails = () => {
                             <span>{warrantyRequestData.request[0].product_serial_no}</span>
                           </div>
                         </div>
+                         <div className="col-lg-4 mb-3">
+                          <div className="request_list ">
+                            City:
+                            <span>{warrantyRequestData.request[0].retailer_city_name || "--"}</span>
+                          </div>
+                        </div>
                         <div className="col-lg-12">
                           <div className="row">
                             <div className="col-lg-12">
