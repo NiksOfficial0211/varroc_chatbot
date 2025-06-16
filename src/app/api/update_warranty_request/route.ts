@@ -30,6 +30,12 @@ export async function POST(request: Request) {
     await connection.query(
       `UPDATE user_warranty_requests 
        SET status_id = ?, addressed_id = ?, fk_reject_id = ?
+       WHERE go_activity_id = ?`,
+      [status,pk_id]
+    );
+    await connection.query(
+      `UPDATE user_warranty_requests 
+       SET status_id = ?, addressed_id = ?, fk_reject_id = ?
        WHERE pk_request_id = ?`,
       [status, auth_id, rejection_id, pk_id]
     );

@@ -540,6 +540,10 @@ let connection;
 
   }
   catch (err) {
+     if (connection) {
+      await connection.rollback();
+      connection.release();
+    }
     console.error('DB Error:', err);
      const cleanedWhatsAppNumber =
       whatsapp_number?.trim() !== '' ? whatsapp_number.trim() : null;
@@ -562,10 +566,7 @@ const aisensyApiRes = await fetch("https://backend.aisensy.com/campaign/t1/api/v
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(failedAisensyPayload),
     });
-    if (connection) {
-      await connection.rollback();
-      connection.release();
-    }
+   
     return NextResponse.json({ status: 0, error: 'Database error' }, { status: 500 });
   }
 
