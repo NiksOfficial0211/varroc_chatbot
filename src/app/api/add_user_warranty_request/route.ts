@@ -202,7 +202,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '../../../../utils/db';
 import { formatDateYYYYMMDD, generateMixedString, generateMixedStringWithNumbers, generateRequestID, parseForm } from '@/app/pro_utils/const_functions';
-import { AddUserRequestActivity } from '@/app/pro_utils/db_add_requests';
+import { AddCommonLog, AddUserRequestActivity } from '@/app/pro_utils/db_add_requests';
 import { ResultSetHeader } from 'mysql2';
 import fs from "fs/promises";
 import { writeFile } from "fs/promises";
@@ -342,6 +342,7 @@ export async function POST(request: NextRequest) {
   // } 
 
   const body = await request.json();
+  const activityAdded = await AddCommonLog(null,null,"Request Raised Body",body)
 
   const { whatsapp_number, user_name,
     retailer_shop_name,
@@ -351,6 +352,8 @@ export async function POST(request: NextRequest) {
     product_serial_no, product_purchase_date, invoice, battery_image, documents } = body;
   let connection;
   try {
+
+
 
     connection = await pool.getConnection();
     await connection.beginTransaction();
