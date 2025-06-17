@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     };
 
     await connection.query(
-      `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?)`,
+      `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
       ["Update Warranty Request",pk_id,1, JSON.stringify(createdJson), new Date()]
     );
 
