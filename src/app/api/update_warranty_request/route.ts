@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     // Step 2: Update user_warranty_requests
     await connection.query(
       `UPDATE user_activities 
-       SET status_id = ?,
+       SET status_id = ?
        WHERE go_activity_id = ?`,
       [status,pk_id]
     );

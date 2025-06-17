@@ -353,8 +353,6 @@ export async function POST(request: NextRequest) {
   let connection;
   try {
 
-
-
     connection = await pool.getConnection();
     await connection.beginTransaction();
 
@@ -434,7 +432,7 @@ export async function POST(request: NextRequest) {
 
     const result = insertRequest as ResultSetHeader;
     console.log(result);
-
+    let mediaUploadFialed=false;
     if (documents) {
 
       for (let i = 0; i < documents.length; i++) {
@@ -463,7 +461,7 @@ export async function POST(request: NextRequest) {
 
           // Optional: detect MIME type if needed
           const mime = mediaRes.headers.get("Content-Type"); // e.g. 'image/jpeg', 'application/pdf'
-          const filename = `${documents[i].id}_${Date.now()}.${mime?.includes("pdf") ? "pdf" : "jpg"}`;
+          const filename = `${documents[i].id}_${Date.now()}.${mime}`;
 
           // const currentMonthShort = new Date().toLocaleString('default', { month: 'short' });
           // const currentDate = getCurrentDateFormatted();
@@ -487,12 +485,23 @@ export async function POST(request: NextRequest) {
           const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(filename);
           console.log("this is the supabase upload url", publicUrlData);
 
+          // const [insertImagesURL] = await connection.execute(
+          //   `INSERT INTO user_request_attachements (
+          //       fk_request_id,aisensy_image_id,image_url,is_invoice,created_at
+          //       ) VALUES (?,?, ?, ?, ?)`, [result.insertId, documents[i].id, filePath, false, new Date()]
+
           const [insertImagesURL] = await connection.execute(
             `INSERT INTO user_request_attachements (
                 fk_request_id,aisensy_image_id,image_url,is_invoice,created_at
                 ) VALUES (?,?, ?, ?, ?)`, [result.insertId, documents[i].id, publicUrlData.publicUrl, false, new Date()]
           );
         } else {
+          mediaUploadFialed=true;
+        }
+      }
+
+    }
+      if(mediaUploadFialed){
           await connection.rollback();
           connection.release();
           const failedAisensyPayload = {
@@ -514,10 +523,9 @@ export async function POST(request: NextRequest) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(failedAisensyPayload),
           });
-        }
+          return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
       }
 
-    }
 
     const activityAdded = await AddUserRequestActivity(cleanedUserName, cleanedPhone, 1, 1, requestIDstring, result.insertId)
     if (!activityAdded) {
