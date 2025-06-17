@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { auth_id, pk_id, comments, status, request_type, rejection_id, rejection_other, isRejected, customer_phone } = body;
+  const { auth_id, pk_id, comments, status,request_id, request_type, rejection_id, rejection_other, isRejected, customer_phone } = body;
 
   let connection;
 
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
       campaignName:"Reject_message",
       destination: `${customer_phone}`,
       userName: "Varroc Aftermarket",
-      templateParams: ["Hello abhi", isRejected ? "Rejected" : "Approved"],
+      templateParams: [request_id, isRejected ? "Rejected" : "Approved"],
       source: "new-landing-page form",
       media: {},
       buttons: [],

@@ -166,6 +166,7 @@ const WarrantyRequestDetails = () => {
           pk_id: warrantyRequestData?.request[0].pk_request_id,
           comments: formVal.comments,
           status: formVal.status_id, 
+          request_id:warrantyRequestData?.request[0].request_id,
           request_type: warrantyRequestData?.request[0].request_type_id,
           rejection_id:formVal.rejection_id,
           rejection_other:formVal.comments,
@@ -176,7 +177,7 @@ const WarrantyRequestDetails = () => {
           pk_id: warrantyRequestData?.request[0].pk_request_id,
           comments: formVal.comments,
           status: formVal.status_id,
-          
+          request_id:warrantyRequestData?.request[0].request_id,
           request_type: warrantyRequestData?.request[0].request_type_id,
           isRejected:false,
           customer_phone:warrantyRequestData?.request[0].user_phone
