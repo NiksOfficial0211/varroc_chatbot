@@ -414,7 +414,7 @@ export async function POST(request: NextRequest) {
 
     }
       if(mediaUploadFialed){
-          await connection.rollback();
+          // await connection.rollback();
           connection.release();
           const failedAisensyPayload = {
             "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
@@ -479,7 +479,7 @@ export async function POST(request: NextRequest) {
   }
   catch (err) {
     if (connection) {
-      await connection.rollback();
+      // await connection.rollback();
       connection.release();
     }
     console.error('DB Error:', err);
