@@ -240,6 +240,7 @@ export async function POST(request: NextRequest) {
     user_phone,
     user_pin_code,
     product_serial_no, product_purchase_date, invoice, battery_image, documents } = body;
+    
   let connection;
   try {
 
@@ -321,7 +322,28 @@ export async function POST(request: NextRequest) {
     );
 
     const result = insertRequest as ResultSetHeader;
-    console.log(result);
+
+    // const activityAdded = await AddUserRequestActivity(cleanedUserName, cleanedPhone, 1, 1, requestIDstring, result.insertId)
+    // if (!activityAdded) {
+    //   return NextResponse.json({ status: 0, message: "Failed to add user activity" });
+    // }
+    const [insertActivity] = await connection.execute(
+            `INSERT INTO user_activities 
+             (name,phone,
+              request_type_id,
+              status_id,
+              request_id,
+              go_activity_id,created_at)
+             VALUES (?,?,?,?,?,?,?)`,
+            [
+                cleanedUserName,cleanedPhone,
+                1,
+                1,
+                requestIDstring,
+                result.insertId,
+                new Date()//for created at date
+            ]
+        );
     let mediaUploadFialed=false;
     if (documents) {
 
@@ -414,14 +436,7 @@ export async function POST(request: NextRequest) {
             body: JSON.stringify(failedAisensyPayload),
           });
           return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
-      }
-
-
-    const activityAdded = await AddUserRequestActivity(cleanedUserName, cleanedPhone, 1, 1, requestIDstring, result.insertId)
-    if (!activityAdded) {
-      return NextResponse.json({ status: 0, message: "Failed to add user activity" });
-    }
-
+      }else{
 
     const aisensyPayload = {
 
@@ -460,9 +475,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" });
 
     }
-
-
-
+  }
   }
   catch (err) {
     if (connection) {
