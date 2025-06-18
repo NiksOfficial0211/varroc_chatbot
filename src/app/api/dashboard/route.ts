@@ -40,7 +40,7 @@ export async function  POST(request:Request){
                 JOIN request_status rs ON ua.status_id = rs.status_id
                 WHERE DATE(ua.created_at) = CURDATE()
                 ORDER BY ua.created_at DESC
-                LIMIT 10
+                
             `);
             connection.release();
         return NextResponse.json({status:1,message:"Data Received",data:{
