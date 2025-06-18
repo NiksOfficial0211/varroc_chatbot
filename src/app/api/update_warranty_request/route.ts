@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { auth_id, pk_id, comments, status,request_id, request_type, rejection_id, rejection_other, isRejected, customer_phone } = body;
+  const { auth_id, pk_id, comments, status,request_id, request_type, rejection_id, rejection_other, isRejected,isDuplicate, customer_phone } = body;
 
   let connection;
 
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
       campaignName:"Reject_message",
       destination: `${customer_phone}`,
       userName: "Varroc Aftermarket",
-      templateParams: [request_id, isRejected ? "Rejected" : "Approved"],
+      templateParams: [request_id, isRejected ? `Rejected ${comments}` : isDuplicate?"Duplicate Request": "Approved"],
       source: "new-landing-page form",
       media: {},
       buttons: [],
@@ -92,13 +92,22 @@ export async function POST(request: Request) {
     if(result.success==='true'){
       return NextResponse.json({ status: 1, message: "Request updated message sent to customer" });
     }{
+      await connection.query(
+      `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
+      ["Update Warranty Request Send Message Failed",pk_id,1, aisensyPayload, new Date()]
+    );
       return NextResponse.json({ status: 1, message: "Request updated but message delivery failed to customer"});
     }
   } catch (e: any) {
     if (connection) {
       await connection.rollback();
+       await connection.query(
+      `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
+      ["Update Warranty Request Exception",pk_id,1, e, new Date()]
+    );
       connection.release();
     }
+   
     console.error("Transaction failed:", e);
     return NextResponse.json(
       { status: 0, error: e.message || "Internal Server Error", code: e.code || null },

@@ -34,6 +34,9 @@ const Dashboard = () => {
             // fetchActivities();
             fetchData();
         }, 5000); 
+        return () => {
+            clearInterval(intervalId);
+          };
   }, []);
 
   const fetchData = async () => {

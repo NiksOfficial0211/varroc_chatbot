@@ -180,6 +180,7 @@ const WarrantyRequestDetails = () => {
           request_id:warrantyRequestData?.request[0].request_id,
           request_type: warrantyRequestData?.request[0].request_type_id,
           isRejected:false,
+          isDuplicate: formVal.status_id == status_Duplicate ? true : false,
           customer_phone:warrantyRequestData?.request[0].user_phone
         }),
       });

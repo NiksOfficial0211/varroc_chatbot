@@ -414,7 +414,7 @@ export async function POST(request: NextRequest) {
 
     }
       if(mediaUploadFialed){
-          // await connection.rollback();
+          await connection.rollback();
           connection.release();
           const failedAisensyPayload = {
             "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
@@ -435,7 +435,12 @@ export async function POST(request: NextRequest) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(failedAisensyPayload),
           });
-          return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
+          if (aisensyApiRes && aisensyApiRes.ok) {
+              return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
+          }else{
+
+          }
+          
       }else{
 
     const aisensyPayload = {
@@ -472,6 +477,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ status: 1, message: "Request received reference id sent to customer" });
     }
     else {
+      await connection.query(
+      `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
+      ["Add Warranty Request Send Message Failed",null,1, aisensyPayload, new Date()]
+    );
       return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" });
 
     }
@@ -479,7 +488,7 @@ export async function POST(request: NextRequest) {
   }
   catch (err) {
     if (connection) {
-      // await connection.rollback();
+      await connection.rollback();
       connection.release();
     }
     console.error('DB Error:', err);
@@ -499,11 +508,11 @@ export async function POST(request: NextRequest) {
       "attributes": {},
       "paramsFallbackValue": {}
     }
-    // const aisensyApiRes = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
-    //       method: "POST",
-    //       headers: { "Content-Type": "application/json" },
-    //       body: JSON.stringify(failedAisensyPayload),
-    //     });
+    const aisensyApiRes = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(failedAisensyPayload),
+        });
 
     return NextResponse.json({ status: 0, error: 'Database error' }, { status: 500 });
   }
