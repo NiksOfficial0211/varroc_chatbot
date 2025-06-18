@@ -579,7 +579,7 @@ const WarrantyRequestDetails = () => {
                       {warrantyRequestData?.images && warrantyRequestData?.images.length > 0 &&
                         warrantyRequestData?.images.map((imageURL, index) =>
                           <div className="invoice_attach_box">
-                            <FileViewer fileUrl={getImageApiURL + "/" + imageURL.image_url} isDialogView={false} set_height={150} key={index} /><br></br>
+                            <FileViewer fileUrl={imageURL.image_url && imageURL.image_url.includes('uploads')?getImageApiURL + "/" + imageURL.image_url:imageURL.image_url} isDialogView={false} set_height={150} key={index} /><br></br>
                             <button className="blue_btn" onClick={() => { setShowImagePop(true); setImagePopURL(imageURL.image_url) }}>View</button>
 
                           </div>
