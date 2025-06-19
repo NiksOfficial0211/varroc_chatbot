@@ -233,13 +233,46 @@ export async function POST(request: NextRequest) {
  
   const body = await request.json();
   const activityAdded = await AddCommonLog(null,null,"Request Raised Body",body)
-  return NextResponse.json({ status: 1, message: 'Add only logs' }, { status: 200 });
   const { whatsapp_number, user_name,
     retailer_shop_name,
     user_email,
     user_phone,
     user_pin_code,
     product_serial_no, product_purchase_date, invoice, battery_image, documents } = body;
+  const connection = await pool.getConnection();
+      const [resultID] = await connection.execute<any[]>(`SELECT request_id FROM user_warranty_requests
+                WHERE DATE(created_at) = CURDATE()
+                ORDER BY created_at DESC
+                LIMIT 1`);
+    const requestIDstring = generateRequestID(resultID)
+      const aisensyPayload = {
+
+      "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
+      "campaignName": "reference_id_message",
+      "destination": `${whatsapp_number}`,
+      "userName": "Varroc Aftermarket",
+      "templateParams": [
+        `${requestIDstring}`
+      ],
+      "source": "new-landing-page form",
+      "media": {},
+      "buttons": [],
+      "carouselCards": [],
+      "location": {},
+      "attributes": {},
+      "paramsFallbackValue": {
+        "FirstName": "user"
+      }
+    }
+    console.log(aisensyPayload);
+
+    const aisensyApiRes = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(aisensyPayload),
+    });
+  return NextResponse.json({ status: 1, message: 'Add only logs' }, { status: 200 });
+  
     
   // let connection;
   // try {
