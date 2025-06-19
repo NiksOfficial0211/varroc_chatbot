@@ -472,7 +472,7 @@ export async function POST(request: NextRequest) {
 
     const aisensyApiJson = await aisensyApiRes.json();
     console.log("Aisensy response:", result);
-    // await connection.commit();
+    await connection.commit();
     if (aisensyApiJson.success == 'true') {
       return NextResponse.json({ status: 1, message: "Request received reference id sent to customer" });
     }
