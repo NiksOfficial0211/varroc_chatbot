@@ -80,7 +80,7 @@ const Dashboard = () => {
   return (
     <div>
       
-      <LoadingDialog isLoading={isLoading} />
+      <LoadingDialog isLoading={false} />
       {showAlert && <ShowAlertMessage title={alertTitle} startContent={alertStartContent} onOkClicked={function (): void {
         setShowAlert(false)
 

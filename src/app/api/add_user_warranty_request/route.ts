@@ -245,7 +245,7 @@ export async function POST(request: NextRequest) {
   try {
 
     connection = await pool.getConnection();
-    await connection.beginTransaction();
+    // await connection.beginTransaction();
 
     const [resultID] = await connection.execute<any[]>(`SELECT request_id FROM user_warranty_requests
                 WHERE DATE(created_at) = CURDATE()
@@ -414,7 +414,7 @@ export async function POST(request: NextRequest) {
 
     }
       if(mediaUploadFialed){
-          await connection.rollback();
+          // await connection.rollback();
           connection.release();
           const failedAisensyPayload = {
             "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
@@ -472,7 +472,7 @@ export async function POST(request: NextRequest) {
 
     const aisensyApiJson = await aisensyApiRes.json();
     console.log("Aisensy response:", result);
-    await connection.commit();
+    // await connection.commit();
     if (aisensyApiJson.success == 'true') {
       return NextResponse.json({ status: 1, message: "Request received reference id sent to customer" });
     }
@@ -488,7 +488,7 @@ export async function POST(request: NextRequest) {
   }
   catch (err) {
     if (connection) {
-      await connection.rollback();
+      // await connection.rollback();
       connection.release();
     }
     console.error('DB Error:', err);

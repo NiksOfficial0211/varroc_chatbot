@@ -18,8 +18,8 @@ const ShowAlertMessage = ({ title, startContent, successFailure,  onOkClicked, o
                 {title}
               </div>
               <div className='alert_content'>{startContent}</div>
-              <div className='alert_btn'><input type="button" value="Ok" className="black_btn" onClick={()=>onOkClicked(successFailure)} /></div>
-              {showCloseButton && <div className='alert_btn'><input type="button" value="Close" className="black_btn" onClick={onCloseClicked} /></div>}
+              <div className='alert_btn'><input type="button" value="Ok" className="blue_btn" onClick={()=>onOkClicked(successFailure)} /></div>
+              {/* {showCloseButton && <div className='alert_btn'><input type="button" value="Close" className="black_btn" onClick={onCloseClicked} /></div>} */}
             </div>
           </div>
         </div>

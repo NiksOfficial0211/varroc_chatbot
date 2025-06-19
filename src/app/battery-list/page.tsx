@@ -130,23 +130,37 @@ const BatteryListing = () => {
     fetchData(dataFilters.page);
   }
 
-  function formatDateYYYYMMDD(inputDate: string) {
+  function formatDateYYYYMMDD(inputDate: string,timeZone = 'Asia/Kolkata') {
     const date = new Date(inputDate);
 
-// Convert to local time components
-const year = date.getFullYear();
-const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-const day = String(date.getDate()).padStart(2, '0');
+// // Convert to local time components
+// const year = date.getFullYear();
+// const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+// const day = String(date.getDate()).padStart(2, '0');
 
-let hours = date.getHours();
-const minutes = String(date.getMinutes()).padStart(2, '0');
-const ampm = hours >= 12 ? 'PM' : 'AM';
-hours = hours % 12;
-hours = hours ? hours : 12; // the hour '0' should be '12'
+// let hours = date.getHours();
+// const minutes = String(date.getMinutes()).padStart(2, '0');
+// const ampm = hours >= 12 ? 'PM' : 'AM';
+// hours = hours % 12;
+// hours = hours ? hours : 12; // the hour '0' should be '12'
 
-const formattedTime = `${year}-${month}-${day} ${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+// const formattedTime = `${year}-${month}-${day} ${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
 
-    return formattedTime;
+//     return formattedTime;
+const formatter = new Intl.DateTimeFormat('en-IN', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
+
+  const parts = formatter.formatToParts(date);
+  const get = (type: string) => parts.find(p => p.type === type)?.value;
+  return `${get('year')}-${get('month')}-${get('day')} ${get('hour')}:${get('minute')} ${get('dayPeriod')}`;
+
   }
 
 

@@ -271,6 +271,8 @@ const WarrantyRequestDetails = () => {
         setShowAlert(false)
         if (navigateBack) {
           router.back()
+        }else{
+          fetchData()
         }
 
       }} onCloseClicked={function (): void {
@@ -354,11 +356,16 @@ const WarrantyRequestDetails = () => {
 
                             <div className="request_list">
                               Pin code:
-                              <input type="text" id="proposed_mrp" name="proposed_mrp" value={pinCode} onChange={(e) => setPinCode(e.target.value)} />
-                              {cityError && <span className="error" style={{ color: "red" }}>{cityError}</span>}
+                              <div className="row mt-2">
+                                <div className="col-lg-4 form_box">
+                                  <input type="text" id="proposed_mrp" name="proposed_mrp" value={pinCode} onChange={(e) => setPinCode(e.target.value)} style={{padding:"8px"}}/>
+                                  {cityError && <span className="error" style={{ color: "red" }}>{cityError}</span>}
 
-
-                              <a className="blue_btn " style={{ cursor: "pointer", }} onClick={UpdateCity}>Add City</a>
+                                </div>
+                                <div className="col-lg-4 mt-2">
+                                  <a className="blue_btn " style={{ cursor: "pointer", }} onClick={UpdateCity}>Add City</a>
+                                </div>
+                              </div>
 
                             </div>
                           </div>
@@ -560,7 +567,7 @@ const WarrantyRequestDetails = () => {
                                 </div>
                               </div>
                               <div className="col-lg-11">
-                                <button type="submit" className="blue_btn">Submit</button>
+                                <button className="blue_btn" onClick={(e) => handleSubmit(e)}>Submit</button>
                                 <button className="blue_btn m-2" onClick={() => {
                                   router.back();
                                 }}>Back</button>
@@ -579,7 +586,7 @@ const WarrantyRequestDetails = () => {
                       {warrantyRequestData?.images && warrantyRequestData?.images.length > 0 &&
                         warrantyRequestData?.images.map((imageURL, index) =>
                           <div className="invoice_attach_box">
-                            <FileViewer fileUrl={imageURL.image_url && imageURL.image_url.includes('uploads')?getImageApiURL + "/" + imageURL.image_url:imageURL.image_url} isDialogView={false} set_height={150} key={index} /><br></br>
+                            <FileViewer fileUrl={getImageApiURL + "/" + imageURL.image_url} isDialogView={false} set_height={150} key={index} /><br></br>
                             <button className="blue_btn" onClick={() => { setShowImagePop(true); setImagePopURL(imageURL.image_url) }}>View</button>
 
                           </div>
