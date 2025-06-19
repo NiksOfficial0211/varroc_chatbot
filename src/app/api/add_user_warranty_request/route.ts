@@ -415,7 +415,7 @@ export async function POST(request: NextRequest) {
     }
       if(mediaUploadFialed){
           await connection.rollback();
-          connection.release();
+          
           const failedAisensyPayload = {
             "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
             "campaignName": "form_failed_warranty_reg",
@@ -436,9 +436,19 @@ export async function POST(request: NextRequest) {
             body: JSON.stringify(failedAisensyPayload),
           });
           if (aisensyApiRes && aisensyApiRes.ok) {
+                      await connection.query(
+                `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
+                ["Add Warranty Request Media Upload failed message ",null,1, failedAisensyPayload, new Date()]
+              );
+              connection.release();
               return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
           }else{
-
+            await connection.query(
+                  `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
+                  ["Add Warranty Request Media Upload failed send message failed",null,1, failedAisensyPayload, new Date()]
+                );
+                connection.release();
+              return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
           }
           
       }else{
@@ -474,13 +484,19 @@ export async function POST(request: NextRequest) {
     console.log("Aisensy response:", result);
     await connection.commit();
     if (aisensyApiJson.success == 'true') {
+       await connection.query(
+      `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
+      ["Add Warranty Request Send Reference ID ",null,1, aisensyPayload, new Date()]
+    );
+    connection.release();
       return NextResponse.json({ status: 1, message: "Request received reference id sent to customer" });
     }
     else {
       await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Add Warranty Request Send Message Failed",null,1, aisensyPayload, new Date()]
+      ["Add Warranty Request Send Reference ID Failed",null,1, aisensyPayload, new Date()]
     );
+    connection.release();
       return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" });
 
     }
@@ -513,7 +529,20 @@ export async function POST(request: NextRequest) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(failedAisensyPayload),
         });
-
+    if(connection){    
+    if(aisensyApiRes){
+      await connection.query(
+      `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
+      ["Add Warranty Request DB add exception But Exception message sent",null,1, failedAisensyPayload, new Date()]
+    );
+    }else{
+      await connection.query(
+      `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
+      ["Add Warranty Request DB add exception But Exception message sent",null,1, failedAisensyPayload, new Date()]
+    );
+    }
+  }    
+  
     return NextResponse.json({ status: 0, error: 'Database error' }, { status: 500 });
   }finally{
     if (connection) connection.release();
