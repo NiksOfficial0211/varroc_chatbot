@@ -15,9 +15,10 @@ export async function  POST(request:Request){
   }
     const body = await request.json();
     const { user_id } = body;
+    let connection ;
     try{
-        const connection = await pool.getConnection();
         
+        connection = await pool.getConnection();
         const [totalWarrantyRequestRows] = await connection.execute<CountResult[]>(
             'SELECT COUNT(*) AS total FROM user_warranty_requests'
           );
@@ -55,4 +56,7 @@ export async function  POST(request:Request){
         
         return NextResponse.json({status:0,message:"Exception Occured"})
     }
+    finally{
+    if (connection) connection.release();
+  }
 }

@@ -260,7 +260,17 @@ const WarrantyRequestDetails = () => {
   }
 
   function formatDate(date: Date): string {
-    return date.toISOString().slice(0, 19).replace("T", " ");
+    // return date.toISOString().slice(0, 19).replace("T", " ");
+    const localDate = new Date(date); // assumes input is a Date object (still in UTC under the hood)
+
+  const year = localDate.getFullYear();
+  const month = String(localDate.getMonth() + 1).padStart(2, '0');
+  const day = String(localDate.getDate()).padStart(2, '0');
+  const hours = String(localDate.getHours()).padStart(2, '0');
+  const minutes = String(localDate.getMinutes()).padStart(2, '0');
+  const seconds = String(localDate.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
   return (
@@ -586,7 +596,7 @@ const WarrantyRequestDetails = () => {
                       {warrantyRequestData?.images && warrantyRequestData?.images.length > 0 &&
                         warrantyRequestData?.images.map((imageURL, index) =>
                           <div className="invoice_attach_box">
-                            <FileViewer fileUrl={getImageApiURL + "/" + imageURL.image_url} isDialogView={false} set_height={150} key={index} /><br></br>
+                            <FileViewer fileUrl={imageURL.image_url.includes("uploads")? getImageApiURL + "/" + imageURL.image_url:imageURL.image_url} isDialogView={false} set_height={150} key={index} /><br></br>
                             <button className="blue_btn" onClick={() => { setShowImagePop(true); setImagePopURL(imageURL.image_url) }}>View</button>
 
                           </div>

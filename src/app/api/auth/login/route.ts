@@ -8,8 +8,10 @@ export async function POST(request: Request) {
   if (!token || token !== process.env.NEXT_PUBLIC_API_SECRET_TOKEN) {
     return NextResponse.json({ error: 'Unauthorized',message:"You are unauthorized" }, { status: 403 });
   }
+  let connection ;
   try {
     // Parse raw JSON body
+    connection = await pool.getConnection();
     const body = await request.json();
     const { email, password } = body;
 
@@ -20,7 +22,7 @@ export async function POST(request: Request) {
 
     // Query database for user with matching email
     // const [rows]: any = await pool.query('SELECT * FROM auth WHERE username = ?', [email]);
-    const connection = await pool.getConnection();
+    
     const [rows]: any = await connection.execute(
       // 'SELECT * FROM auth WHERE username = ? AND password = MD5(?)',
       'SELECT * FROM auth WHERE username = ? AND password = ?',
@@ -50,5 +52,7 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error('DB Error:', err);
     return NextResponse.json({ message: 'Internal Server Error',error:err,status:0}, { status: 500 });
+  }finally{
+    if (connection) connection.release();
   }
 }

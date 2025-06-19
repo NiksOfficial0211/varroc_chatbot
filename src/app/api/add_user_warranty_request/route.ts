@@ -245,7 +245,7 @@ export async function POST(request: NextRequest) {
   try {
 
     connection = await pool.getConnection();
-    // await connection.beginTransaction();
+    await connection.beginTransaction();
 
     const [resultID] = await connection.execute<any[]>(`SELECT request_id FROM user_warranty_requests
                 WHERE DATE(created_at) = CURDATE()
@@ -414,7 +414,7 @@ export async function POST(request: NextRequest) {
 
     }
       if(mediaUploadFialed){
-          // await connection.rollback();
+          await connection.rollback();
           connection.release();
           const failedAisensyPayload = {
             "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
@@ -488,8 +488,8 @@ export async function POST(request: NextRequest) {
   }
   catch (err) {
     if (connection) {
-      // await connection.rollback();
-      connection.release();
+      await connection.rollback();
+      
     }
     console.error('DB Error:', err);
     const cleanedWhatsAppNumber =
@@ -515,6 +515,8 @@ export async function POST(request: NextRequest) {
         });
 
     return NextResponse.json({ status: 0, error: 'Database error' }, { status: 500 });
+  }finally{
+    if (connection) connection.release();
   }
 
 }
