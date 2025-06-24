@@ -486,7 +486,7 @@ export async function POST(request: NextRequest) {
     if (aisensyApiJson.success == 'true') {
        await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Add Warranty Request Send Reference ID ",null,1, aisensyPayload, new Date()]
+      ["Add Warranty Request Send Reference ID ",null,1, JSON.stringify(aisensyPayload), new Date()]
     );
     connection.release();
       return NextResponse.json({ status: 1, message: "Request received reference id sent to customer" });
@@ -494,7 +494,7 @@ export async function POST(request: NextRequest) {
     else {
       await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Add Warranty Request Send Reference ID Failed",null,1, aisensyPayload, new Date()]
+      ["Add Warranty Request Send Reference ID Failed",null,1, JSON.stringify(aisensyPayload), new Date()]
     );
     connection.release();
       return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" });
@@ -505,7 +505,6 @@ export async function POST(request: NextRequest) {
   catch (err) {
     if (connection) {
       await connection.rollback();
-      
     }
     console.error('DB Error:', err);
     const cleanedWhatsAppNumber =
@@ -533,17 +532,19 @@ export async function POST(request: NextRequest) {
     if(aisensyApiRes){
       await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Add Warranty Request DB add exception But Exception message sent",null,1, failedAisensyPayload, new Date()]
+      ["Add Warranty Request DB add exception But Exception message sent",null,1, JSON.stringify(failedAisensyPayload), new Date()]
     );
+    return NextResponse.json({ status: 0, error: err }, { status: 500 });
     }else{
       await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Add Warranty Request DB add exception But Exception message sent",null,1, failedAisensyPayload, new Date()]
+      ["Add Warranty Request DB add exception But Exception message sent",null,1, JSON.stringify(failedAisensyPayload), new Date()]
     );
+    return NextResponse.json({ status: 0, error: err }, { status: 500 });
     }
   }    
   
-    return NextResponse.json({ status: 0, error: 'Database error' }, { status: 500 });
+    
   }finally{
     if (connection) connection.release();
   }
