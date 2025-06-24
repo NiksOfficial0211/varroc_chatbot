@@ -486,7 +486,7 @@ export async function POST(request: NextRequest) {
     if (aisensyApiJson.success == 'true') {
        await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Add Warranty Request Send Reference ID ",null,1, aisensyPayload, new Date()]
+      ["Add Warranty Request Send Reference ID ",null,1, JSON.stringify(aisensyPayload), new Date()]
     );
     connection.release();
       return NextResponse.json({ status: 1, message: "Request received reference id sent to customer" });
@@ -494,7 +494,7 @@ export async function POST(request: NextRequest) {
     else {
       await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Add Warranty Request Send Reference ID Failed",null,1, aisensyPayload, new Date()]
+      ["Add Warranty Request Send Reference ID Failed",null,1, JSON.stringify(aisensyPayload), new Date()]
     );
     connection.release();
       return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" });
