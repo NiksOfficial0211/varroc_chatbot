@@ -60,9 +60,9 @@ export async function POST(request: NextRequest) {
         ? complaint_type.trim()
         : null;
     const cleanedComplaintDesc =
-      complaint_description?.trim() !== ''
+     complaint_description && complaint_description.length>0 ? complaint_description?.trim() !== ''
         ? complaint_description.trim()
-        : null;
+        : null:null;
 
     const cleanedPhone =
       user_phone !== undefined && user_phone !== null ? parseInt(user_phone) : null;
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       [
         requestIDstring,
         cleanedSerialNo,
-        same_mobile,
+        parseInt(same_mobile),
         cleanedPhone,
         cleanedComplaintType,
         cleanedComplaintDesc,
@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
           // );
 
           const [updateDocURL] = await connection.execute(
-            `UPDATE user_complaint_requests SETdocument_id=?, document_url=? WHERE pk_id=?`,[documents[i].id,publicUrlData.publicUrl,result.insertId]
+            `UPDATE user_complaint_requests SET document_id = ?, document_url = ? WHERE pk_id=?`,[documents[i].id,publicUrlData.publicUrl,result.insertId]
           );
         } else {
           mediaUploadFialed=true;
