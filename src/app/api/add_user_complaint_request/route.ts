@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
           // );
 
           const [updateDocURL] = await connection.execute(
-            `UPDATE user_complaint_requests SET document_url=? WHERE pk_id=?`,[publicUrlData.publicUrl,result.insertId]
+            `UPDATE user_complaint_requests SETdocument_id=?, document_url=? WHERE pk_id=?`,[documents[i].id,publicUrlData.publicUrl,result.insertId]
           );
         } else {
           mediaUploadFialed=true;
