@@ -147,7 +147,10 @@ export function generateComplaintID(resultID: any[]) {
   // }else{
   //   return initialRequestID+formatDateYYMMDD(new Date())+"-00001"
   // }
-  return resultID[0].complaint__id+1;
+  console.log("this is from generateComplaintID;-----------",resultID);
+  
+  const increment_id=resultID && resultID.length>0 && resultID[0].complaint__id?resultID[0].complaint__id+1:100
+  return increment_id;
 }
 
 
