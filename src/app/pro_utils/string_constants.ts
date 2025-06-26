@@ -34,3 +34,8 @@ export const status_Pending=1;
 export const status_Verified=2;
 export const status_Rejected=4;
 export const status_Duplicate=5;
+
+export const complaint_status_new=6;
+export const complaint_status_Investigating=7;
+export const complaint_status_resolved=8;
+export const complaint_status_closed=9;

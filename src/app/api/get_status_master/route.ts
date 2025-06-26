@@ -8,11 +8,13 @@ interface CountResult extends RowDataPacket {
 
 export async function  POST(request:Request){
     
+    const body = await request.json();
+    const {request_type} = body;
     
     try{
         const connection = await pool.getConnection();
         const [rows] = await connection.query(
-          `SELECT status_id,status FROM request_status`
+          `SELECT status_id,status FROM request_status WHERE request_type= ?`,[request_type]
         );
       
 

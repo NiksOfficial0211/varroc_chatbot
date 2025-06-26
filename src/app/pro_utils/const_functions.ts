@@ -141,6 +141,14 @@ export function generateRequestID(resultID: any[]) {
     return initialRequestID+formatDateYYMMDD(new Date())+"-00001"
   }
 }
+export function generateComplaintID(resultID: any[]) {
+  // if(resultID.length>0){  
+  //   return incrementRequestID(resultID[0].request_id);
+  // }else{
+  //   return initialRequestID+formatDateYYMMDD(new Date())+"-00001"
+  // }
+  return resultID[0].complaint__id+1;
+}
 
 
 export function formatDateYYMMDD(inputDate: Date): string {

@@ -441,14 +441,14 @@ export async function POST(request: NextRequest) {
                 ["Add Warranty Request Media Upload failed message ",null,1, failedAisensyPayload, new Date()]
               );
               connection.release();
-              return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
+              return NextResponse.json({ status: 0, message: "Failed to get and upload images"}, { status: 200 });
           }else{
             await connection.query(
                   `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
                   ["Add Warranty Request Media Upload failed send message failed",null,1, failedAisensyPayload, new Date()]
                 );
                 connection.release();
-              return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
+              return NextResponse.json({ status: 0, message: "Failed to get and upload images"}, { status: 200 });
           }
           
       }else{
@@ -489,7 +489,7 @@ export async function POST(request: NextRequest) {
       ["Add Warranty Request Send Reference ID ",null,1, JSON.stringify(aisensyPayload), new Date()]
     );
     connection.release();
-      return NextResponse.json({ status: 1, message: "Request received reference id sent to customer" });
+      return NextResponse.json({ status: 1, message: "Request received reference id sent to customer" }, { status: 200 });
     }
     else {
       await connection.query(
@@ -497,7 +497,7 @@ export async function POST(request: NextRequest) {
       ["Add Warranty Request Send Reference ID Failed",null,1, JSON.stringify(aisensyPayload), new Date()]
     );
     connection.release();
-      return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" });
+      return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" }, { status: 200 });
 
     }
   }

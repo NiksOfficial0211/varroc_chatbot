@@ -9,12 +9,13 @@ import { WarrantyRequestDetailResponseModel } from '@/app/datamodels/WarrantyReq
 import PageErrorCenterContent from '@/app/components/pageError';
 import useSessionRedirect from '@/app/pro_utils/manage_session';
 import LeftPanelMenus from '@/app/components/leftPanel';
-import { getImageApiURL, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
+import { complaint_status_closed, getImageApiURL, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
 import moment from 'moment';
 import { RejectMSGMasterDataModel, StatusMasterDataModel } from '@/app/datamodels/CommonDataModels';
 import { useRouter } from 'next/navigation';
 import { FileViewer } from '@/app/components/DocViewer';
 import DialogImagePop from '@/app/components/dialog_DocViewer';
+import { ComplaintDetailDataModel, ComplaintListDataModel } from '@/app/datamodels/ComplaintsDataModel';
 
 
 interface formValues {
@@ -41,7 +42,7 @@ const WarrantyRequestDetails = () => {
   const [cityError, setCityError] = useState('');
   // const [pageNumber, setPageNumber] = useState(1);
   // const [pageSize, setPageSize] = useState(10);
-  const [warrantyRequestData, setWarrantyRequestData] = useState<WarrantyRequestDetailResponseModel>();
+  const [complaintData, setComplaintData] = useState<ComplaintDetailDataModel>();
   const [statusMasterData, setStatusMasterData] = useState<StatusMasterDataModel[]>([]);
   const [rejectionMasterData, setRejectionMasterData] = useState<RejectMSGMasterDataModel[]>([]);
   const [formVal, setFormVal] = useState<formValues>({
@@ -60,7 +61,7 @@ const WarrantyRequestDetails = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/get_warranty_request_details", {
+      const res = await fetch("/api/get_complaint_detail", {
         method: "POST",
         headers: {
           "Content-Type": "application/json", // 🔥 Important for raw JSON
@@ -68,7 +69,7 @@ const WarrantyRequestDetails = () => {
         },
         body: JSON.stringify({
 
-          request_id: selectedViewID,
+          pk_id: selectedViewID,
 
         }),
       });
@@ -77,11 +78,10 @@ const WarrantyRequestDetails = () => {
 
       if (response.status == 1) {
 
-        setWarrantyRequestData(response.data)
-        console.log('current status----------------->', response.data.request[0].status_id);
+        setComplaintData(response.data)
 
         setFormVal({
-          status_id: response.data.request[0].status_id,
+          status_id: response.data.complaint_data[0].status_id,
           comments: '',
           rejection_id: 0
         });
@@ -99,7 +99,7 @@ const WarrantyRequestDetails = () => {
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
          body:JSON.stringify({
-            "request_type":1
+            "request_type":2
         })
 
       });
@@ -108,20 +108,6 @@ const WarrantyRequestDetails = () => {
       if (statuses.status == 1) {
         setStatusMasterData(statuses.data)
       }
-      const rejectionRes = await fetch("/api/get_rejection_msgs", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
-        },
-
-      });
-      const rejectres = await rejectionRes.json();
-
-      if (rejectres.status == 1) {
-        setRejectionMasterData(rejectres.data)
-      }
-
       setLoading(false);
     } catch (e) {
       console.log(e);
@@ -151,45 +137,7 @@ const WarrantyRequestDetails = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
-  const UpdateCity = async (e: React.FormEvent) => {
-    if (!pinCode) { setCityError("required"); return; };
-
-    try {
-      const response = await fetch("/api/set_city_manually", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
-        },
-        body: JSON.stringify({ pk_id: selectedViewID, changedPinCode: pinCode })
-      });
-      const resJson = await response.json();
-      if (resJson && resJson.status == 1) {
-        setLoading(false);
-        setShowAlert(true);
-        setAlertTitle("Success")
-        setAlertStartContent(resJson.message);
-        setAlertForSuccess(1);
-        setNavigateBack(false)
-      } else {
-        setLoading(false);
-        setShowAlert(true);
-        setAlertTitle("Error")
-        setAlertStartContent(resJson.message);
-        setAlertForSuccess(2)
-        setNavigateBack(false)
-      }
-
-    } catch (e: any) {
-      setLoading(false);
-      setShowAlert(true);
-      setAlertTitle("Exception")
-      setAlertStartContent(e.message);
-      setAlertForSuccess(2)
-      setNavigateBack(false)
-    }
-
-  }
+  
   const handleSubmit = async (e: React.FormEvent) => {
 
     e.preventDefault()
@@ -204,28 +152,9 @@ const WarrantyRequestDetails = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
-        body: formVal.status_id == status_Rejected ? JSON.stringify({
-          auth_id: auth_id,
-          pk_id: warrantyRequestData?.request[0].pk_request_id,
-          comments: formVal.comments,
-          status: formVal.status_id,
-          request_id: warrantyRequestData?.request[0].request_id,
-          request_type: warrantyRequestData?.request[0].request_type_id,
-          rejection_id: formVal.rejection_id,
-          rejection_other: formVal.comments,
-          isRejected: true,
-          customer_phone: warrantyRequestData?.request[0].user_phone
-        }) : JSON.stringify({
-          auth_id: auth_id,
-          pk_id: warrantyRequestData?.request[0].pk_request_id,
-          comments: formVal.comments,
-          status: formVal.status_id,
-          request_id: warrantyRequestData?.request[0].request_id,
-          request_type: warrantyRequestData?.request[0].request_type_id,
-          isRejected: false,
-          isDuplicate: formVal.status_id == status_Duplicate ? true : false,
-          customer_phone: warrantyRequestData?.request[0].user_phone
-        }),
+        body: JSON.stringify({
+          
+        }) 
       });
       const resJson = await response.json();
       if (resJson && resJson.status == 1) {
@@ -298,23 +227,21 @@ const WarrantyRequestDetails = () => {
             <div className="col-lg-12">
               <div className="row" id="top">
                 <div className="col-lg-12 mb-5">
-                  <div className="heading25" style={{ paddingLeft: "20px" }}>Requests Details</div>
+                  <div className="heading25" style={{ paddingLeft: "20px" }}>Complaint Details</div>
                 </div>
 
               </div>
 
 
-              {warrantyRequestData && warrantyRequestData.addressedData && warrantyRequestData.request ?
+              {complaintData && complaintData.addressedData && complaintData ?
                 <div className="grey_box request_details_mainbox">
                   <div className='row'>
                     <div className="col-lg-8">
                       <div className="row">
                         <div className="col-lg-12 mb-4">
-                          <div className="request_list_heading">
-                            Customer Name: <span style={{ color: "#D93731" }}>{warrantyRequestData.request[0].user_name}</span>
-                          </div>
+                          
                           <div className="request_list_heading" style={{ margin: "-42px 0px 0px 20px", backgroundColor: "#e6f6ff" }}>
-                            Request ID: <span>{warrantyRequestData.request[0].request_id}</span>
+                            Complaint ID: <span>{complaintData.complaint_data[0].complaint__id}</span>
                           </div>
                         </div>
                       </div>
@@ -325,30 +252,18 @@ const WarrantyRequestDetails = () => {
                             <span>{warrantyRequestData.request[0].request_id}</span>
                           </div>
                         </div> */}
-                        <div className="col-lg-4 mb-3">
-                          <div className="request_list">
-                            Purcahase Date:
-                            <span>{formatDateDDMMYYYY(warrantyRequestData.request[0].product_purchase_date)}</span>
-                          </div>
-                        </div>
+                        
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Request Date:
-                            <span>{formatDateDDMMYYYY(warrantyRequestData.request[0].created_at)}</span>
+                            <span>{formatDateDDMMYYYY(complaintData.complaint_data[0].created_at)}</span>
 
                           </div>
                         </div>
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Customer Phone:
-                            <span>{warrantyRequestData.request[0].user_phone}</span>
-
-                          </div>
-                        </div>
-                        <div className="col-lg-4 mb-3">
-                          <div className="request_list">
-                            Request Type:
-                            <span>{warrantyRequestData.request[0].request_type}</span>
+                            <span>{complaintData.complaint_data[0].user_phone}</span>
 
                           </div>
                         </div>
@@ -356,33 +271,22 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
                             Serial Number:
-                            <span>{warrantyRequestData.request[0].product_serial_no}</span>
+                            <span>{complaintData.complaint_data[0].battery_serial_no}</span>
                           </div>
                         </div>
-                        {warrantyRequestData.request[0].retailer_city_name && warrantyRequestData.request[0].retailer_city_name.length > 0 ? <div className="col-lg-4 mb-3">
+                        <div className="col-lg-4 mb-3">
                           <div className="request_list ">
-                            City:
-                            <span>{warrantyRequestData.request[0].retailer_city_name}</span>
+                            Complaint Type:
+                            <span>{complaintData.complaint_data[0].complaint_type}</span>
                           </div>
-                        </div> :
-                          <div className="col-lg-12 mb-3">
-
-                            <div className="request_list">
-                              Pin code:
-                              <div className="row mt-2">
-                                <div className="col-lg-4 form_box">
-                                  <input type="text" id="proposed_mrp" name="proposed_mrp" value={pinCode} onChange={(e) => setPinCode(e.target.value)} style={{padding:"8px"}}/>
-                                  {cityError && <span className="error" style={{ color: "red" }}>{cityError}</span>}
-
-                                </div>
-                                <div className="col-lg-4 mt-2">
-                                  <a className="blue_btn " style={{ cursor: "pointer", }} onClick={UpdateCity}>Add City</a>
-                                </div>
-                              </div>
-
-                            </div>
+                        </div>
+                        <div className="col-lg-4 mb-3">
+                          <div className="request_list ">
+                            Description:
+                            <span>{complaintData.complaint_data[0].complaint_description}</span>
                           </div>
-                        }
+                        </div>
+                        
                         <div className="col-lg-12">
                           <div className="row">
                             <div className="col-lg-12">
@@ -395,64 +299,58 @@ const WarrantyRequestDetails = () => {
                             <div className="col-lg-4 mb-3">
                               <div className="request_list">
                                 Request Status:
-                                <span>{warrantyRequestData.request[0].request_status}</span>
+                                <span>{complaintData.complaint_data[0].request_status}</span>
 
                               </div>
                             </div>
                             <div className="col-lg-4 mb-3">
                               <div className="request_list ">
                                 Battery Model
-                                <span>{warrantyRequestData.battery_details
-                                  && warrantyRequestData.battery_details.length > 0 ?
-                                  warrantyRequestData.battery_details[0].battery_model : "--"}</span>
+                                <span>{complaintData.battery_details
+                                  && complaintData.battery_details.length > 0 ?
+                                  complaintData.battery_details[0].battery_model : "--"}</span>
                               </div>
                             </div>
                             <div className="col-lg-4 mb-3">
                               <div className="request_list ">
                                 Varroc Part Code
-                                <span>{warrantyRequestData.battery_details
-                                  && warrantyRequestData.battery_details.length > 0 ? warrantyRequestData.battery_details[0].varroc_part_code : "--"}</span>
+                                <span>{complaintData.battery_details
+                                  && complaintData.battery_details.length > 0 ? complaintData.battery_details[0].varroc_part_code : "--"}</span>
                               </div>
                             </div>
                             <div className="col-lg-4 mb-3">
                               <div className="request_list ">
                                 Master Serial Number
-                                <span>{warrantyRequestData.battery_details
-                                  && warrantyRequestData.battery_details.length > 0 ? warrantyRequestData.battery_details[0].battery_serial_number : "--"}</span>
+                                <span>{complaintData.battery_details
+                                  && complaintData.battery_details.length > 0 ? complaintData.battery_details[0].battery_serial_number : "--"}</span>
                               </div>
                             </div>
                             <div className="col-lg-4 mb-3">
                               <div className="request_list ">
                                 Manufacturing Date
-                                <span>{warrantyRequestData.battery_details
-                                  && warrantyRequestData.battery_details.length > 0 ? warrantyRequestData.battery_details[0].manufacturing_date : "--"}</span>
+                                <span>{complaintData.battery_details
+                                  && complaintData.battery_details.length > 0 ? complaintData.battery_details[0].manufacturing_date : "--"}</span>
                               </div>
                             </div>
                             <div className="col-lg-4 mb-3">
                               <div className="request_list ">
                                 Proposed MRP
-                                <span>{warrantyRequestData.battery_details
-                                  && warrantyRequestData.battery_details.length > 0 ? warrantyRequestData.battery_details[0].proposed_mrp : "--"}</span>
+                                <span>{complaintData.battery_details
+                                  && complaintData.battery_details.length > 0 ? complaintData.battery_details[0].proposed_mrp : "--"}</span>
                               </div>
                             </div>
                             <div className="col-lg-12 mb-3">
                               <div className="request_list ">
                                 Description
-                                <span>{warrantyRequestData.battery_details
-                                  && warrantyRequestData.battery_details.length > 0 ? warrantyRequestData.battery_details[0].battery_description : "--"}</span>
+                                <span>{complaintData.battery_details
+                                  && complaintData.battery_details.length > 0 ? complaintData.battery_details[0].battery_description : "--"}</span>
                               </div>
                             </div>
                           </div>
                         </div>
 
-                        {warrantyRequestData.duplicate_data && warrantyRequestData.duplicate_data.length > 0 && <div className="col-lg-12">
-                          <div className="row">
-                            <div className="col-lg-12">
-                              <div className='masterrecord_heading'>Duplicate Record</div>
-                            </div>
-                          </div>
-                        </div>}
-                        {warrantyRequestData.duplicate_data && warrantyRequestData.duplicate_data.map((duplicates, index) => (
+                        
+                        {complaintData.duplicate_data && complaintData.duplicate_data.map((duplicates, index) => (
                           <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }}>
 
                             <div className="row">
@@ -480,58 +378,43 @@ const WarrantyRequestDetails = () => {
                             </div>
                           </div>))}
 
-                        {warrantyRequestData.battery_details.length == 0 && <div className="request_list_heading mb-4 ml-3" style={{ width: "auto", margin: "0" }}>
+                        {complaintData.battery_details.length == 0 && <div className="request_list_heading mb-4 ml-3" style={{ width: "auto", margin: "0" }}>
                           <span style={{ color: "#D93731" }}>Serial Number does not match</span>
                         </div>}
 
                       </div>
-                      {warrantyRequestData.request[0].status_id != status_Pending ?
+                      {complaintData.addressedData && complaintData.addressedData.length>0 && complaintData.complaint_data[0].status_id != status_Pending ?
                         <div>
                           <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>
                             <div className="row">
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Request Status:
-                                  <span>{warrantyRequestData.addressedData[0].request_status}</span>
+                                  <span>{complaintData.addressedData[0].request_status}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated By:
-                                  <span>{warrantyRequestData.addressedData[0].addressedBY}</span>
+                                  <span>{complaintData.addressedData[0].addressedBY}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated Date:
-                                  <span>{formatDate(new Date(warrantyRequestData.addressedData[0].updated_at))}</span>
+                                  <span>{formatDate(new Date(complaintData.addressedData[0].updated_at))}</span>
                                 </div>
                               </div>
-                              {warrantyRequestData.addressedData[0].fk_rejection_id ? <div className="col-lg-4 mb-3">
-                                <div className="request_list">
-                                  Rejection message:
-                                  <span>{warrantyRequestData.addressedData[0].other_rejection && warrantyRequestData.addressedData[0].other_rejection.length > 0 ? warrantyRequestData.addressedData[0].other_rejection : warrantyRequestData.addressedData[0].rejection_msg}</span>
-                                </div>
-                              </div> : <></>}
-                              {warrantyRequestData.addressedData[0].other_rejection && warrantyRequestData.addressedData[0].other_rejection.length > 0 && <div className="col-lg-4 mb-3">
-                                <div className="request_list">
-                                  Comments:
-                                  <span>{warrantyRequestData.addressedData[0].comments}</span>
-                                </div>
-                              </div>}
-                              {/* <div className="col-lg-4 mb-3">
-                            <div className="request_list">
-                              Rejected Reason:
-                              <span>{warrantyRequestData.addressedData[0]}</span>
-                            </div>
-                          </div> */}
+                              
+                              
+                              
                             </div>
                           </div>
                         </div> : <></>
 
                       }
 
-                      {warrantyRequestData.request[0].status_id == status_Pending || warrantyRequestData.request[0].status_id == status_Duplicate ?
+                      {complaintData.complaint_data[0].status_id != complaint_status_closed ?
                         <div>
                           <form onSubmit={handleSubmit}>
                             <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>
@@ -596,14 +479,14 @@ const WarrantyRequestDetails = () => {
                     </div>
                     <div className="col-lg-4 text-center">
 
-                      {warrantyRequestData?.images && warrantyRequestData?.images.length > 0 &&
-                        warrantyRequestData?.images.map((imageURL, index) =>
+                      {complaintData?.complaint_data && complaintData?.complaint_data[0].document_url.length > 0 &&
+                        
                           <div className="invoice_attach_box">
-                            <FileViewer fileUrl={imageURL.image_url.includes("uploads")? getImageApiURL + "/" + imageURL.image_url:imageURL.image_url} isDialogView={false} set_height={150} key={index} /><br></br>
-                            <button className="blue_btn" onClick={() => { setShowImagePop(true); setImagePopURL(imageURL.image_url) }}>View</button>
+                            <FileViewer fileUrl={complaintData?.complaint_data[0].document_url.includes("uploads")? getImageApiURL + "/" + complaintData?.complaint_data[0].document_url:complaintData?.complaint_data[0].document_url} isDialogView={false} set_height={150} /><br></br>
+                            <button className="blue_btn" onClick={() => { setShowImagePop(true); setImagePopURL(complaintData?.complaint_data[0].document_url) }}>View</button>
 
                           </div>
-                        )}
+                      }
                     </div>
                   </div>
                   {showImagePop && <DialogImagePop

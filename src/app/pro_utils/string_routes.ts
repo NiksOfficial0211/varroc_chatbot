@@ -7,4 +7,8 @@ export const pageURL_WarrantyRequestList=baseUrl+"/warranty-request";
 export const pageURL_WarrantyRequestDetails=baseUrl+"/warranty-request/request-details";
 export const pageURL_BatteryListingPage=baseUrl+"/battery-list";
 export const pageURL_ErrorLogsPage=baseUrl+"/error-logs";
+export const pageURL_ComplaintList=baseUrl+"/complaint-request";
+export const pageURL_ComplaintDetails=baseUrl+"/complaint-request/complaint-detail";
+export const pageURL_LeadRequstList=baseUrl+"/error-logs";
+export const pageURL_LeadDetails=baseUrl+"/error-logs";
 

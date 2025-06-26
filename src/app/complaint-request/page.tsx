@@ -8,14 +8,15 @@ import { data } from 'jquery';
 import { staticIconsBaseURL, status_Rejected } from '../pro_utils/string_constants'
 import { useGlobalContext } from '../contextProviders/globalContext';
 import { useRouter } from 'next/navigation';
-import { pageURL_WarrantyRequestDetails } from '../pro_utils/string_routes';
+import { pageURL_ComplaintDetails, pageURL_WarrantyRequestDetails } from '../pro_utils/string_routes';
 import useSessionRedirect from '../pro_utils/manage_session';
 import LeftPanelMenus from '../components/leftPanel';
 import moment from 'moment';
 import { RejectMSGMasterDataModel, StatusMasterDataModel } from '../datamodels/CommonDataModels';
+import { ComplaintListDataModel } from '../datamodels/ComplaintsDataModel';
 
 interface DataFilters {
-  date: any, request_id: any, phone_no: any, name: any, status: any, reject_id: any, page: any, limit: any
+  date: any, request_id: any, phone_no: any, name: any, status: any, page: any, limit: any
 }
 
 const WarrantyRequestListing = () => {
@@ -30,12 +31,11 @@ const WarrantyRequestListing = () => {
   const [alertStartContent, setAlertStartContent] = useState('');
   // const [pageNumber, setPageNumber] = useState(1);
   // const [pageSize, setPageSize] = useState(10);
-  const [warrantyRequestData, setWarrantyRequestData] = useState<WarrantyRequestDataModel[]>([]);
+  const [complaintsList, setComplaintsData] = useState<ComplaintListDataModel[]>([]);
   const [statusMasterData, setStatusMasterData] = useState<StatusMasterDataModel[]>([]);
-  const [rejectionMasterData, setRejectionMasterData] = useState<RejectMSGMasterDataModel[]>([]);
 
   const [dataFilters, setDataFilters] = useState<DataFilters>({
-    date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
+    date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
 
   });
   const [hasMoreData, setHasMoreData] = useState(true);
@@ -57,8 +57,8 @@ const WarrantyRequestListing = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
-         body:JSON.stringify({
-            "request_type":1
+        body:JSON.stringify({
+            "request_type":2
         })
 
       });
@@ -67,20 +67,8 @@ const WarrantyRequestListing = () => {
       if (statuses.status == 1) {
         setStatusMasterData(statuses.data)
       }
-      const rejectionRes = await fetch("/api/get_rejection_msgs", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
-        },
-
-      });
-      const rejectres = await rejectionRes.json();
-
-      if (rejectres.status == 1) {
-        setRejectionMasterData(rejectres.data)
-      }
-      const res = await fetch("/api/get_warranty_requests", {
+     
+      const res = await fetch("/api/get_complaints_request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json", // 🔥 Important for raw JSON
@@ -92,7 +80,6 @@ const WarrantyRequestListing = () => {
           phone_no: dataFilters.phone_no,
           name: dataFilters.name,
           status: dataFilters.status,
-          reject_id: dataFilters.reject_id,
           page: dataFilters.page == page ? dataFilters.page : page,
           limit: dataFilters.limit
         }),
@@ -103,7 +90,7 @@ const WarrantyRequestListing = () => {
       if (response.status == 1 && response.data.length > 0) {
         setLoading(false);
 
-        setWarrantyRequestData(response.data)
+        setComplaintsData(response.data)
         if (response.data.length < dataFilters.limit) {
           setHasMoreData(false);
 
@@ -112,15 +99,13 @@ const WarrantyRequestListing = () => {
         }
       } else if (response.status == 1 && response.data.length == 0) {
         setLoading(false);
-        setWarrantyRequestData([])
+        setComplaintsData([])
         setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page }))
 
         setHasMoreData(false);
       }
       else {
         setDataFilters((prev) => ({ ...prev, ['pageNumber']: response.pageNumber }))
-
-
         setHasMoreData(false)
         setLoading(false);
         setShowAlert(true);
@@ -162,7 +147,7 @@ const WarrantyRequestListing = () => {
     window.location.reload();
     setDataFilters({
 
-      date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
+      date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
     });
     fetchData(dataFilters.page);
   }
@@ -176,30 +161,29 @@ const WarrantyRequestListing = () => {
   const downloadExport = async () => {
 
     setLoading(true);
-    const response = await fetch("/api/export-data", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json", // 🔥 Important for raw JSON
-        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
-      },
-      body: JSON.stringify({
-        date: dataFilters.date,
-          request_id: dataFilters.request_id,
-          phone_no: dataFilters.phone_no,
-          name: dataFilters.name,
-          status: dataFilters.status,
-          reject_id: dataFilters.reject_id,
-      }),
-    });
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
+    // const response = await fetch("/api/export-data", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json", // 🔥 Important for raw JSON
+    //     "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
+    //   },
+    //   body: JSON.stringify({
+    //     date: dataFilters.date,
+    //       request_id: dataFilters.request_id,
+    //       phone_no: dataFilters.phone_no,
+    //       name: dataFilters.name,
+    //       status: dataFilters.status,
+    //   }),
+    // });
+    // const blob = await response.blob();
+    // const url = window.URL.createObjectURL(blob);
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "warranty_requests.csv";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    // const a = document.createElement("a");
+    // a.href = url;
+    // a.download = "warranty_requests.csv";
+    // document.body.appendChild(a);
+    // a.click();
+    // document.body.removeChild(a);
     setLoading(false);
   };
 
@@ -215,7 +199,7 @@ const WarrantyRequestListing = () => {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
 
-      <LeftPanelMenus selectedMenu={2} showLeftPanel={false} rightBoxUI={
+      <LeftPanelMenus selectedMenu={3} showLeftPanel={false} rightBoxUI={
         <div className="container warranty_mainbox">
           <div className="row mt-4">
             <div className="col-lg-12">
@@ -224,7 +208,7 @@ const WarrantyRequestListing = () => {
                 
                   <div className="col-lg-12 mb-3">
                     <div className="heading25">
-                      Requests
+                      Complaints / Claims
                       <button className="blue_btn" style={{ float: "right" }} onClick={downloadExport}>Export Data</button>
                     </div>
                 </div>
@@ -237,13 +221,6 @@ const WarrantyRequestListing = () => {
                         <div className="form_box ">
                           <label htmlFor="formFile" className="form-label">Reference ID: </label>
                           <input type="text" id="request_id" name="request_id" value={dataFilters.request_id} onChange={handleInputChange} />
-                        </div>
-                      </div>
-
-                      <div className="col-lg-2">
-                        <div className="form_box ">
-                          <label htmlFor="formFile" className="form-label">Customer Name: </label>
-                          <input type="text" id="name" name="name" value={dataFilters.name} onChange={handleInputChange} />
                         </div>
                       </div>
 
@@ -265,18 +242,7 @@ const WarrantyRequestListing = () => {
                           {/* <input type="text" id="status" name="status" value={dataFilters.status} onChange={handleInputChange} /> */}
                         </div>
                       </div>
-                      {dataFilters.status && dataFilters.status==status_Rejected && <div className="col-lg-2">
-                        <div className="form_box ">
-                          <label htmlFor="formFile" className="form-label"> Rejection Reason: </label>
-                          <select id="reject_id" name="reject_id" onChange={handleInputChange}>
-                            <option value="">Select</option>
-                            {rejectionMasterData.map((rejectMSG) => (
-                              <option value={rejectMSG.pk_reject_id} key={rejectMSG.pk_reject_id}>{rejectMSG.rejection_msg}</option>
-                            ))}
-                          </select>
-                          {/* <input type="text" id="status" name="status" value={dataFilters.status} onChange={handleInputChange} /> */}
-                        </div>
-                      </div>}
+                      
                       <div className="col-lg-2">
                         <div className="form_box ">
                           <label htmlFor="formFile" className="form-label">Date: </label>
@@ -299,38 +265,38 @@ const WarrantyRequestListing = () => {
                 <div className="col-lg-12">
                   <div className="grey_box" style={{ backgroundColor: "#fff", position:"relative", padding:"20px 60px 20px 30px" }}>
                     <div className="row list_label mb-4">
-                      <div className="col-lg-3 text-center"><div className="label">Reference <br></br>ID</div></div>
-                      <div className="col-lg-2 text-center"><div className="label">Reference <br></br>Date</div></div>
-                      <div className="col-lg-1 text-center"><div className="label">Customer <br></br>Name</div></div>
+                      <div className="col-lg-3 text-center"><div className="label">Complaint <br></br>ID</div></div>
+                      <div className="col-lg-2 text-center"><div className="label">Complaint <br></br>Date</div></div>
                       <div className="col-lg-2 text-center"><div className="label">Customer <br></br>Phone</div></div>
-                      <div className="col-lg-2 text-center"><div className="label">Comments</div></div>
+                      <div className="col-lg-2 text-center"><div className="label">Complaint <br></br>Type</div></div>
+                      {/* <div className="col-lg-2 text-center"><div className="label">Description</div></div> */}
                       <div className="col-lg-1 text-center"><div className="label">Status</div></div>
-                      <div className="col-lg-1 text-center"><div className="label">Reason </div></div>
+                      <div className="col-lg-2 text-center"><div className="label">Addressed By</div></div>
                       {/* <div className="col-lg-1 text-center"><div className="label">Action</div></div> */}
 
                     </div>
 
-                    {warrantyRequestData && warrantyRequestData.length > 0 &&
-                      warrantyRequestData.map((request) => (
-                        <div className="row list_listbox" style={{ alignItems: "center", cursor: "pointer" }} key={request.pk_request_id} onClick={() => { }}>
-                          <div className="col-lg-3 text-center"><div className="label">{request.request_id}</div></div>
-                          <div className="col-lg-2 text-center"><div className="label">{formatDateYYYYMMDD(request.created_at)}</div></div>
-                          <div className="col-lg-1 text-center"><div className="label">{request.user_name}</div></div>
-                          <div className="col-lg-2 text-center"><div className="label">{request.user_phone}</div></div>
-                          <div className="col-lg-2 text-center"><div className="label">{request.addressedDetails && request.addressedDetails.length > 0 ? request.addressedDetails[0].comments : "--"}</div></div>
-                          <div className="col-lg-1 text-center"><div className="label">{request.addressedDetails && request.addressedDetails.length > 0 ? request.addressedDetails[0].request_status : request.request_status}</div></div>
-                          <div className="col-lg-1 text-center"><div className="label">{request.addressedDetails && request.addressedDetails.length > 0 && request.status_id == status_Rejected ? request.addressedDetails[0].rejection_msg && request.addressedDetails[0].rejection_msg.length > 0 ? request.addressedDetails[0].rejection_msg : request.addressedDetails[0].other_rejection : "--"}</div></div>
+                    {complaintsList && complaintsList.length > 0 &&
+                      complaintsList.map((complaints) => (
+                        <div className="row list_listbox" style={{ alignItems: "center", cursor: "pointer" }} key={complaints.pk_id} onClick={() => { }}>
+                          <div className="col-lg-3 text-center"><div className="label">{complaints.complaint__id}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{formatDateYYYYMMDD(complaints.created_at)}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{complaints.user_phone}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{complaints.complaint_type}</div></div>
+                          {/* <div className="col-lg-2 text-center"><div className="label">{complaints.complaint_description}</div></div> */}
+                          <div className="col-lg-1 text-center"><div className="label">{complaints.request_status}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{complaints.addressedDetails && complaints.addressedDetails.length>0?complaints.addressedDetails[0].auth_user_id:"--"}</div></div>
                           <div className=""><div className="label viewbtn" onClick={() => {
                             setGlobalState({
-                              selectedViewID: request.pk_request_id + '',
+                              selectedViewID: complaints.pk_id + '',
                               auth_id: auth_id,
                               userName: userName
                             });
-                            router.push(pageURL_WarrantyRequestDetails);
+                            router.push(pageURL_ComplaintDetails);
                           }}><img src={staticIconsBaseURL + "/images/view_icon.png"} alt="Varroc Excellence" className="img-fluid" style={{ maxHeight: "18px" }} /></div>
                           </div>
                         </div>
-                      ))}
+                       ))} 
                   </div>
                 </div>
               </div>
