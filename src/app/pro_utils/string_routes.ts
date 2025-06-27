@@ -9,6 +9,6 @@ export const pageURL_BatteryListingPage=baseUrl+"/battery-list";
 export const pageURL_ErrorLogsPage=baseUrl+"/error-logs";
 export const pageURL_ComplaintList=baseUrl+"/complaint-request";
 export const pageURL_ComplaintDetails=baseUrl+"/complaint-request/complaint-detail";
-export const pageURL_LeadRequstList=baseUrl+"/error-logs";
-export const pageURL_LeadDetails=baseUrl+"/error-logs";
+export const pageURL_LeadRequstList=baseUrl+"/lead-request";
+export const pageURL_LeadDetails=baseUrl+"/lead-request/lead-request-detail";
 

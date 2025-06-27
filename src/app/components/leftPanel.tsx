@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { baseUrl, pageURL_BatteryListingPage, pageURL_ComplaintList, pageURL_dashboard, pageURL_ErrorLogsPage, pageURL_WarrantyRequestList } from '../pro_utils/string_routes'
+import { baseUrl, pageURL_BatteryListingPage, pageURL_ComplaintList, pageURL_dashboard, pageURL_ErrorLogsPage, pageURL_LeadRequstList, pageURL_WarrantyRequestList } from '../pro_utils/string_routes'
 import { staticIconsBaseURL } from '../pro_utils/string_constants';
 import HeaderComponent from './header';
 import BulkUploadForm from './bulkUpload';
@@ -84,7 +84,7 @@ const LeftPanelMenus = ({ selectedMenu, rightBoxUI }: LeftPanelProps) => {
                                     </a>
                                 </li>
                                 <li className={menuIndex == 5 ? "selected" : ""}>
-                                            <a href={'#'}>
+                                            <a href={pageURL_LeadRequstList}>
                                                 <div className="iconbox" onClick={()=>setMenuIndex(5)}>
                                                     <img src={staticIconsBaseURL + "/images/dealershipenquire_icon.png"} alt="icon" className="img-fluid"/>
                                                 </div>

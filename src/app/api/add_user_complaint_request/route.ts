@@ -168,10 +168,19 @@ export async function POST(request: NextRequest) {
           // const [updateDocURL] = await connection.execute(
           //   `UPDATE user_complaint_requests SET document_id=?,document_url=? WHERE pk_id=?`,[documents[i].id,filePath,result.insertId]
           // );
+          // const [insertImagesURL] = await connection.execute(
+          //   `INSERT INTO user_request_attachements (
+          //       fk_request_id,aisensy_image_id,image_url,is_invoice,created_at
+          //       ) VALUES (?,?, ?, ?, ?)`, [result.insertId, documents[i].id, filePath, false, new Date()]
 
-          const [updateDocURL] = await connection.execute(
-            `UPDATE user_complaint_requests SET document_id = ?, document_url = ? WHERE pk_id=?`,[documents[i].id,publicUrlData.publicUrl,result.insertId]
+          const [insertImagesURL] = await connection.execute(
+            `INSERT INTO user_request_attachements (
+                fk_request_id,aisensy_image_id,image_url,is_invoice,created_at
+                ) VALUES (?,?, ?, ?, ?)`, [result.insertId, documents[i].id, publicUrlData.publicUrl, false, new Date()]
           );
+          // const [updateDocURL] = await connection.execute(
+          //   `UPDATE user_complaint_requests SET document_id = ?, document_url = ? WHERE pk_id=?`,[documents[i].id,publicUrlData.publicUrl,result.insertId]
+          // );
         } else {
           mediaUploadFialed=true;
         }
