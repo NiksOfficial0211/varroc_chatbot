@@ -31,8 +31,11 @@ export async function POST(request: NextRequest) {
   }];
  
   const body = await request.json();
-  const activityAdded = await AddCommonLog(null,null,"Complaint Raised Body",body)
-
+  // try{
+    const activityAdded = await AddCommonLog(null,null,"Complaint Raised Body",body)
+  // }catch(err){
+  //   return NextResponse.json({ status: 0, error: err }, { status: 500 });
+  // }
   const { whatsapp_number,user_phone,serial_number,
     complaint_type, complaint_description, same_mobile, documents } = body;
     
@@ -225,7 +228,7 @@ export async function POST(request: NextRequest) {
           //     return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
           // }
           connection.release();
-    return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" },{status:200});
+        return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" },{status:200});
 
       }else{
       

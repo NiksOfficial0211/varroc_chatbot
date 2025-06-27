@@ -67,8 +67,8 @@ const LeftPanelMenus = ({ selectedMenu, rightBoxUI }: LeftPanelProps) => {
                                                     <img src={staticIconsBaseURL + "/images/complaint_icon.png"} alt="icon" className="img-fluid"/>
                                                 </div>
                                                 <div className="leftmenutext">                                        
-                                                    Complaint/ Cliam 
-                                                    <span>Requests</span>
+                                                    Warranty
+                                                    <span>Claims</span>
                                                 </div>
                                             </a>
                                         </li>
@@ -83,17 +83,17 @@ const LeftPanelMenus = ({ selectedMenu, rightBoxUI }: LeftPanelProps) => {
                                         </div>
                                     </a>
                                 </li>
-                                <li className={menuIndex == 5 ? "selected" : ""}>
+                                {/* <li className={menuIndex == 5 ? "selected" : ""}>
                                             <a href={pageURL_LeadRequstList}>
                                                 <div className="iconbox" onClick={()=>setMenuIndex(5)}>
                                                     <img src={staticIconsBaseURL + "/images/dealershipenquire_icon.png"} alt="icon" className="img-fluid"/>
                                                 </div>
                                                 <div className="leftmenutext">                                        
-                                                    Dealership / Business
-                                                    <span>Enquiry</span>
+                                                    Dealership 
+                                                    <span>Enquiries</span>
                                                 </div>
                                             </a>
-                                        </li>
+                                        </li> */}
                                 <li className={menuIndex == 6 ? "selected" : ""}>
                                     <a onClick={() => { setMenuIndex(6), setShowUploadDialog(true) }}>
                                         <div className="iconbox">

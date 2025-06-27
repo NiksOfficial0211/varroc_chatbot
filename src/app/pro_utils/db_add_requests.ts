@@ -87,7 +87,7 @@ export async function updateErrorLog(pk_error_id:any,auth_id:any,updated_json:an
 export async function AddCommonLog(fk_request_id:any,request_type_id:any,activity_type:any,change_json:any) {
     try{
         const connection = await pool.getConnection();
-
+        
         const [insertRequest] = await connection.execute(
             `INSERT INTO logs 
              (fk_request_id,request_type_id,activity_type,change_json,created_at)
@@ -96,7 +96,7 @@ export async function AddCommonLog(fk_request_id:any,request_type_id:any,activit
                 fk_request_id,
                 request_type_id,
                 activity_type,
-                change_json,
+                JSON.stringify(change_json),
                 new Date()//for created at date
             ]
         );
@@ -104,7 +104,8 @@ export async function AddCommonLog(fk_request_id:any,request_type_id:any,activit
         const result = insertRequest as ResultSetHeader;
         return result.affectedRows === 1;
     }catch(e){
-        console.log(e);
+
+        console.log("AddCommonLog--------------",e);
     }
 
 }

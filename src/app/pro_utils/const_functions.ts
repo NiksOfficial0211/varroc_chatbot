@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import multiparty from 'multiparty';
 import { Readable } from "stream";
-import { apifailedWithException, apiStatusFailureCode, initialRequestID } from "./string_constants";
+import { apifailedWithException, apiStatusFailureCode, initialComplaintID, initialRequestID } from "./string_constants";
 
 export function generateMixedString() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -142,19 +142,10 @@ export function generateRequestID(resultID: any[]) {
   }
 }
 export function generateComplaintID(resultID: any[]) {
-  // if(resultID.length>0){  
-  //   return incrementRequestID(resultID[0].request_id);
-  // }else{
-  //   return initialRequestID+formatDateYYMMDD(new Date())+"-00001"
-  // }
-  console.log("this is from generateComplaintID;-----------",resultID);
-  if(resultID&& resultID.length>0 && resultID[0].complaint__id){
-    const parts = resultID[0].complaint__id.split("-");
-    const lastPart = parts.pop();
-    const increment_id= parseInt(lastPart)+1;
-    return formatDateYYMMDD(new Date())+"-"+increment_id;
+  if(resultID.length>0){  
+    return incrementRequestID(resultID[0].complaint__id);
   }else{
-    return formatDateYYMMDD(new Date())+"-"+100;
+    return initialComplaintID+formatDateYYMMDD(new Date())+"-00001"
   }
 }
 
@@ -167,6 +158,8 @@ export function formatDateYYMMDD(inputDate: Date): string {
 }
 
 export function incrementRequestID(id: string): string {
+  console.log("incrementRequestID---------",id);
+  
   const parts = id.split("-");
   const lastPart = parts.pop();
 
