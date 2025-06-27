@@ -148,9 +148,14 @@ export function generateComplaintID(resultID: any[]) {
   //   return initialRequestID+formatDateYYMMDD(new Date())+"-00001"
   // }
   console.log("this is from generateComplaintID;-----------",resultID);
-  
-  const increment_id=resultID && resultID.length>0 && resultID[0].complaint__id?resultID[0].complaint__id+1:100
-  return increment_id;
+  if(resultID&& resultID.length>0 && resultID[0].complaint__id){
+    const parts = resultID[0].complaint__id.split("-");
+    const lastPart = parts.pop();
+    const increment_id= parseInt(lastPart)+1;
+    return formatDateYYMMDD(new Date())+"-"+increment_id;
+  }else{
+    return formatDateYYMMDD(new Date())+"-"+100;
+  }
 }
 
 

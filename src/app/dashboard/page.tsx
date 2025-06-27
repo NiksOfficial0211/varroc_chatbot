@@ -6,7 +6,7 @@ import LoadingDialog from '../components/PageLoader';
 import ShowAlertMessage from '../components/alert';
 import { staticIconsBaseURL } from '../pro_utils/string_constants'
 import { useRouter } from 'next/navigation';
-import { pageURL_WarrantyRequestDetails, pageURL_WarrantyRequestList } from '../pro_utils/string_routes';
+import { pageURL_ComplaintDetails, pageURL_WarrantyRequestDetails, pageURL_WarrantyRequestList } from '../pro_utils/string_routes';
 import { useScrollCounter } from '../hooks/DashboardCountHook/dashboardCountHook';
 import { useGlobalContext } from '../contextProviders/globalContext';
 import LeftPanelMenus from '../components/leftPanel';
@@ -109,7 +109,8 @@ const Dashboard = () => {
                   <div className="col-lg-12 request_text">Request <br></br>Addressed</div>
                 </div>
               </div>
-              <div className="req_whitebox" style={{ backgroundColor:"#ffeceb"}} onClick={() => router.push(pageURL_WarrantyRequestList)}>
+              {/* onClick={() => router.push(pageURL_WarrantyRequestList)} */}
+              <div className="req_whitebox" style={{ backgroundColor:"#ffeceb"}} >
                 <div className="row text-center">
                   <div className="col-lg-12 mb-2"><span data-max="39" className="ms-animated">{dashboardData?.warranty_pending_request || 0}</span></div>
                   <div className="col-lg-12 request_text">Pending <br></br>Warranty Requests</div>
@@ -117,16 +118,17 @@ const Dashboard = () => {
               </div>
               <div className="req_whitebox" style={{ backgroundColor:"#ffeceb"}}>
                 <div className="row text-center">
-                  <div className="col-lg-12 mb-2"><span data-max="39" className="ms-animated">0</span></div>
-                  <div className="col-lg-12 request_text">Pending <br></br>Dealership Enquiries</div>
+                  <div className="col-lg-12 mb-2"><span data-max="39" className="ms-animated">{dashboardData?.complaints_pending_request || 0}</span></div>
+                  <div className="col-lg-12 request_text">Pending<br></br>Complaints</div>
                 </div>
               </div>
               <div className="req_whitebox" style={{ backgroundColor:"#ffeceb"}}>
                 <div className="row text-center">
-                  <div className="col-lg-12 mb-2"><span data-max="39" className="ms-animated">0</span></div>
-                  <div className="col-lg-12 request_text">Pending<br></br>Complaints</div>
+                  <div className="col-lg-12 mb-2"><span data-max="39" className="ms-animated">{dashboardData?.business_pending_requests || 0}</span></div>
+                  <div className="col-lg-12 request_text">Pending <br></br>Dealership Enquiries</div>
                 </div>
               </div>
+              
             </div>
           </div>
           {/* <div className="row mb-4">
@@ -198,7 +200,12 @@ const Dashboard = () => {
                                                     auth_id:auth_id,
                                                     userName:userName
                                                   })
-                                                  router.push(pageURL_WarrantyRequestDetails)
+                                                  if(activity.request_type_id==1){
+                                                      router.push(pageURL_WarrantyRequestDetails)
+                                                  }else if(activity.request_type_id==2){
+                                                      router.push(pageURL_ComplaintDetails)
+                                                  }
+                                                  
                                                 }}><img src={staticIconsBaseURL + "/images/view_icon.png"} alt="Varroc Excellence" className="img-fluid" style={{ maxHeight: "18px" }} /></div></div>
                         </div>))}
                     

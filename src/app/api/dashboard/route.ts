@@ -27,7 +27,10 @@ export async function  POST(request:Request){
           );
 
           const [warrantyPendingRequests] = await connection.execute<CountResult[]>(
-            'SELECT COUNT(*) AS total FROM user_warranty_requests where status_id=1'
+            'SELECT COUNT(*) AS total FROM user_warranty_requests where status_id=1'//1=pending
+          );  
+          const [complaintPendingRequests] = await connection.execute<CountResult[]>(
+            'SELECT COUNT(*) AS total FROM user_complaint_requests where status_id=6'//6=new
           );  
         const [userActivities] = await connection.execute(`SELECT 
                 ua.pk_activity_id,ua.name,
@@ -45,10 +48,12 @@ export async function  POST(request:Request){
             `);
             connection.release();
         return NextResponse.json({status:1,message:"Data Received",data:{
-            total_Request:totalWarrantyRequestRows[0].total,
+            total_Request:totalWarrantyRequestRows[0].total + complaintPendingRequests[0].total,
             total_Warranty_Request:totalWarrantyRequestRows[0].total,
             addressed_count:totalAddressedCount[0].total,
             warranty_pending_request:warrantyPendingRequests[0].total,
+            complaints_pending_request:complaintPendingRequests[0].total,
+            business_pending_requests:warrantyPendingRequests[0].total,
             activities:userActivities
         }});
     }catch(e){

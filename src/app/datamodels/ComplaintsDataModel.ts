@@ -1,4 +1,5 @@
 import { AddressedByDetail } from "./WarrantyReqestListDataModel"
+import { Images } from "./WarrantyRequestDetailsModel"
 
 export interface ComplaintListDataModel {
   pk_id: number
@@ -22,6 +23,7 @@ export interface ComplaintDetailDataModel {
   addressedData: any[]
   battery_details: any[]
   duplicate_data: any[]
+  images: Images[]
 }
 
 export interface ComplaintDataModel {

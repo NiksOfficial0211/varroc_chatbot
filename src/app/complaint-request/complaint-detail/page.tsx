@@ -98,8 +98,8 @@ const WarrantyRequestDetails = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
-         body:JSON.stringify({
-            "request_type":2
+        body: JSON.stringify({
+          "request_type": 2
         })
 
       });
@@ -137,7 +137,7 @@ const WarrantyRequestDetails = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
 
     e.preventDefault()
@@ -153,8 +153,8 @@ const WarrantyRequestDetails = () => {
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
         body: JSON.stringify({
-          
-        }) 
+
+        })
       });
       const resJson = await response.json();
       if (resJson && resJson.status == 1) {
@@ -195,14 +195,14 @@ const WarrantyRequestDetails = () => {
     // return date.toISOString().slice(0, 19).replace("T", " ");
     const localDate = new Date(date); // assumes input is a Date object (still in UTC under the hood)
 
-  const year = localDate.getFullYear();
-  const month = String(localDate.getMonth() + 1).padStart(2, '0');
-  const day = String(localDate.getDate()).padStart(2, '0');
-  const hours = String(localDate.getHours()).padStart(2, '0');
-  const minutes = String(localDate.getMinutes()).padStart(2, '0');
-  const seconds = String(localDate.getSeconds()).padStart(2, '0');
+    const year = localDate.getFullYear();
+    const month = String(localDate.getMonth() + 1).padStart(2, '0');
+    const day = String(localDate.getDate()).padStart(2, '0');
+    const hours = String(localDate.getHours()).padStart(2, '0');
+    const minutes = String(localDate.getMinutes()).padStart(2, '0');
+    const seconds = String(localDate.getSeconds()).padStart(2, '0');
 
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
   return (
@@ -213,7 +213,7 @@ const WarrantyRequestDetails = () => {
         setShowAlert(false)
         if (navigateBack) {
           router.back()
-        }else{
+        } else {
           fetchData()
         }
 
@@ -239,7 +239,7 @@ const WarrantyRequestDetails = () => {
                     <div className="col-lg-8">
                       <div className="row">
                         <div className="col-lg-12 mb-4">
-                          
+
                           <div className="request_list_heading" style={{ margin: "-42px 0px 0px 20px", backgroundColor: "#e6f6ff" }}>
                             Complaint ID: <span>{complaintData.complaint_data[0].complaint__id}</span>
                           </div>
@@ -252,7 +252,7 @@ const WarrantyRequestDetails = () => {
                             <span>{warrantyRequestData.request[0].request_id}</span>
                           </div>
                         </div> */}
-                        
+
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Request Date:
@@ -263,7 +263,7 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Customer Phone:
-                            <span>{complaintData.complaint_data[0].user_phone}</span>
+                            <span>{complaintData.complaint_data[0].user_phone || "--"}</span>
 
                           </div>
                         </div>
@@ -280,13 +280,13 @@ const WarrantyRequestDetails = () => {
                             <span>{complaintData.complaint_data[0].complaint_type}</span>
                           </div>
                         </div>
-                        <div className="col-lg-4 mb-3">
+                        <div className="col-lg-8 mb-3">
                           <div className="request_list ">
                             Description:
-                            <span>{complaintData.complaint_data[0].complaint_description}</span>
+                            <span>{complaintData.complaint_data[0].complaint_description || "--"}</span>
                           </div>
                         </div>
-                        
+
                         <div className="col-lg-12">
                           <div className="row">
                             <div className="col-lg-12">
@@ -349,7 +349,14 @@ const WarrantyRequestDetails = () => {
                           </div>
                         </div>
 
-                        
+
+                        <div className="col-lg-12">
+                          <div className="row">
+                            <div className="col-lg-12">
+                              <div className='masterrecord_heading'>Previous/Duplicate Request</div>
+                            </div>
+                          </div>
+                        </div>
                         {complaintData.duplicate_data && complaintData.duplicate_data.map((duplicates, index) => (
                           <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }}>
 
@@ -357,7 +364,7 @@ const WarrantyRequestDetails = () => {
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Reference ID
-                                  <span>{duplicates.request_id}</span>
+                                  <span>{duplicates.complaint__id}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
@@ -383,7 +390,7 @@ const WarrantyRequestDetails = () => {
                         </div>}
 
                       </div>
-                      {complaintData.addressedData && complaintData.addressedData.length>0 && complaintData.complaint_data[0].status_id != status_Pending ?
+                      {complaintData.addressedData && complaintData.addressedData.length > 0 && complaintData.complaint_data[0].status_id != status_Pending ?
                         <div>
                           <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>
                             <div className="row">
@@ -405,9 +412,9 @@ const WarrantyRequestDetails = () => {
                                   <span>{formatDate(new Date(complaintData.addressedData[0].updated_at))}</span>
                                 </div>
                               </div>
-                              
-                              
-                              
+
+
+
                             </div>
                           </div>
                         </div> : <></>
@@ -479,14 +486,21 @@ const WarrantyRequestDetails = () => {
                     </div>
                     <div className="col-lg-4 text-center">
 
-                      {complaintData?.complaint_data && complaintData?.complaint_data[0].document_url.length > 0 &&
-                        
+                      {complaintData?.images && complaintData?.images.length > 0 &&
+
+                        complaintData?.images.map((imageURL, index) =>
                           <div className="invoice_attach_box">
-                            <FileViewer fileUrl={complaintData?.complaint_data[0].document_url.includes("uploads")? getImageApiURL + "/" + complaintData?.complaint_data[0].document_url:complaintData?.complaint_data[0].document_url} isDialogView={false} set_height={150} /><br></br>
-                            <button className="blue_btn" onClick={() => { setShowImagePop(true); setImagePopURL(complaintData?.complaint_data[0].document_url) }}>View</button>
+                            <FileViewer fileUrl={imageURL.image_url.includes("uploads") ? getImageApiURL + "/" + imageURL.image_url : imageURL.image_url} isDialogView={false} set_height={150} key={index} /><br></br>
+                            <button className="blue_btn" onClick={() => { setShowImagePop(true); setImagePopURL(imageURL.image_url) }}>View</button>
 
                           </div>
-                      }
+
+                          // <div className="invoice_attach_box">
+                          //   <FileViewer fileUrl={complaintData?.complaint_data[0].document_url.includes("uploads")? getImageApiURL + "/" + complaintData?.complaint_data[0].document_url:complaintData?.complaint_data[0].document_url} isDialogView={false} set_height={150} /><br></br>
+                          //   <button className="blue_btn" onClick={() => { setShowImagePop(true); setImagePopURL(complaintData?.complaint_data[0].document_url) }}>View</button>
+
+                          // </div>
+                        )}
                     </div>
                   </div>
                   {showImagePop && <DialogImagePop

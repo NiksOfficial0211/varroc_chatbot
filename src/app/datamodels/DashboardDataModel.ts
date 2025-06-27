@@ -1,7 +1,10 @@
 interface DashboardResponseData {
   total_Request: number
+  total_Warranty_Request:number
   warranty_pending_request: number
   addressed_count: number
+  complaints_pending_request:number
+  business_pending_requests:number
   activities: ActivityDataModel[]
 }
 

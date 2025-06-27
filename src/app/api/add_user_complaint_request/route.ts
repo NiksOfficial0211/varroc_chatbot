@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
         cleanedComplaintType,
         cleanedComplaintDesc,
         cleanedWhatsAppNumber,
-        1, // status_id (pending)
+        6, // status_id (New)
         new Date(), // created_at
       ]
     );
