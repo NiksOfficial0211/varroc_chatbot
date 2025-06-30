@@ -39,4 +39,4 @@ export const status_Duplicate=5;
 export const complaint_status_new=6;
 export const complaint_status_Investigating=7;
 export const complaint_status_resolved=8;
-export const complaint_status_closed=9;
+export const complaint_status_rejected=9;

@@ -9,7 +9,7 @@ import { WarrantyRequestDetailResponseModel } from '@/app/datamodels/WarrantyReq
 import PageErrorCenterContent from '@/app/components/pageError';
 import useSessionRedirect from '@/app/pro_utils/manage_session';
 import LeftPanelMenus from '@/app/components/leftPanel';
-import { complaint_status_closed, getImageApiURL, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
+import { complaint_status_new, complaint_status_rejected, getImageApiURL, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
 import moment from 'moment';
 import { RejectMSGMasterDataModel, StatusMasterDataModel } from '@/app/datamodels/CommonDataModels';
 import { useRouter } from 'next/navigation';
@@ -170,10 +170,29 @@ const WarrantyRequestDetails = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
-        body: JSON.stringify({
-
-        })
-      });
+        body: 
+            formVal.status_id == status_Rejected ? JSON.stringify({
+                      auth_id: auth_id,
+                      pk_id: complaintData?.complaint_data[0].pk_id,
+                      comments: formVal.comments ,
+                      status: formVal.status_id,
+                      request_id: complaintData?.complaint_data[0].complaint__id,
+                      rejection_id: formVal.rejection_id,
+                      rejection_other: formVal.comments,
+                      isRejected: true,
+                      customer_phone: complaintData?.complaint_data[0].raised_whatsapp_no
+                    }) : JSON.stringify({
+                      auth_id: auth_id,
+                      pk_id: complaintData?.complaint_data[0].pk_id,
+                      comments: formVal.comments,
+                      status: formVal.status_id,
+                      request_id: complaintData?.complaint_data[0].complaint__id,
+                      isRejected: false,
+                      isDuplicate: formVal.status_id == status_Duplicate ? true : false,
+                      customer_phone: complaintData?.complaint_data[0].raised_whatsapp_no
+                    }),
+        });
+    
       const resJson = await response.json();
       if (resJson && resJson.status == 1) {
         setLoading(false);
@@ -492,7 +511,7 @@ const WarrantyRequestDetails = () => {
 
                       }
 
-                      {complaintData.complaint_data[0].status_id != complaint_status_closed ?
+                      {complaintData.complaint_data[0].status_id == complaint_status_new ?
                         <div>
                           
                             <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>

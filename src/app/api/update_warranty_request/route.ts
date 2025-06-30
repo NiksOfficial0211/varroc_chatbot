@@ -90,11 +90,15 @@ export async function POST(request: Request) {
     const result = await res.json();
     console.log("Aisensy response:", result);
     if(result.success==='true'){
+      await connection.query(
+      `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
+      ["Update Warranty Request Send Message Successful",pk_id,1, JSON.stringify({...aisensyPayload,message:"message sent to customer"}), new Date()]
+    );
       return NextResponse.json({ status: 1, message: "Request updated message sent to customer" });
     }{
       await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Update Warranty Request Send Message Failed",pk_id,1, aisensyPayload, new Date()]
+      ["Update Warranty Request Send Message Failed",pk_id,1, JSON.stringify({...aisensyPayload,message:"Failed to send message to customer",response:result}), new Date()]
     );
       return NextResponse.json({ status: 1, message: "Request updated but message delivery failed to customer"});
     }
