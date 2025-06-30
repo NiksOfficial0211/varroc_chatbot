@@ -210,6 +210,7 @@ import path from "path";
 import { headers } from 'next/headers';
 import { promises as fsPromises } from 'fs'; // <-- for promise-based methods like readFile
 import { supabase } from '../../../../utils/supabaseClient';
+import { initialRequestID } from '@/app/pro_utils/string_constants';
 
 
 interface fileURLInter {
@@ -251,14 +252,36 @@ export async function POST(request: NextRequest) {
                 WHERE DATE(created_at) = CURDATE()
                 ORDER BY created_at DESC
                 LIMIT 1`);
+
+    // const today = new Date();
+    // const yyyy_mm_dd = today.toISOString().slice(0, 10); // e.g., "2025-06-30"
+    // const [resultID]=await connection.execute<any[]>(`SELECT latest_request_num FROM request_id_counter
+    //                WHERE pk_id_date = ? AND request_type=?
+    //                ORDER BY created_at DESC
+    //                LIMIT 1`,[yyyy_mm_dd,1]);
+    
+    //    let nextNumber = "00000";
+    //     let lastLefID;
+    //     if (resultID.length > 0) {
+    //       nextNumber = parseInt(resultID[0].latest_request_num) + 1+"";
+    //       lastLefID=initialRequestID+"-"+resultID
+    //       await connection.execute(
+    //         `UPDATE request_id_counter SET latest_request_num = ? WHERE pk_id_date = ?`,
+    //         [nextNumber, yyyy_mm_dd]
+    //       );
+    //     } else {
+          
+    //       await connection.execute(
+    //         `INSERT INTO request_id_counter (pk_id_date, latest_request_num ,request_type) VALUES (?, ?,?)`,
+    //         [yyyy_mm_dd, nextNumber,1]
+    //       );
+    //     }
+
     const requestIDstring = generateRequestID(resultID)
 
 
     const cleanedRetailerShopName =
       retailer_shop_name?.trim() !== '' ? retailer_shop_name.trim() : null;
-
-    // const cleanedUserEmail =
-    //   user_email?.trim() !== '' ? user_email.trim() : null;
 
     const cleanedPinCode =
       user_pin_code?.trim() !== '' ? user_pin_code.trim() : null;
@@ -454,12 +477,12 @@ export async function POST(request: NextRequest) {
       }else{
 
     const aisensyPayload = {
-
       "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-      "campaignName": "reference_id_message",
+      "campaignName": "final_reference_id",
       "destination": `${cleanedWhatsAppNumber}`,
       "userName": "Varroc Aftermarket",
       "templateParams": [
+        "Warranty registration",
         `${requestIDstring}`
       ],
       "source": "new-landing-page form",

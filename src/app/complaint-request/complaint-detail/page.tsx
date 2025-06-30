@@ -51,6 +51,9 @@ const WarrantyRequestDetails = () => {
   const { selectedViewID } = useGlobalContext()
   const [errors, setErrors] = useState<Partial<formValues>>({});
 
+  const [warrantyEndDate,setWarrantyEndDate]=useState<Date>();
+  const [warrantyRemainingDays,setWarrantyRemainingDays]=useState(0);
+
 
   useEffect(() => {
     // fetchData(dataFilters.date, dataFilters.request_id, dataFilters.phone_no, dataFilters.name, dataFilters.status, dataFilters.page, dataFilters.limit);
@@ -79,7 +82,22 @@ const WarrantyRequestDetails = () => {
       if (response.status == 1) {
 
         setComplaintData(response.data)
+        const purchaseDate = new Date("2025-06-04T18:30:00.000Z");
 
+        // Step 1: Add 24 months
+        const expiryDate = new Date(purchaseDate);
+        expiryDate.setMonth(expiryDate.getMonth() + 24);
+
+        // Step 2: Get today's date (UTC)
+        const today = new Date();
+        const todayUTC = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+
+        // Step 3: Calculate remaining days
+        const timeDiff = expiryDate.getTime() - todayUTC.getTime();
+        setWarrantyEndDate(expiryDate)
+        
+        // const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        setWarrantyRemainingDays(Math.ceil(timeDiff / (1000 * 60 * 60 * 24)))
         setFormVal({
           status_id: response.data.complaint_data[0].status_id,
           comments: '',
@@ -146,7 +164,7 @@ const WarrantyRequestDetails = () => {
     setLoading(true);
     // pk_request_id
     try {
-      const response = await fetch("/api/update_warranty_request", {
+      const response = await fetch("/api/update_claim_request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -220,7 +238,7 @@ const WarrantyRequestDetails = () => {
       }} onCloseClicked={function (): void {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
-      <LeftPanelMenus selectedMenu={2} showLeftPanel={false} rightBoxUI={
+      <LeftPanelMenus selectedMenu={3} showLeftPanel={false} rightBoxUI={
         <div className="container">
           <div className="row mt-4 mb-5">
 
@@ -350,14 +368,14 @@ const WarrantyRequestDetails = () => {
                         </div>
 
 
-                        <div className="col-lg-12">
+                       {complaintData.duplicate_data && complaintData.duplicate_data.length>0 && <div className="col-lg-12">
                           <div className="row">
                             <div className="col-lg-12">
                               <div className='masterrecord_heading'>Previous/Duplicate Request</div>
                             </div>
                           </div>
-                        </div>
-                        {complaintData.duplicate_data && complaintData.duplicate_data.map((duplicates, index) => (
+                        </div>}
+                        {complaintData.duplicate_data && complaintData.duplicate_data.length>0 && complaintData.duplicate_data.map((duplicates, index) => (
                           <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }}>
 
                             <div className="row">
@@ -385,6 +403,59 @@ const WarrantyRequestDetails = () => {
                             </div>
                           </div>))}
 
+                {complaintData.warrantyRaised && complaintData.warrantyRaised.length>0 && <div className="col-lg-12">
+                          <div className="row">
+                            <div className="col-lg-12">
+                              <div className='masterrecord_heading'>Warranty Request</div>
+                            </div>
+                          </div>
+                        </div>}
+                        {complaintData.warrantyRaised && complaintData.warrantyRaised.length>0 && complaintData.warrantyRaised.map((warrantyreq, index) => (
+                          <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }} key={index}>
+
+                            <div className="row">
+                              <div className="col-lg-4 mb-3">
+                                <div className="request_list">
+                                  Reference ID
+                                  <span>{warrantyreq.request_id}</span>
+                                </div>
+                              </div>
+                              <div className="col-lg-4 mb-3">
+                                <div className="request_list">
+                                  Purchase Date
+                                  <span>{formatDateDDMMYYYY(warrantyreq.product_purchase_date)}</span>
+                                </div>
+                              </div>
+                              <div className="col-lg-4 mb-3">
+                                <div className="request_list ">
+                                  Warranty End Date:
+                                  <span>{warrantyEndDate ? formatDateDDMMYYYY(warrantyEndDate):"--"}</span>
+                                </div>
+                              </div>
+                               <div className="col-lg-4 mb-3">
+                                <div className="request_list ">
+                                  Warranty Remaining Days:
+                                  <span>{warrantyRemainingDays} {warrantyRemainingDays>1?"Days":"Days"}</span>
+                                </div>
+                              </div>
+                              <div className="col-lg-4 mb-3">
+                                <div className="request_list">
+                                  Request Status:
+                                  <span>{warrantyreq.request_status}</span>
+
+                                </div>
+                              </div>  
+                              {/* <div className="col-lg-4 mb-3">
+                                <div className="request_list ">
+                                  Updated By:
+                                  <span>{wa.addressed_id || "--"}</span>
+                                </div>
+                              </div> */}
+                              
+
+
+                            </div>
+                          </div>))}
                         {complaintData.battery_details.length == 0 && <div className="request_list_heading mb-4 ml-3" style={{ width: "auto", margin: "0" }}>
                           <span style={{ color: "#D93731" }}>Serial Number does not match</span>
                         </div>}
@@ -423,7 +494,7 @@ const WarrantyRequestDetails = () => {
 
                       {complaintData.complaint_data[0].status_id != complaint_status_closed ?
                         <div>
-                          <form onSubmit={handleSubmit}>
+                          
                             <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>
                               <div className="row">
                                 <div className="col-lg-6">
@@ -477,7 +548,7 @@ const WarrantyRequestDetails = () => {
                               </div>
 
                             </div>
-                          </form>
+                          
                         </div> : <></>
                       }
 

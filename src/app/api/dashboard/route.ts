@@ -53,7 +53,7 @@ export async function  POST(request:Request){
             addressed_count:totalAddressedCount[0].total,
             warranty_pending_request:warrantyPendingRequests[0].total,
             complaints_pending_request:complaintPendingRequests[0].total,
-            business_pending_requests:warrantyPendingRequests[0].total,
+            business_pending_requests:0,
             activities:userActivities
         }});
     }catch(e){

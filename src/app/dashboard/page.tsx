@@ -190,7 +190,7 @@ const Dashboard = () => {
                       dashboardData.activities.map((activity, index) => (
                         <div className="row list_listbox" style={{ alignItems: "center", cursor: "pointer" }} key={index} onClick={() => { }}>
                           <div className="col-lg-2 text-center"><div className="label">{activity.request_id}</div></div>
-                          <div className="col-lg-3 text-center"><div className="label">{activity.name}</div></div>
+                          <div className="col-lg-3 text-center"><div className="label">{activity.name || "--"}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{activity.phone}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{activity.request_type}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{activity.request_status == "1" ? "New" : activity.request_status}</div></div>

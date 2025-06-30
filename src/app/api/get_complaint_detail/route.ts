@@ -60,6 +60,15 @@ export async function POST(request: Request) {
         WHERE battery_serial_no = ? && complaint__id != ?
     `, [userRequests[0].battery_serial_no, userRequests[0].complaint__id]);
 
+
+    const [warrantyRecord]= await connection.execute(`SELECT 
+        ua.*,
+        rt.request_type AS request_type,
+        rs.status AS request_status
+        FROM user_warranty_requests ua
+        JOIN request_types rt ON ua.request_type_id = rt.request_type_id 
+        JOIN request_status rs ON ua.status_id = rs.status_id WHERE ua.product_serial_no=?`,[userRequests[0].battery_serial_no])
+
     const [addressedData] = await connection.execute(
       `SELECT
           ura.*,
@@ -83,7 +92,7 @@ export async function POST(request: Request) {
            FROM user_request_attachements WHERE fk_request_id = ?`, [pk_id]);
     connection.release();
     return NextResponse.json({
-      status: 1, message: "Data Received", data: { complaint_data: userRequests, addressedData: addressedData, images: images, battery_details: batteryData, duplicate_data: duplicateDataRows }
+      status: 1, message: "Data Received", data: { complaint_data: userRequests, addressedData: addressedData, images: images, battery_details: batteryData, duplicate_data: duplicateDataRows,warrantyRaised:warrantyRecord }
     });
 
   } catch (e) {

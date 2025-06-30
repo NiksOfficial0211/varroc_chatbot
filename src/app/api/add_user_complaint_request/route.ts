@@ -193,96 +193,90 @@ export async function POST(request: NextRequest) {
       if(mediaUploadFialed){
           await connection.rollback();
           
-          // const failedAisensyPayload = {
-          //   "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-          //   "campaignName": "form_failed_warranty_reg",
-          //   "destination": `${cleanedWhatsAppNumber}`,
-          //   "userName": "Varroc Aftermarket",
-          //   "templateParams": [],
-          //   "source": "new-landing-page form",
-          //   "media": {},
-          //   "buttons": [],
-          //   "carouselCards": [],
-          //   "location": {},
-          //   "attributes": {},
-          //   "paramsFallbackValue": {}
-          // }
-          // const aisensyApiRes = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
-          //   method: "POST",
-          //   headers: { "Content-Type": "application/json" },
-          //   body: JSON.stringify(failedAisensyPayload),
-          // });
-          // if (aisensyApiRes && aisensyApiRes.ok) {
-          //             await connection.query(
-          //       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-          //       ["Add Complaint Request Media Upload failed message ",null,1, failedAisensyPayload, new Date()]
-          //     );
-          //     connection.release();
-          //     return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
-          // }else{
-          //   await connection.query(
-          //         `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-          //         ["Add Complaint Request Media Upload failed send message failed",null,1, failedAisensyPayload, new Date()]
-          //       );
-          //       connection.release();
-          //     return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
-          // }
+          const failedAisensyPayload = {
+            "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
+            "campaignName": "form_failed_warranty_reg",
+            "destination": `${cleanedWhatsAppNumber}`,
+            "userName": "Varroc Aftermarket",
+            "templateParams": [],
+            "source": "new-landing-page form",
+            "media": {},
+            "buttons": [],
+            "carouselCards": [],
+            "location": {},
+            "attributes": {},
+            "paramsFallbackValue": {}
+          }
+          const aisensyApiRes = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(failedAisensyPayload),
+          });
+          if (aisensyApiRes && aisensyApiRes.ok) {
+                      await connection.query(
+                `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
+                ["Add Complaint Request Media Upload failed message ",null,1, failedAisensyPayload, new Date()]
+              );
+              connection.release();
+              return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
+          }else{
+            await connection.query(
+                  `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
+                  ["Add Complaint Request Media Upload failed send message failed",null,1, failedAisensyPayload, new Date()]
+                );
+                connection.release();
+              return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
+          }
           connection.release();
         return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" },{status:200});
 
       }else{
-      
-      
+        const aisensyPayload = {
+          "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
+          "campaignName": "final_reference_id",
+          "destination": `${cleanedWhatsAppNumber}`,
+          "userName": "Varroc Aftermarket",
+          "templateParams": [
+            "Warranty Claim",
+            `${requestIDstring}`
+          ],
+          "source": "new-landing-page form",
+          "media": {},
+          "buttons": [],
+          "carouselCards": [],
+          "location": {},
+          "attributes": {},
+          "paramsFallbackValue": {
+            "FirstName": "user"
+          }
+        }
 
-    // const aisensyPayload = {
+        const aisensyApiRes = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(aisensyPayload),
+        });
 
-    //   "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-    //   "campaignName": "reference_id_message",
-    //   "destination": `${cleanedWhatsAppNumber}`,
-    //   "userName": "Varroc Aftermarket",
-    //   "templateParams": [
-    //     `${requestIDstring}`
-    //   ],
-    //   "source": "new-landing-page form",
-    //   "media": {},
-    //   "buttons": [],
-    //   "carouselCards": [],
-    //   "location": {},
-    //   "attributes": {},
-    //   "paramsFallbackValue": {
-    //     "FirstName": "user"
-    //   }
-    // }
-
-    // const aisensyApiRes = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(aisensyPayload),
-    // });
-
-    // const aisensyApiJson = await aisensyApiRes.json();
-    // await connection.commit();
-    // if (aisensyApiJson.success == 'true') {
-    //    await connection.query(
-    //   `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-    //   ["Add Complaint Request Reference ID ",null,1, JSON.stringify(aisensyPayload), new Date()]
-    // );
-    // connection.release();
-    //   return NextResponse.json({ status: 1, message: "Request received reference id sent to customer" });
-    // }
-    // else {
-    //   await connection.query(
-    //   `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-    //   ["Add Complaint Request Send Reference ID Failed",null,1, JSON.stringify(aisensyPayload), new Date()]
-    // );
-    // connection.release();
-    //   return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" });
-
-    // }
-    
+    const aisensyApiJson = await aisensyApiRes.json();
     await connection.commit();
+    if (aisensyApiJson.success == 'true') {
+       await connection.query(
+      `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
+      ["Add Complaint Request Reference ID ",null,1, JSON.stringify(aisensyPayload), new Date()]
+    );
+      connection.release();
+      return NextResponse.json({ status: 1, message: "Request received reference id sent to customer" });
+    }
+    else {
+      await connection.query(
+      `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
+      ["Add Complaint Request Send Reference ID Failed",null,1, JSON.stringify(aisensyPayload), new Date()]
+    );
     connection.release();
-    return NextResponse.json({ status: 1, message: "Request Received" },{status:200});
+      return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" });
+
+    }
+
 
   }
   }

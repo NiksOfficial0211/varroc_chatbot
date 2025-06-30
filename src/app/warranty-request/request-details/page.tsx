@@ -19,7 +19,7 @@ import DialogImagePop from '@/app/components/dialog_DocViewer';
 
 interface formValues {
   status_id: any,
-  comments: any
+  comments: string
   rejection_id: any
 }
 
@@ -196,6 +196,12 @@ const WarrantyRequestDetails = () => {
     console.log("this is the form vals", formVal);
     if (!validate()) return;
     setLoading(true);
+    let rejectionSelectedMsg=""
+    for(let i=0;i<rejectionMasterData.length;i++){
+      if(formVal.rejection_id==rejectionMasterData[i].pk_reject_id){
+        rejectionSelectedMsg=rejectionMasterData[i].rejection_msg;
+      }
+    }
     // pk_request_id
     try {
       const response = await fetch("/api/update_warranty_request", {
@@ -207,7 +213,7 @@ const WarrantyRequestDetails = () => {
         body: formVal.status_id == status_Rejected ? JSON.stringify({
           auth_id: auth_id,
           pk_id: warrantyRequestData?.request[0].pk_request_id,
-          comments: formVal.comments,
+          comments: formVal.comments && formVal.comments.length>0?formVal.comments: rejectionSelectedMsg,
           status: formVal.status_id,
           request_id: warrantyRequestData?.request[0].request_id,
           request_type: warrantyRequestData?.request[0].request_type_id,
