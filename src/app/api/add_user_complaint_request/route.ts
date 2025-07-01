@@ -44,6 +44,8 @@ export async function POST(request: NextRequest) {
   // }catch(err){
   //   return NextResponse.json({ status: 0, error: err }, { status: 500 });
   // }
+
+
   const { whatsapp_number,user_phone,serial_number,
     complaint_type, complaint_description, same_mobile, documents } = body;
     
@@ -58,7 +60,9 @@ export async function POST(request: NextRequest) {
                 LIMIT 1`);
 
     const requestIDstring = generateComplaintID(resultID)
-
+    const [hashPresent] = await connection.execute<any[]>(`INSERT INTO FROM all_request_hash
+                (hash_key,created_at) VALUES (?, ?)
+                `,[hash, new Date()]);  
     const cleanedWhatsAppNumber =
       whatsapp_number?.trim() !== '' ? whatsapp_number.trim() : null;
 

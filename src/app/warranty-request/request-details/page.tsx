@@ -542,7 +542,7 @@ const WarrantyRequestDetails = () => {
 
                       {warrantyRequestData.request[0].status_id == status_Pending || warrantyRequestData.request[0].status_id == status_Duplicate ?
                         <div>
-                          <form onSubmit={handleSubmit}>
+                          {/* <form onSubmit={handleSubmit}> */}
                             <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>
                               <div className="row">
                                 <div className="col-lg-6">
@@ -596,7 +596,7 @@ const WarrantyRequestDetails = () => {
                               </div>
 
                             </div>
-                          </form>
+                          {/* </form> */}
                         </div> : <></>
                       }
 
