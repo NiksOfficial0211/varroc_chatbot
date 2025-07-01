@@ -245,9 +245,9 @@ export async function POST(request: NextRequest) {
 
 if (hashPresent.length == 0) {
   const activityAdded = await AddCommonLog(null,null,"Request Raised Body",body)
-  const [hashPresent] = await connection.execute<any[]>(`INSERT INTO FROM all_request_hash
-                (hash_key,created_at) VALUES (?, ?)
-                `,[hash, new Date()]);
+  const [hashPresent] = await connection.execute<any[]>(`INSERT INTO all_request_hash
+                (hash_key,created_at) VALUES (?,?)
+                `,[hash,new Date()]);  
   const { whatsapp_number, user_name,
     retailer_shop_name,
     user_email,

@@ -60,9 +60,9 @@ export async function POST(request: NextRequest) {
                 LIMIT 1`);
 
     const requestIDstring = generateComplaintID(resultID)
-    const [hashPresent] = await connection.execute<any[]>(`INSERT INTO FROM all_request_hash
-                (hash_key,created_at) VALUES (?, ?)
-                `,[hash, new Date()]);  
+    const [hashPresent] = await connection.execute<any[]>(`INSERT INTO all_request_hash
+                (hash_key,created_at) VALUES (?,?)
+                `,[hash,new Date()]);  
     const cleanedWhatsAppNumber =
       whatsapp_number?.trim() !== '' ? whatsapp_number.trim() : null;
 
