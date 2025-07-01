@@ -14,10 +14,12 @@ export async function  POST(request:NextRequest){
   if (!token || token !== process.env.NEXT_PUBLIC_API_SECRET_TOKEN) {
     return NextResponse.json({ error: 'Unauthorized',message:"You are unauthorized" }, { status: 403 });
   }
+  const body = await request.json();
+    const {request_type} = body;
     try{
         const connection = await pool.getConnection();
         const [rows] = await connection.query(
-          `SELECT pk_reject_id,rejection_msg FROM request_rejections`
+          `SELECT pk_reject_id,rejection_msg FROM request_rejections WHERE request_type=?`,[request_type]
         );
         connection.release();
         return NextResponse.json({status:1,message:"All Rejection messages",data:rows});

@@ -9,7 +9,7 @@ import { WarrantyRequestDetailResponseModel } from '@/app/datamodels/WarrantyReq
 import PageErrorCenterContent from '@/app/components/pageError';
 import useSessionRedirect from '@/app/pro_utils/manage_session';
 import LeftPanelMenus from '@/app/components/leftPanel';
-import { complaint_status_new, complaint_status_rejected, getImageApiURL, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
+import { complaint_status_new, complaint_status_rejected, complaint_status_resolved, getImageApiURL, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
 import moment from 'moment';
 import { RejectMSGMasterDataModel, StatusMasterDataModel } from '@/app/datamodels/CommonDataModels';
 import { useRouter } from 'next/navigation';
@@ -52,7 +52,7 @@ const WarrantyRequestDetails = () => {
   const [errors, setErrors] = useState<Partial<formValues>>({});
 
   const [warrantyEndDate,setWarrantyEndDate]=useState<Date>();
-  const [warrantyRemainingDays,setWarrantyRemainingDays]=useState(0);
+  const [warrantyRemainingDays,setWarrantyRemainingDays]=useState<any>();
 
 
   useEffect(() => {
@@ -82,7 +82,7 @@ const WarrantyRequestDetails = () => {
       if (response.status == 1) {
 
         setComplaintData(response.data)
-        const purchaseDate = new Date("2025-06-04T18:30:00.000Z");
+        const purchaseDate = new Date(response.data.warrantyRaised[0].product_purchase_date);
 
         // Step 1: Add 24 months
         const expiryDate = new Date(purchaseDate);
@@ -94,10 +94,16 @@ const WarrantyRequestDetails = () => {
 
         // Step 3: Calculate remaining days
         const timeDiff = expiryDate.getTime() - todayUTC.getTime();
+        
         setWarrantyEndDate(expiryDate)
         
-        // const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-        setWarrantyRemainingDays(Math.ceil(timeDiff / (1000 * 60 * 60 * 24)))
+        const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        if(daysRemaining>0){
+            setWarrantyRemainingDays(daysRemaining)
+        }else{
+          setWarrantyRemainingDays("Warranty already expired")
+        }
+        
         setFormVal({
           status_id: response.data.complaint_data[0].status_id,
           comments: '',
@@ -125,6 +131,22 @@ const WarrantyRequestDetails = () => {
 
       if (statuses.status == 1) {
         setStatusMasterData(statuses.data)
+      }
+      const rejectionRes = await fetch("/api/get_rejection_msgs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
+        },
+        body:JSON.stringify({
+            "request_type":2
+        })
+
+      });
+      const rejectres = await rejectionRes.json();
+
+      if (rejectres.status == 1) {
+        setRejectionMasterData(rejectres.data)
       }
       setLoading(false);
     } catch (e) {
@@ -162,6 +184,7 @@ const WarrantyRequestDetails = () => {
     console.log("this is the form vals", formVal);
     if (!validate()) return;
     setLoading(true);
+    // return;
     // pk_request_id
     try {
       const response = await fetch("/api/update_claim_request", {
@@ -454,7 +477,7 @@ const WarrantyRequestDetails = () => {
                                <div className="col-lg-4 mb-3">
                                 <div className="request_list ">
                                   Warranty Remaining Days:
-                                  <span>{warrantyRemainingDays} {warrantyRemainingDays>1?"Days":"Days"}</span>
+                                  <span>{warrantyRemainingDays}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
@@ -487,19 +510,19 @@ const WarrantyRequestDetails = () => {
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Request Status:
-                                  <span>{complaintData.addressedData[0].request_status}</span>
+                                  <span>{complaintData.addressedData[complaintData.addressedData.length-1].request_status}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated By:
-                                  <span>{complaintData.addressedData[0].addressedBY}</span>
+                                  <span>{complaintData.addressedData[complaintData.addressedData.length-1].addressedBY}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated Date:
-                                  <span>{formatDate(new Date(complaintData.addressedData[0].updated_at))}</span>
+                                  <span>{formatDate(new Date(complaintData.addressedData[complaintData.addressedData.length-1].updated_at))}</span>
                                 </div>
                               </div>
 
@@ -533,7 +556,7 @@ const WarrantyRequestDetails = () => {
                                     </div>
                                   </div>
                                 </div>
-                                {formVal.status_id == status_Rejected &&
+                                {formVal.status_id == complaint_status_rejected &&
                                   <div className="col-lg-5">
                                     <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Rejection Cause:</div>
                                     <div className="col-lg-12 mb-3">

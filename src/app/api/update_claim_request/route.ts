@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { auth_id, pk_id, comments, status,request_id, request_type, rejection_id, rejection_other, isRejected,isDuplicate, customer_phone } = body;
+  const { auth_id, pk_id, comments, status,request_id, request_type, rejection_id, rejection_other, isRejected, customer_phone } = body;
 
   let connection;
 
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       `INSERT INTO user_request_addressed 
        (fk_request_id, auth_user_id, comments, request_type, request_status, fk_rejection_id, other_rejection, created_at) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [pk_id, auth_id, comments, request_type, status, rejection_id, rejection_other, new Date()]
+      [pk_id, auth_id, comments, 2, status, rejection_id, rejection_other, new Date()]
     );
 
     // Step 2: Update user_warranty_requests
@@ -33,10 +33,11 @@ export async function POST(request: Request) {
        WHERE go_activity_id = ?`,
       [status,pk_id]
     );
+    // Step 2: Update user_complaint_requests
     await connection.query(
-      `UPDATE user_warranty_requests 
-       SET status_id = ?, addressed_id = ?, fk_reject_id = ?
-       WHERE pk_request_id = ?`,
+      `UPDATE user_complaint_requests 
+       SET status_id = ?, addressed_by = ?, fk_reject_id = ?
+       WHERE pk_id = ?`,
       [status, auth_id, rejection_id, pk_id]
     );
 
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
 
     await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Update Warranty Request",pk_id,1, JSON.stringify(createdJson), new Date()]
+      ["Update Claim Request",pk_id,1, JSON.stringify(createdJson), new Date()]
     );
 
     // ✅ COMMIT after all DB operations are successful
@@ -59,26 +60,27 @@ export async function POST(request: Request) {
     connection.release();
 
     // Step 4: Send Aisensy message
-    // const campaignName = "Reject_message";
 
     const aisensyPayload = {
-      apiKey: process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-      campaignName:"Reject_message",
-      destination: `${customer_phone}`,
-      userName: "Varroc Aftermarket",
-      templateParams: [request_id, isRejected ? `Rejected` : isDuplicate?"Duplicate Request": "Approved"],
-      source: "new-landing-page form",
-      media: {},
-      buttons: [],
-      carouselCards: [],
-      location: {},
-      attributes: {},
-      paramsFallbackValue: {
-        FirstName: "user"
-      }
-    };
+              "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
+              "campaignName": "warranty_claim_status",
+              "destination": `${customer_phone}`,
+              "userName": "Varroc Aftermarket",
+              "templateParams": [
+                request_id,
+                isRejected ? `Rejected ${comments}` : status=="7"?`Resolved`:"In progress"
+              ],
+              "source": "new-landing-page form",
+              "media": {},
+              "buttons": [],
+              "carouselCards": [],
+              "location": {},
+              "attributes": {},
+              "paramsFallbackValue": {
+                "FirstName": "user"
+              }
+};
 
-    console.log("this is the payload for aisensy"+JSON.stringify(aisensyPayload));
     
 
     const res = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
@@ -88,7 +90,6 @@ export async function POST(request: Request) {
     });
 
     const result = await res.json();
-    console.log("Aisensy response:", result);
     if(result.success==='true'){
       return NextResponse.json({ status: 1, message: "Request updated message sent to customer" });
     }{
@@ -103,7 +104,7 @@ export async function POST(request: Request) {
       await connection.rollback();
        await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Update Warranty Request Exception",pk_id,1, e, new Date()]
+      ["Update Warranty Request Exception",pk_id,1, JSON.stringify(e), new Date()]
     );
       connection.release();
     }

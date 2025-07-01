@@ -161,29 +161,28 @@ const WarrantyRequestListing = () => {
   const downloadExport = async () => {
 
     setLoading(true);
-    // const response = await fetch("/api/export-data", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json", // 🔥 Important for raw JSON
-    //     "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
-    //   },
-    //   body: JSON.stringify({
-    //     date: dataFilters.date,
-    //       request_id: dataFilters.request_id,
-    //       phone_no: dataFilters.phone_no,
-    //       name: dataFilters.name,
-    //       status: dataFilters.status,
-    //   }),
-    // });
-    // const blob = await response.blob();
-    // const url = window.URL.createObjectURL(blob);
+    const response = await fetch("/api/export-claims", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // 🔥 Important for raw JSON
+        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
+      },
+      body: JSON.stringify({
+        date: dataFilters.date,
+          request_id: dataFilters.request_id,
+          phone_no: dataFilters.phone_no,
+          status: dataFilters.status,
+      }),
+    });
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
 
-    // const a = document.createElement("a");
-    // a.href = url;
-    // a.download = "warranty_requests.csv";
-    // document.body.appendChild(a);
-    // a.click();
-    // document.body.removeChild(a);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "warranty_requests.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     setLoading(false);
   };
 

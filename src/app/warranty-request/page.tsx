@@ -73,6 +73,9 @@ const WarrantyRequestListing = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
+        body:JSON.stringify({
+            "request_type":1
+        })
 
       });
       const rejectres = await rejectionRes.json();

@@ -381,7 +381,7 @@ export async function POST(request: NextRequest) {
             body: JSON.stringify(
               {
                 "id": documents[i].id,//"1344347393330195",
-                "response_type": "stream"
+                "response_type": "document"
               }
             ),
           }
@@ -478,11 +478,10 @@ export async function POST(request: NextRequest) {
 
     const aisensyPayload = {
       "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-      "campaignName": "final_reference_id",
+      "campaignName": "warranty_registration_form_id",
       "destination": `${cleanedWhatsAppNumber}`,
       "userName": "Varroc Aftermarket",
       "templateParams": [
-        "Warranty registration",
         `${requestIDstring}`
       ],
       "source": "new-landing-page form",
@@ -551,6 +550,8 @@ export async function POST(request: NextRequest) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(failedAisensyPayload),
         });
+    console.log(aisensyApiRes);
+        
     if(connection){    
     if(aisensyApiRes){
       await connection.query(

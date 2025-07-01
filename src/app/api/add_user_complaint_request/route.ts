@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
             body: JSON.stringify(
               {
                 "id": documents[i].id,//"1344347393330195",
-                "response_type": "stream"
+                "response_type": "document"
               }
             ),
           }
@@ -215,29 +215,28 @@ export async function POST(request: NextRequest) {
           if (aisensyApiRes && aisensyApiRes.ok) {
                       await connection.query(
                 `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-                ["Add Complaint Request Media Upload failed message ",null,1, failedAisensyPayload, new Date()]
+                ["Add Complaint Request Media Upload failed message ",null,1, JSON.stringify(failedAisensyPayload), new Date()]
               );
               connection.release();
               return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
           }else{
             await connection.query(
                   `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-                  ["Add Complaint Request Media Upload failed send message failed",null,1, failedAisensyPayload, new Date()]
+                  ["Add Complaint Request Media Upload failed send message failed",null,1, JSON.stringify(failedAisensyPayload), new Date()]
                 );
                 connection.release();
               return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
           }
-          connection.release();
-        return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" },{status:200});
+        //   connection.release();
+        // return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" },{status:200});
 
       }else{
         const aisensyPayload = {
           "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-          "campaignName": "final_reference_id",
+          "campaignName": "warranty_claim_form_id",
           "destination": `${cleanedWhatsAppNumber}`,
           "userName": "Varroc Aftermarket",
           "templateParams": [
-            "Warranty Claim",
             `${requestIDstring}`
           ],
           "source": "new-landing-page form",
