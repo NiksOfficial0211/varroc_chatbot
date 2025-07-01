@@ -119,17 +119,20 @@ export async function POST(req: NextRequest) {
             description:item.battery_description,
       }));
     //-----------------------Convert data to CSV
-    const csv = Papa.unparse(flatData);
+
+    return NextResponse.json({ status: 1, message: "Request received reference id sent to customer",data:flatData }, { status: 200 });
+
+    // const csv = Papa.unparse(flatData);
     
 
-    // ---------------------Create response with headers
-    return new NextResponse(csv, {
-        status: 200,
-        headers: {
-            "Content-Type": "text/xlsx",
-            "Content-Disposition": 'attachment; filename="data.xlsx"',
-        },
-    });
+    // // ---------------------Create response with headers
+    // return new NextResponse(csv, {
+    //     status: 200,
+    //     headers: {
+    //         "Content-Type": "text/xlsx",
+    //         "Content-Disposition": 'attachment; filename="data.xlsx"',
+    //     },
+    // });
 
 }catch(e){
     return funSendApiException(e)

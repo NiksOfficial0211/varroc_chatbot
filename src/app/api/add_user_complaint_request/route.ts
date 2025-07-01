@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
   const [hashPresent] = await connection.execute<any[]>(`SELECT hash_key FROM all_request_hash
                 WHERE hash_key = ?
                 `,[hash]);
-  if(hashPresent.length > 0){              
+  if(hashPresent.length == 0){              
   // try{
     const activityAdded = await AddCommonLog(null,null,"Complaint Raised Body",body)
   // }catch(err){

@@ -243,7 +243,7 @@ export async function POST(request: NextRequest) {
                 WHERE hash_key = ?
                 `,[hash]);
 
-if (hashPresent.length > 0) {
+if (hashPresent.length == 0) {
   const activityAdded = await AddCommonLog(null,null,"Request Raised Body",body)
 
   const { whatsapp_number, user_name,
