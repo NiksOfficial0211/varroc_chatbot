@@ -82,6 +82,7 @@ const WarrantyRequestDetails = () => {
       if (response.status == 1) {
 
         setComplaintData(response.data)
+        if(response.data.warrantyRaised && response.data.warrantyRaised.length>0){
         const purchaseDate = new Date(response.data.warrantyRaised[0].product_purchase_date);
 
         // Step 1: Add 24 months
@@ -103,6 +104,7 @@ const WarrantyRequestDetails = () => {
         }else{
           setWarrantyRemainingDays("Warranty already expired")
         }
+      }
         
         setFormVal({
           status_id: response.data.complaint_data[0].status_id,
@@ -323,7 +325,10 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Customer Phone:
-                            <span>{complaintData.complaint_data[0].same_number==0?complaintData.complaint_data[0].user_phone?complaintData.complaint_data[0].user_phone : "--":complaintData.warrantyRaised && complaintData.warrantyRaised.length>0 && complaintData.warrantyRaised[complaintData.warrantyRaised.length].raised_whatsapp_number?complaintData.warrantyRaised[complaintData.warrantyRaised.length].raised_whatsapp_number: "--"}</span>
+                            <span>{complaintData.complaint_data[0].same_number==0?
+                                    complaintData.complaint_data[0].user_phone?
+                                    complaintData.complaint_data[0].user_phone : "--"
+                                    :complaintData.warrantyRaised && complaintData.warrantyRaised.length>0 && complaintData.warrantyRaised[complaintData.warrantyRaised.length].raised_whatsapp_number?complaintData.warrantyRaised[complaintData.warrantyRaised.length].raised_whatsapp_number: "--"}</span>
 
                           </div>
                         </div>
