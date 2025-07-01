@@ -330,7 +330,7 @@ const WarrantyRequestDetails = () => {
                                     complaintData.complaint_data[0].user_phone : "--"
                                     :complaintData.warrantyRaised && complaintData.warrantyRaised.length>0 
                                     && complaintData.warrantyRaised[complaintData.warrantyRaised.length].raised_whatsapp_number!=null?
-                                    complaintData.warrantyRaised[complaintData.warrantyRaised.length].raised_whatsapp_number: "--"}</span>
+                                    complaintData.warrantyRaised[complaintData.warrantyRaised.length].raised_whatsapp_number+"": "--"}</span>
 
                           </div>
                         </div>
