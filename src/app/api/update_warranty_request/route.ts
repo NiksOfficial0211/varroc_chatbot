@@ -63,7 +63,7 @@ export async function POST(request: Request) {
 
     const aisensyPayload = {
       apiKey: process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-      campaignName:"Reject_message",
+      campaignName:"warranty_registration_status",
       destination: `${customer_phone}`,
       userName: "Varroc Aftermarket",
       templateParams: [request_id, isRejected ? `Rejected ${comments}` : isDuplicate?"Duplicate Request": "Approved"],

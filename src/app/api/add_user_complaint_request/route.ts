@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '../../../../utils/db';
-import { formatDateYYYYMMDD, generateComplaintID, generateMixedString, generateMixedStringWithNumbers, generateRequestID, parseForm } from '@/app/pro_utils/const_functions';
+import { formatDateYYYYMMDD, generateComplaintID, generateMixedString, generateMixedStringWithNumbers, generateRequestID, parseForm, stableStringify } from '@/app/pro_utils/const_functions';
 import { AddCommonLog, AddUserRequestActivity } from '@/app/pro_utils/db_add_requests';
 import { ResultSetHeader } from 'mysql2';
 import fs from "fs/promises";
@@ -9,6 +9,7 @@ import path from "path";
 import { headers } from 'next/headers';
 import { promises as fsPromises } from 'fs'; // <-- for promise-based methods like readFile
 import { supabase } from '../../../../utils/supabaseClient';
+import crypto from 'crypto';
 
 
 interface fileURLInter {
@@ -25,12 +26,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized', message: "You are unauthorized" }, { status: 403 });
   }
 
-  let fileURL: fileURLInter[] = [{
-    url: '',
-    isInvoice: false
-  }];
+
  
   const body = await request.json();
+  const normalized = stableStringify(body);
+
+// 2. Generate SHA-256 hash
+  const hash = crypto.createHash('sha256').update(normalized).digest('hex');
+  let connection;
+  connection = await pool.getConnection();
+  const [hashPresent] = await connection.execute<any[]>(`SELECT hash_key FROM all_request_hash
+                WHERE hash_key = ?
+                `,[hash]);
+  if(hashPresent.length > 0){              
   // try{
     const activityAdded = await AddCommonLog(null,null,"Complaint Raised Body",body)
   // }catch(err){
@@ -39,7 +47,6 @@ export async function POST(request: NextRequest) {
   const { whatsapp_number,user_phone,serial_number,
     complaint_type, complaint_description, same_mobile, documents } = body;
     
-  let connection;
   try {
 
     connection = await pool.getConnection();
@@ -172,12 +179,12 @@ export async function POST(request: NextRequest) {
           //   `UPDATE user_complaint_requests SET document_id=?,document_url=? WHERE pk_id=?`,[documents[i].id,filePath,result.insertId]
           // );
           // const [insertImagesURL] = await connection.execute(
-          //   `INSERT INTO user_request_attachements (
+          //   `INSERT INTO user_claim_attachements (
           //       fk_request_id,aisensy_image_id,image_url,is_invoice,created_at
           //       ) VALUES (?,?, ?, ?, ?)`, [result.insertId, documents[i].id, filePath, false, new Date()]
 
           const [insertImagesURL] = await connection.execute(
-            `INSERT INTO user_request_attachements (
+            `INSERT INTO user_claim_attachements (
                 fk_request_id,aisensy_image_id,image_url,is_invoice,created_at
                 ) VALUES (?,?, ?, ?, ?)`, [result.insertId, documents[i].id, publicUrlData.publicUrl, false, new Date()]
           );
@@ -271,12 +278,9 @@ export async function POST(request: NextRequest) {
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
       ["Add Complaint Request Send Reference ID Failed",null,1, JSON.stringify(aisensyPayload), new Date()]
     );
-    connection.release();
+      connection.release();
       return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" });
-
     }
-
-
   }
   }
   catch (err) {
@@ -319,12 +323,16 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json({ status: 0, error: err }, { status: 500 });
     }
-  }    
-  
-    
+  }        
   }finally{
     if (connection) connection.release();
   }
+}else{
+      const activityAdded = await AddCommonLog(null,null,"Complaint Raised Body duplicate entry",body);
+        return NextResponse.json({ status: 1, message:"Already Request is Registered" }, { status: 200 });
+
+
+}
 
 }
 

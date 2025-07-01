@@ -22,15 +22,10 @@ export async function POST(req: NextRequest) {
    
         let query = `
       SELECT 
-        ua.*,
-        rt.request_type AS request_type,
-        rs.status AS request_status,
-        pi.*,
-        DATE_FORMAT(pi.manufacturing_date, '%Y-%m-%d') AS manufacturing_date
-        FROM user_warranty_requests ua
-        JOIN request_types rt ON ua.request_type_id = rt.request_type_id 
-        JOIN request_status rs ON ua.status_id = rs.status_id
-        LEFT JOIN product_info pi ON pi.battery_serial_number = ua.product_serial_no
+        ucr.*,
+        rs.status AS request_status
+      FROM user_complaint_requests ucr
+      JOIN request_status rs ON ucr.status_id = rs.status_id
     `;
 
     // Dynamic WHERE conditions
@@ -38,29 +33,24 @@ export async function POST(req: NextRequest) {
     const values: any[] = [];
 
     if (date) {
-      conditions.push(`DATE(ua.created_at) = ?`);
+      conditions.push(`DATE(ucr.created_at) = ?`);
       values.push(date); // should be in 'YYYY-MM-DD' format
     }
 
     if (request_id) {
-      conditions.push(`ua.request_id = ?`);
+      conditions.push(`ucr.request_id = ?`);
       values.push(request_id);
     }
 
     if (phone_no) {
-      conditions.push(`ua.user_phone like ?`);
+      conditions.push(`ucr.user_phone like ?`);
       values.push(`%${phone_no}%`);
     }
-
-    if (name) {
-      conditions.push(`ua.user_name LIKE ?`);
-      values.push(`%${name}%`);
-    }
-
     if (status) {
-      conditions.push(`ua.status_id = ?`);
+      conditions.push(`ucr.status_id = ?`);
       values.push(status);
     }
+
     if (reject_id) {
       conditions.push(`ua.fk_reject_id = ?`);
       values.push(reject_id);
@@ -70,7 +60,7 @@ export async function POST(req: NextRequest) {
       query += ` WHERE ` + conditions.join(" AND ");
     }
 
-    query += ` ORDER BY ua.created_at ASC`;
+    query += ` ORDER BY ucr.created_at ASC`;
     const [userRequests] = await connection.execute<RowDataPacket[]>(query, values);
     
     const enrichedRequests = await Promise.all(
@@ -112,12 +102,10 @@ export async function POST(req: NextRequest) {
 
     const flatData = enrichedRequests.map((item:any,index:any) => ({
             sr_no: index,
-            request_id:item.request_id,
+            complaint__id:item.complaint__id,
             request_date:item.created_at,
-            customer_name:item.user_name,
-            customer_phone:item.user_phone,
-            serial_no:item.product_serial_no,
-            purchase_date:item.product_purchase_date,
+            customer_phone:item.user_phone.length>0?item.user_phone : item.raised_whatsapp_no,
+            serial_no:item.battery_serial_no,
             request_type:item.request_type,
             request_status:item.request_status,
             request_comments:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].comments?item.addressedDetails[0].comments:"",

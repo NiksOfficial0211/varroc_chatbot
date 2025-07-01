@@ -323,7 +323,7 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Customer Phone:
-                            <span>{complaintData.complaint_data[0].user_phone || "--"}</span>
+                            <span>{complaintData.complaint_data[0].same_number==0?complaintData.complaint_data[0].user_phone || "--":complaintData.warrantyRaised[complaintData.warrantyRaised.length].raised_whatsapp_number || "--"}</span>
 
                           </div>
                         </div>

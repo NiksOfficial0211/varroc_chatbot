@@ -179,7 +179,7 @@ const WarrantyRequestListing = () => {
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = "warranty_requests.csv";
+    a.download = "claim_requests.csv";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

@@ -201,7 +201,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '../../../../utils/db';
-import { formatDateYYYYMMDD, generateMixedString, generateMixedStringWithNumbers, generateRequestID, parseForm } from '@/app/pro_utils/const_functions';
+import { formatDateYYYYMMDD, generateMixedString, generateMixedStringWithNumbers, generateRequestID, parseForm, stableStringify } from '@/app/pro_utils/const_functions';
 import { AddCommonLog, AddUserRequestActivity } from '@/app/pro_utils/db_add_requests';
 import { ResultSetHeader } from 'mysql2';
 import fs from "fs/promises";
@@ -211,7 +211,7 @@ import { headers } from 'next/headers';
 import { promises as fsPromises } from 'fs'; // <-- for promise-based methods like readFile
 import { supabase } from '../../../../utils/supabaseClient';
 import { initialRequestID } from '@/app/pro_utils/string_constants';
-
+import crypto from 'crypto';
 
 interface fileURLInter {
   url: any;
@@ -233,6 +233,17 @@ export async function POST(request: NextRequest) {
   }];
  
   const body = await request.json();
+  const normalized = stableStringify(body);
+
+// 2. Generate SHA-256 hash
+  const hash = crypto.createHash('sha256').update(normalized).digest('hex');
+  let connection;
+  connection = await pool.getConnection();
+  const [hashPresent] = await connection.execute<any[]>(`SELECT hash_key FROM all_request_hash
+                WHERE hash_key = ?
+                `,[hash]);
+
+if (hashPresent.length > 0) {
   const activityAdded = await AddCommonLog(null,null,"Request Raised Body",body)
 
   const { whatsapp_number, user_name,
@@ -242,10 +253,10 @@ export async function POST(request: NextRequest) {
     user_pin_code,
     product_serial_no, product_purchase_date, invoice, battery_image, documents } = body;
     
-  let connection;
+  
   try {
 
-    connection = await pool.getConnection();
+    // connection = await pool.getConnection();
     await connection.beginTransaction();
 
     const [resultID] = await connection.execute<any[]>(`SELECT request_id FROM user_warranty_requests
@@ -567,13 +578,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: 0, error: err }, { status: 500 });
     }
   }    
-  
-    
   }finally{
     if (connection) connection.release();
   }
+}else{
+  const activityAdded = await AddCommonLog(null,null,"Request Raised Body Duplicate Entry",body);
+  return NextResponse.json({ status: 1, message:"Already Request is Registered" }, { status: 200 });
 
 }
+
+}
+
+
+
 
 
 

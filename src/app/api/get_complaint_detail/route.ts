@@ -89,7 +89,7 @@ export async function POST(request: Request) {
           image_url,
           fk_request_id,
           is_invoice
-           FROM user_request_attachements WHERE fk_request_id = ?`, [pk_id]);
+           FROM user_claim_attachements WHERE fk_request_id = ?`, [pk_id]);
     connection.release();
     return NextResponse.json({
       status: 1, message: "Data Received", data: { complaint_data: userRequests, addressedData: addressedData, images: images, battery_details: batteryData, duplicate_data: duplicateDataRows,warrantyRaised:warrantyRecord }
