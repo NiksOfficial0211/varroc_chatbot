@@ -325,14 +325,13 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Customer Phone:
-                            {complaintData.warrantyRaised[0].raised_whatsapp_number}
-                            {/* {complaintData.warrantyRaised[complaintData.warrantyRaised.length].raised_whatsapp_number} */}
-                            {/* <span>{complaintData.complaint_data[0].same_number==0?
+                            
+                            <span>{complaintData.complaint_data[0].same_number==0?
                                     complaintData.complaint_data[0].user_phone?
                                     complaintData.complaint_data[0].user_phone : "--"
                                     :complaintData.warrantyRaised && complaintData.warrantyRaised.length>0 
-                                    && complaintData.warrantyRaised[complaintData.warrantyRaised.length].raised_whatsapp_number!=null?
-                                    complaintData.warrantyRaised[complaintData.warrantyRaised.length].raised_whatsapp_number+"": "--"}</span> */}
+                                    && complaintData.warrantyRaised[complaintData.warrantyRaised.length-1].raised_whatsapp_number!=null?
+                                    complaintData.warrantyRaised[complaintData.warrantyRaised.length-1].raised_whatsapp_number+"": "--"}</span>
 
                           </div>
                         </div>
