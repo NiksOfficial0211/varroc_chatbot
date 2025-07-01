@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
   // }
 
 
-  const { whatsapp_number,user_phone,serial_number,
+  const { whatsapp_number,mobile_number,serial_number,
     complaint_type, complaint_description, same_mobile, documents } = body;
     
   try {
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
         : null:null;
 
     const cleanedPhone =
-      user_phone !== undefined && user_phone !== null ? parseInt(user_phone) : null;
+      mobile_number !== undefined && mobile_number !== null ? parseInt(mobile_number) : null;
 
 
     // const cleanedDate = convertDDMMYYYYtoYYYYMMDD(product_purchase_date.trim());

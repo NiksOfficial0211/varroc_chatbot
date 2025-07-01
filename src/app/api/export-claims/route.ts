@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (reject_id) {
-      conditions.push(`ua.fk_reject_id = ?`);
+      conditions.push(`ucr.fk_reject_id = ?`);
       values.push(reject_id);
     }
 
@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
 
     query += ` ORDER BY ucr.created_at ASC`;
     const [userRequests] = await connection.execute<RowDataPacket[]>(query, values);
+    console.log("all user request data",userRequests);
     
     const enrichedRequests = await Promise.all(
       userRequests.map(async (request: any) => {
@@ -85,7 +86,7 @@ export async function POST(req: NextRequest) {
 
     
       conditions.push(`ura.fk_request_id = ?`);
-      values.push(request.pk_request_id); // should be in 'YYYY-MM-DD' format
+      values.push(request.pk_id); 
     
     if (conditions.length > 0) {
       addressedQuery += ` WHERE ` + conditions.join(" AND ");
@@ -104,13 +105,13 @@ export async function POST(req: NextRequest) {
             sr_no: index,
             complaint__id:item.complaint__id,
             request_date:item.created_at,
-            customer_phone:item.user_phone.length>0?item.user_phone : item.raised_whatsapp_no,
+            customer_phone:item.user_phone?item.user_phone : item.raised_whatsapp_no,
             serial_no:item.battery_serial_no,
             request_type:item.request_type,
             request_status:item.request_status,
-            request_comments:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].comments?item.addressedDetails[0].comments:"",
+            request_comments:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].comments?item.addressedDetails[0].comments:"--",
             requst_updated_date:item.updated_at,
-            updated_by:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].addressedBY? item.addressedDetails[0].addressedBY:"",
+            updated_by:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].addressedBY? item.addressedDetails[0].addressedBY:"--",
             master_serial_no:item.battery_serial_number,
             master_battery_model:item.battery_model,
             master_varroc_part_code:item.varroc_part_code,
@@ -120,21 +121,23 @@ export async function POST(req: NextRequest) {
       }));
     //-----------------------Convert data to CSV
 
-    return NextResponse.json({ status: 1, message: "Request received reference id sent to customer",data:flatData }, { status: 200 });
+    // return NextResponse.json({ status: 1, message: "Request received reference id sent to customer",data:flatData }, { status: 200 });
 
-    // const csv = Papa.unparse(flatData);
+    const csv = Papa.unparse(flatData);
     
 
-    // // ---------------------Create response with headers
-    // return new NextResponse(csv, {
-    //     status: 200,
-    //     headers: {
-    //         "Content-Type": "text/xlsx",
-    //         "Content-Disposition": 'attachment; filename="data.xlsx"',
-    //     },
-    // });
+    // ---------------------Create response with headers
+    return new NextResponse(csv, {
+        status: 200,
+        headers: {
+            "Content-Type": "text/xlsx",
+            "Content-Disposition": 'attachment; filename="data.xlsx"',
+        },
+    });
 
 }catch(e){
+  console.log("export claims exception",e);
+  
     return funSendApiException(e)
 }
 }
