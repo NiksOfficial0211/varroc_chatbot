@@ -196,7 +196,7 @@ const WarrantyRequestDetails = () => {
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
         body: 
-            formVal.status_id == status_Rejected ? JSON.stringify({
+            formVal.status_id == complaint_status_rejected ? JSON.stringify({
                       auth_id: auth_id,
                       pk_id: complaintData?.complaint_data[0].pk_id,
                       comments: formVal.comments ,

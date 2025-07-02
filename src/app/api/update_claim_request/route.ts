@@ -68,7 +68,7 @@ export async function POST(request: Request) {
               "userName": "Varroc Aftermarket",
               "templateParams": [
                 request_id,
-                isRejected ? `Rejected ${comments}` : status=="7"?`Resolved`:"In progress"
+                isRejected ? `Rejected ${comments}` : status=="7"?`In progress`:"Resolved"
               ],
               "source": "new-landing-page form",
               "media": {},
