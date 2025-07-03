@@ -26,41 +26,40 @@ export async function POST(request: NextRequest) {
     let isSuccess = false;
     if (isProductAdd) {
       const [insertResult] = await db.query<ResultSetHeader>(
-  `INSERT INTO product_info 
-    (created_by, updated_by, battery_model, varroc_part_code, battery_serial_number, 
-     manufacturing_date, battery_description, proposed_mrp, warranty, is_sold, created_at, updated_at)
-   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-   ON DUPLICATE KEY UPDATE
-     created_by = VALUES(created_by),
-     updated_by = VALUES(updated_by),
-     battery_model = VALUES(battery_model),
-     varroc_part_code = VALUES(varroc_part_code),
-     manufacturing_date = VALUES(manufacturing_date),
-     battery_description = VALUES(battery_description),
-     proposed_mrp = VALUES(proposed_mrp),
-     warranty = VALUES(warranty),
-     is_sold = VALUES(is_sold),
-     created_at = VALUES(created_at),
-     updated_at = ?`,
-  [
-    auth_id,                      // created_by
-    auth_id,                      // updated_by
-    model_no,
-    varroc_part_code,
-    serial_no,
-    manufacturing_date,
-    description,
-    proposed_mrp,
-    24,                           // warranty
-    0,                            // is_sold
-    formatDateToMySQL(new Date()), // created_at
-    formatDateToMySQL(new Date()), // updated_at for VALUES
-    formatDateToMySQL(new Date())  // updated_at for ON DUPLICATE
-  ]
-);
+          `INSERT INTO product_info 
+            (created_by, updated_by, battery_model, varroc_part_code, battery_serial_number, 
+            manufacturing_date, battery_description, proposed_mrp, warranty, is_sold, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ON DUPLICATE KEY UPDATE
+            created_by = VALUES(created_by),
+            updated_by = VALUES(updated_by),
+            battery_model = VALUES(battery_model),
+            varroc_part_code = VALUES(varroc_part_code),
+            manufacturing_date = VALUES(manufacturing_date),
+            battery_description = VALUES(battery_description),
+            proposed_mrp = VALUES(proposed_mrp),
+            warranty = VALUES(warranty),
+            is_sold = VALUES(is_sold),
+            created_at = VALUES(created_at),
+            updated_at = ?`,
+          [
+            auth_id,                      // created_by
+            auth_id,                      // updated_by
+            model_no,
+            varroc_part_code,
+            serial_no,
+            manufacturing_date,
+            description,
+            proposed_mrp,
+            24,                           // warranty
+            0,                            // is_sold
+            formatDateToMySQL(new Date()), // created_at
+            formatDateToMySQL(new Date()), // updated_at for VALUES
+            formatDateToMySQL(new Date())  // updated_at for ON DUPLICATE
+          ]
+      );
 
 
-      console.log("insert result array", insertResult);
 
       if (insertResult.affectedRows === 1 || insertResult.affectedRows === 2) {
         isSuccess = true;

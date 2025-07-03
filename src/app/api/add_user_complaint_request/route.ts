@@ -29,11 +29,13 @@ export async function POST(request: NextRequest) {
 
  
   const body = await request.json();
+  
+  let connection;
+  try{
   const normalized = stableStringify(body);
-
 // 2. Generate SHA-256 hash
   const hash = crypto.createHash('sha256').update(normalized).digest('hex');
-  let connection;
+  
   connection = await pool.getConnection();
   const [hashPresent] = await connection.execute<any[]>(`SELECT hash_key FROM all_request_hash
                 WHERE hash_key = ?
@@ -120,7 +122,7 @@ export async function POST(request: NextRequest) {
               go_activity_id,created_at)
              VALUES (?,?,?,?,?,?)`,
             [
-                cleanedWhatsAppNumber,
+                mobile_number !== undefined && mobile_number !== null?cleanedPhone: cleanedWhatsAppNumber,
                 2,
                 1,
                 requestIDstring,
@@ -160,7 +162,9 @@ export async function POST(request: NextRequest) {
           // const currentMonthShort = new Date().toLocaleString('default', { month: 'short' });
           // const currentDate = getCurrentDateFormatted();
 
-          // const filePath = path.join(process.cwd(), "/uploads/warranty", `${currentMonthShort}/${currentDate}`, filename);
+          // const dirPath = path.join(process.cwd(), "/uploads/warranty", currentMonthShort, currentDate);
+          // await fs.mkdir(dirPath, { recursive: true });
+          // const filePath = path.join(dirPath, filename);
           // await writeFile(filePath, fileBuffer);
 
           let bucket = "complaint";
@@ -228,14 +232,12 @@ export async function POST(request: NextRequest) {
                 `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
                 ["Add Complaint Request Media Upload failed message ",null,1, JSON.stringify(failedAisensyPayload), new Date()]
               );
-              connection.release();
               return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
           }else{
             await connection.query(
                   `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
                   ["Add Complaint Request Media Upload failed send message failed",null,1, JSON.stringify(failedAisensyPayload), new Date()]
                 );
-                connection.release();
               return NextResponse.json({ status: 0, message: "Failed to get and upload images"});
           }
         //   connection.release();
@@ -274,7 +276,6 @@ export async function POST(request: NextRequest) {
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
       ["Add Complaint Request Reference ID ",null,1, JSON.stringify(aisensyPayload), new Date()]
     );
-      connection.release();
       return NextResponse.json({ status: 1, message: "Request received reference id sent to customer" });
     }
     else {
@@ -282,7 +283,6 @@ export async function POST(request: NextRequest) {
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
       ["Add Complaint Request Send Reference ID Failed",null,1, JSON.stringify(aisensyPayload), new Date()]
     );
-      connection.release();
       return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" });
     }
   }
@@ -328,8 +328,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: 0, error: err }, { status: 500 });
     }
   }        
-  }finally{
-    if (connection) connection.release();
   }
 }else{
       const activityAdded = await AddCommonLog(null,null,"Complaint Raised Body duplicate entry",body);
@@ -337,6 +335,11 @@ export async function POST(request: NextRequest) {
 
 
 }
+}catch(e){
+return NextResponse.json({ status: 0, error: e }, { status: 500 });
+}finally{
+    if (connection) connection.release();
+  }
 
 }
 

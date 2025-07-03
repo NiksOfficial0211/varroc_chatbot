@@ -5,11 +5,20 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
-  const imagePath = url.searchParams.get('imagePath');
+  const rawPath = url.searchParams.get('imagePath');
+  
 
-  if (!imagePath) {
+  if (!rawPath) {
     return NextResponse.json({ error: 'Image path is required' }, { status: 400 });
   }
+  let imagePath = rawPath.replace(/\\/g, '/'); // Convert backslashes to forward slashes
+
+const uploadsIndex = imagePath.indexOf('/uploads/');
+if (uploadsIndex !== -1) {
+  imagePath = imagePath.substring(uploadsIndex + '/uploads/'.length); // Just keep 'warranty/Jul/..'
+} else {
+  return NextResponse.json({ error: 'Invalid image path' }, { status: 400 });
+} 
 
   const filePath = path.join(process.cwd(), 'uploads', imagePath);
 

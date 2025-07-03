@@ -37,7 +37,6 @@ export async function POST(request: Request) {
       'UPDATE auth SET is_login = 1 WHERE username = ?',
       [email]
     );
-    connection.release();
     const user = rows[0];
 
     // Replace this with a hashed password check (bcrypt) in real use cases

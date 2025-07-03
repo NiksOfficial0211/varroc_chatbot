@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import multiparty from 'multiparty';
 import { Readable } from "stream";
-import { apifailedWithException, apiStatusFailureCode, initialComplaintID, initialRequestID } from "./string_constants";
+import { apifailedWithException, apiStatusFailureCode, initialComplaintID, initialDealershipID, initialRequestID } from "./string_constants";
 
 export function generateMixedString() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -146,6 +146,13 @@ export function generateComplaintID(resultID: any[]) {
     return incrementRequestID(resultID[0].complaint__id);
   }else{
     return initialComplaintID+formatDateYYMMDD(new Date())+"-00001"
+  }
+}
+export function generateDelearshipRequestID(resultID: any[]) {
+  if(resultID.length>0){  
+    return incrementRequestID(resultID[0].dealership_id);
+  }else{
+    return initialDealershipID+formatDateYYMMDD(new Date())+"-00001"
   }
 }
 

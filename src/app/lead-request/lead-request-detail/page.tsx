@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import { FileViewer } from '@/app/components/DocViewer';
 import DialogImagePop from '@/app/components/dialog_DocViewer';
 import { ComplaintDetailDataModel, ComplaintListDataModel } from '@/app/datamodels/ComplaintsDataModel';
+import { DealershipEnqDetailDataModel } from '@/app/datamodels/DealershipEnqDataModel';
 
 
 interface formValues {
@@ -42,7 +43,7 @@ const WarrantyRequestDetails = () => {
   const [cityError, setCityError] = useState('');
   // const [pageNumber, setPageNumber] = useState(1);
   // const [pageSize, setPageSize] = useState(10);
-  const [complaintData, setComplaintData] = useState<ComplaintDetailDataModel>();
+  const [leadDetailsResponse, setLeadDetailsRes] = useState<DealershipEnqDetailDataModel>();
   const [statusMasterData, setStatusMasterData] = useState<StatusMasterDataModel[]>([]);
   const [rejectionMasterData, setRejectionMasterData] = useState<RejectMSGMasterDataModel[]>([]);
   const [formVal, setFormVal] = useState<formValues>({
@@ -61,7 +62,7 @@ const WarrantyRequestDetails = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/get_complaint_detail", {
+      const res = await fetch("/api/get_delearship_requests_details", {
         method: "POST",
         headers: {
           "Content-Type": "application/json", // 🔥 Important for raw JSON
@@ -78,10 +79,10 @@ const WarrantyRequestDetails = () => {
 
       if (response.status == 1) {
 
-        setComplaintData(response.data)
+        setLeadDetailsRes(response.data)
 
         setFormVal({
-          status_id: response.data.complaint_data[0].status_id,
+          status_id: response.data.enq_data[0].status_id,
           comments: '',
           rejection_id: 0
         });
@@ -129,6 +130,8 @@ const WarrantyRequestDetails = () => {
     const newErrors: Partial<formValues> = {};
 
     if (!formVal.status_id) newErrors.status_id = "Status is required";
+    if(formVal.status_id && formVal.status_id==0 || formVal.status_id==status_Pending)newErrors.status_id="Please select other status to update"
+    
     if (formVal.status_id && formVal.status_id == status_Pending) newErrors.status_id = "Please change status";
     if (formVal.status_id && formVal.status_id == status_Rejected && !formVal.rejection_id) newErrors.rejection_id = "Please select rejection reason";
     if (formVal.rejection_id && formVal.rejection_id == 1 && !formVal.comments) newErrors.comments = "Please enter rejection reason";// here 1 is for other and need to add comments also
@@ -220,28 +223,28 @@ const WarrantyRequestDetails = () => {
       }} onCloseClicked={function (): void {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
-      <LeftPanelMenus selectedMenu={2} showLeftPanel={false} rightBoxUI={
+      <LeftPanelMenus selectedMenu={5} showLeftPanel={false} rightBoxUI={
         <div className="container">
           <div className="row mt-4 mb-5">
 
             <div className="col-lg-12">
               <div className="row" id="top">
                 <div className="col-lg-12 mb-5">
-                  <div className="heading25" style={{ paddingLeft: "20px" }}>Complaint Details</div>
+                  <div className="heading25" style={{ paddingLeft: "20px" }}>Dealership Enquiry Details</div>
                 </div>
 
               </div>
 
 
-              {complaintData && complaintData.addressedData && complaintData ?
+              {leadDetailsResponse && leadDetailsResponse.addressed_data ?
                 <div className="grey_box request_details_mainbox">
                   <div className='row'>
-                    <div className="col-lg-8">
+                    <div className="col-lg-12">
                       <div className="row">
                         <div className="col-lg-12 mb-4">
                           
                           <div className="request_list_heading" style={{ margin: "-42px 0px 0px 20px", backgroundColor: "#e6f6ff" }}>
-                            Complaint ID: <span>{complaintData.complaint_data[0].complaint__id}</span>
+                            Enquiry ID: <span>{leadDetailsResponse.enq_data[0].dealership_id}</span>
                           </div>
                         </div>
                       </div>
@@ -256,108 +259,58 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Request Date:
-                            <span>{formatDateDDMMYYYY(complaintData.complaint_data[0].created_at)}</span>
+                            <span>{formatDateDDMMYYYY(leadDetailsResponse.enq_data[0].created_at)}</span>
 
                           </div>
                         </div>
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Customer Phone:
-                            <span>{complaintData.complaint_data[0].user_phone}</span>
+                            <span>{leadDetailsResponse.enq_data[0].raised_whatsapp_no}</span>
+
+                          </div>
+                        </div>
+                        <div className="col-lg-4 mb-3">
+                          <div className="request_list">
+                            Alternate Contact No. :
+                            <span>{leadDetailsResponse.enq_data[0].alternate_contact || "--"}</span>
 
                           </div>
                         </div>
 
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
-                            Serial Number:
-                            <span>{complaintData.complaint_data[0].battery_serial_no}</span>
+                            City:
+                            <span>{leadDetailsResponse.enq_data[0].city}</span>
                           </div>
                         </div>
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
-                            Complaint Type:
-                            <span>{complaintData.complaint_data[0].complaint_type}</span>
+                            State:
+                            <span>{leadDetailsResponse.enq_data[0].state_address}</span>
                           </div>
                         </div>
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
-                            Description:
-                            <span>{complaintData.complaint_data[0].complaint_description}</span>
+                            Business Age :
+                            <span>{leadDetailsResponse.enq_data[0].business_age}</span>
+                          </div>
+                        </div>
+                        <div className="col-lg-4 mb-3">
+                          <div className="request_list ">
+                            Shop Type :
+                            <span>{leadDetailsResponse.enq_data[0].shop_type}</span>
                           </div>
                         </div>
                         
-                        <div className="col-lg-12">
-                          <div className="row">
-                            <div className="col-lg-12">
-                              <div className='masterrecord_heading'>Master Record</div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }}>
-                          <div className="row">
-                            <div className="col-lg-4 mb-3">
-                              <div className="request_list">
-                                Request Status:
-                                <span>{complaintData.complaint_data[0].request_status}</span>
-
-                              </div>
-                            </div>
-                            <div className="col-lg-4 mb-3">
-                              <div className="request_list ">
-                                Battery Model
-                                <span>{complaintData.battery_details
-                                  && complaintData.battery_details.length > 0 ?
-                                  complaintData.battery_details[0].battery_model : "--"}</span>
-                              </div>
-                            </div>
-                            <div className="col-lg-4 mb-3">
-                              <div className="request_list ">
-                                Varroc Part Code
-                                <span>{complaintData.battery_details
-                                  && complaintData.battery_details.length > 0 ? complaintData.battery_details[0].varroc_part_code : "--"}</span>
-                              </div>
-                            </div>
-                            <div className="col-lg-4 mb-3">
-                              <div className="request_list ">
-                                Master Serial Number
-                                <span>{complaintData.battery_details
-                                  && complaintData.battery_details.length > 0 ? complaintData.battery_details[0].battery_serial_number : "--"}</span>
-                              </div>
-                            </div>
-                            <div className="col-lg-4 mb-3">
-                              <div className="request_list ">
-                                Manufacturing Date
-                                <span>{complaintData.battery_details
-                                  && complaintData.battery_details.length > 0 ? complaintData.battery_details[0].manufacturing_date : "--"}</span>
-                              </div>
-                            </div>
-                            <div className="col-lg-4 mb-3">
-                              <div className="request_list ">
-                                Proposed MRP
-                                <span>{complaintData.battery_details
-                                  && complaintData.battery_details.length > 0 ? complaintData.battery_details[0].proposed_mrp : "--"}</span>
-                              </div>
-                            </div>
-                            <div className="col-lg-12 mb-3">
-                              <div className="request_list ">
-                                Description
-                                <span>{complaintData.battery_details
-                                  && complaintData.battery_details.length > 0 ? complaintData.battery_details[0].battery_description : "--"}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        
-                        {complaintData.duplicate_data && complaintData.duplicate_data.map((duplicates, index) => (
+                        {leadDetailsResponse.duplicate_data && leadDetailsResponse.duplicate_data.map((duplicates, index) => (
                           <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }}>
 
                             <div className="row">
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
-                                  Reference ID
-                                  <span>{duplicates.request_id}</span>
+                                  Enquiry ID
+                                  <span>{duplicates.dealership_id}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
@@ -370,39 +323,34 @@ const WarrantyRequestDetails = () => {
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list ">
                                   Updated By:
-                                  <span>{duplicates.addressed_id || "--"}</span>
+                                  <span>{duplicates.addressed_by || "--"}</span>
                                 </div>
                               </div>
 
 
                             </div>
                           </div>))}
-
-                        {complaintData.battery_details.length == 0 && <div className="request_list_heading mb-4 ml-3" style={{ width: "auto", margin: "0" }}>
-                          <span style={{ color: "#D93731" }}>Serial Number does not match</span>
-                        </div>}
-
                       </div>
-                      {complaintData.addressedData && complaintData.addressedData.length>0 && complaintData.complaint_data[0].status_id != status_Pending ?
+                      {leadDetailsResponse.addressed_data && leadDetailsResponse.addressed_data.length>0 && leadDetailsResponse.enq_data[0].status_id != status_Pending ?
                         <div>
                           <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>
                             <div className="row">
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Request Status:
-                                  <span>{complaintData.addressedData[0].request_status}</span>
+                                  <span>{leadDetailsResponse.addressed_data[0].request_status}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated By:
-                                  <span>{complaintData.addressedData[0].addressedBY}</span>
+                                  <span>{leadDetailsResponse.addressed_data[0].addressedBY}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated Date:
-                                  <span>{formatDate(new Date(complaintData.addressedData[0].updated_at))}</span>
+                                  <span>{formatDate(new Date(leadDetailsResponse.addressed_data[0].updated_at))}</span>
                                 </div>
                               </div>
                               
@@ -414,7 +362,7 @@ const WarrantyRequestDetails = () => {
 
                       }
 
-                      {complaintData.complaint_data[0].status_id != status_Pending ?
+                      {leadDetailsResponse.enq_data[0].status_id != status_Pending ?
                         <div>
                           <form onSubmit={handleSubmit}>
                             <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>
@@ -477,24 +425,9 @@ const WarrantyRequestDetails = () => {
 
 
                     </div>
-                    <div className="col-lg-4 text-center">
-
-                      {complaintData?.complaint_data && complaintData?.complaint_data[0].document_url.length > 0 &&
-                        
-                          <div className="invoice_attach_box">
-                            <FileViewer fileUrl={complaintData?.complaint_data[0].document_url.includes("uploads")? getImageApiURL + "/" + complaintData?.complaint_data[0].document_url:complaintData?.complaint_data[0].document_url} isDialogView={false} set_height={150} /><br></br>
-                            <button className="blue_btn" onClick={() => { setShowImagePop(true); setImagePopURL(complaintData?.complaint_data[0].document_url) }}>View</button>
-
-                          </div>
-                      }
-                    </div>
+                    
                   </div>
-                  {showImagePop && <DialogImagePop
-                    fileURL={imagePopURL} onDownloadClicked={function (): void {
-
-                    }} onCloseClicked={function (): void {
-                      setShowImagePop(false);
-                    }} />}
+                  
                 </div>
 
                 : <PageErrorCenterContent content={isLoading ? "" : "Failed to load data"} />}

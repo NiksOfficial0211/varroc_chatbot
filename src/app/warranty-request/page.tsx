@@ -133,8 +133,6 @@ const WarrantyRequestListing = () => {
 
       }
     } catch (e) {
-      console.log(e);
-
       setLoading(false);
       setShowAlert(true);
       setAlertTitle("Exception")

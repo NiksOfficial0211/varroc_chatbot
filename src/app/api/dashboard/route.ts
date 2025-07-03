@@ -46,7 +46,7 @@ export async function  POST(request:Request){
                 ORDER BY ua.created_at DESC
                 
             `);
-            connection.release();
+            
         return NextResponse.json({status:1,message:"Data Received",data:{
             total_Request:totalWarrantyRequestRows[0].total + complaintPendingRequests[0].total,
             total_Warranty_Request:totalWarrantyRequestRows[0].total,

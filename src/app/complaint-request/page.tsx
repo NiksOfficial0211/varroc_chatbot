@@ -218,7 +218,7 @@ const WarrantyRequestListing = () => {
 
                       <div className="col-lg-2">
                         <div className="form_box ">
-                          <label htmlFor="formFile" className="form-label">Reference ID: </label>
+                          <label htmlFor="formFile" className="form-label">Complaint ID: </label>
                           <input type="text" id="request_id" name="request_id" value={dataFilters.request_id} onChange={handleInputChange} />
                         </div>
                       </div>

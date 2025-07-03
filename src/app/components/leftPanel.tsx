@@ -83,7 +83,7 @@ const LeftPanelMenus = ({ selectedMenu, rightBoxUI }: LeftPanelProps) => {
                                         </div>
                                     </a>
                                 </li>
-                                {/* <li className={menuIndex == 5 ? "selected" : ""}>
+                                <li className={menuIndex == 5 ? "selected" : ""}>
                                             <a href={pageURL_LeadRequstList}>
                                                 <div className="iconbox" onClick={()=>setMenuIndex(5)}>
                                                     <img src={staticIconsBaseURL + "/images/dealershipenquire_icon.png"} alt="icon" className="img-fluid"/>
@@ -93,7 +93,7 @@ const LeftPanelMenus = ({ selectedMenu, rightBoxUI }: LeftPanelProps) => {
                                                     <span>Enquiries</span>
                                                 </div>
                                             </a>
-                                        </li> */}
+                                        </li>
                                 <li className={menuIndex == 6 ? "selected" : ""}>
                                     <a onClick={() => { setMenuIndex(6), setShowUploadDialog(true) }}>
                                         <div className="iconbox">

@@ -66,7 +66,7 @@ export async function POST(request: Request) {
       campaignName:"warranty_registration_status",
       destination: `${customer_phone}`,
       userName: "Varroc Aftermarket",
-      templateParams: [request_id, isRejected ? `Rejected ${comments}` : isDuplicate?"Duplicate Request": "Approved"],
+      templateParams: [request_id, isRejected ?  comments && comments.length>0?`Rejected ${comments}`:"Rejected" : isDuplicate?"Duplicate Request": "Approved"],
       source: "new-landing-page form",
       media: {},
       buttons: [],

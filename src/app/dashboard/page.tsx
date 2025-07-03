@@ -6,7 +6,7 @@ import LoadingDialog from '../components/PageLoader';
 import ShowAlertMessage from '../components/alert';
 import { staticIconsBaseURL } from '../pro_utils/string_constants'
 import { useRouter } from 'next/navigation';
-import { pageURL_ComplaintDetails, pageURL_WarrantyRequestDetails, pageURL_WarrantyRequestList } from '../pro_utils/string_routes';
+import { pageURL_ComplaintDetails, pageURL_LeadDetails, pageURL_WarrantyRequestDetails, pageURL_WarrantyRequestList } from '../pro_utils/string_routes';
 import { useScrollCounter } from '../hooks/DashboardCountHook/dashboardCountHook';
 import { useGlobalContext } from '../contextProviders/globalContext';
 import LeftPanelMenus from '../components/leftPanel';
@@ -204,6 +204,8 @@ const Dashboard = () => {
                                                       router.push(pageURL_WarrantyRequestDetails)
                                                   }else if(activity.request_type_id==2){
                                                       router.push(pageURL_ComplaintDetails)
+                                                  }else{
+                                                    router.push(pageURL_LeadDetails)
                                                   }
                                                   
                                                 }}><img src={staticIconsBaseURL + "/images/view_icon.png"} alt="Varroc Excellence" className="img-fluid" style={{ maxHeight: "18px" }} /></div></div>

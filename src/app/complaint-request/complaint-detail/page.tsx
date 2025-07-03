@@ -171,8 +171,10 @@ const WarrantyRequestDetails = () => {
     const newErrors: Partial<formValues> = {};
 
     if (!formVal.status_id) newErrors.status_id = "Status is required";
+    if(formVal.status_id && formVal.status_id==0 || formVal.status_id==complaint_status_new)newErrors.status_id="Please select other status to update"
     if (formVal.status_id && formVal.status_id == status_Pending) newErrors.status_id = "Please change status";
-    if (formVal.status_id && formVal.status_id == status_Rejected && !formVal.rejection_id) newErrors.rejection_id = "Please select rejection reason";
+    if (formVal.status_id && formVal.status_id == complaint_status_rejected && !formVal.rejection_id) newErrors.rejection_id = "Please select rejection reason";
+    if (formVal.status_id && formVal.status_id == complaint_status_rejected && formVal.rejection_id==0) newErrors.rejection_id = "Please select rejection reason";
     if (formVal.rejection_id && formVal.rejection_id == 1 && !formVal.comments) newErrors.comments = "Please enter rejection reason";// here 1 is for other and need to add comments also
 
     console.log(newErrors);
@@ -188,6 +190,12 @@ const WarrantyRequestDetails = () => {
     setLoading(true);
     // return;
     // pk_request_id
+    let rejectionSelectedMsg=""
+    for(let i=0;i<rejectionMasterData.length;i++){
+      if(formVal.rejection_id==rejectionMasterData[i].pk_reject_id){
+        rejectionSelectedMsg=rejectionMasterData[i].rejection_msg;
+      }
+    }
     try {
       const response = await fetch("/api/update_claim_request", {
         method: "POST",
@@ -199,7 +207,7 @@ const WarrantyRequestDetails = () => {
             formVal.status_id == complaint_status_rejected ? JSON.stringify({
                       auth_id: auth_id,
                       pk_id: complaintData?.complaint_data[0].pk_id,
-                      comments: formVal.comments ,
+                      comments: formVal.comments && formVal.comments.length>0?formVal.comments : rejectionSelectedMsg,
                       status: formVal.status_id,
                       request_id: complaintData?.complaint_data[0].complaint__id,
                       rejection_id: formVal.rejection_id,
@@ -213,7 +221,7 @@ const WarrantyRequestDetails = () => {
                       status: formVal.status_id,
                       request_id: complaintData?.complaint_data[0].complaint__id,
                       isRejected: false,
-                      isDuplicate: formVal.status_id == status_Duplicate ? true : false,
+                      isResolved: formVal.status_id == complaint_status_resolved ? true : false,
                       customer_phone: complaintData?.complaint_data[0].raised_whatsapp_no
                     }),
         });
@@ -431,7 +439,7 @@ const WarrantyRequestDetails = () => {
                             <div className="row">
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
-                                  Reference ID
+                                  Complaint ID
                                   <span>{duplicates.complaint__id}</span>
                                 </div>
                               </div>
@@ -610,7 +618,7 @@ const WarrantyRequestDetails = () => {
                       {complaintData?.images && complaintData?.images.length > 0 &&
 
                         complaintData?.images.map((imageURL, index) =>
-                          <div className="invoice_attach_box">
+                          <div className="invoice_attach_box" key={index}>
                             <FileViewer fileUrl={imageURL.image_url.includes("uploads") ? getImageApiURL + "/" + imageURL.image_url : imageURL.image_url} isDialogView={false} set_height={150} key={index} /><br></br>
                             <button className="blue_btn" onClick={() => { setShowImagePop(true); setImagePopURL(imageURL.image_url) }}>View</button>
 

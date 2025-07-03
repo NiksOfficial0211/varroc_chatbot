@@ -413,9 +413,13 @@ if (hashPresent.length == 0) {
 
           // const currentMonthShort = new Date().toLocaleString('default', { month: 'short' });
           // const currentDate = getCurrentDateFormatted();
-
-          // const filePath = path.join(process.cwd(), "/uploads/warranty", `${currentMonthShort}/${currentDate}`, filename);
+          
+          // const dirPath = path.join(process.cwd(), "/uploads/warranty", currentMonthShort, currentDate);
+          // await fs.mkdir(dirPath, { recursive: true });
+          // const filePath = path.join(dirPath, filename);
           // await writeFile(filePath, fileBuffer);
+
+          
 
           let bucket = "warranty";
           const contentType = mime || 'application/octet-stream';

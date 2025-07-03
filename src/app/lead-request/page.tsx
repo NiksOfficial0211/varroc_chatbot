@@ -14,12 +14,13 @@ import LeftPanelMenus from '../components/leftPanel';
 import moment from 'moment';
 import { RejectMSGMasterDataModel, StatusMasterDataModel } from '../datamodels/CommonDataModels';
 import { ComplaintListDataModel } from '../datamodels/ComplaintsDataModel';
+import { DealershipEnqListingDataModel } from '../datamodels/DealershipEnqDataModel';
 
 interface DataFilters {
-  date: any, request_id: any, phone_no: any, name: any, status: any, page: any, limit: any
+  date: any, enquiry_id: any, city: any, state: any, status: any, whatsapp_no: any, page: any, limit: any
 }
 
-const WarrantyRequestListing = () => {
+const LeadRequestListing = () => {
   useSessionRedirect();
 
   const [isLoading, setLoading] = useState(false);
@@ -31,11 +32,12 @@ const WarrantyRequestListing = () => {
   const [alertStartContent, setAlertStartContent] = useState('');
   // const [pageNumber, setPageNumber] = useState(1);
   // const [pageSize, setPageSize] = useState(10);
-  const [complaintsList, setComplaintsData] = useState<ComplaintListDataModel[]>([]);
   const [statusMasterData, setStatusMasterData] = useState<StatusMasterDataModel[]>([]);
+  const [dealershipEnqList, setDealershipEnqList] = useState<DealershipEnqListingDataModel[]>([]);
+
 
   const [dataFilters, setDataFilters] = useState<DataFilters>({
-    date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
+    date: '', enquiry_id: '', city: '', state: '', status: '', whatsapp_no: '', page: 1, limit: 10
 
   });
   const [hasMoreData, setHasMoreData] = useState(true);
@@ -49,8 +51,84 @@ const WarrantyRequestListing = () => {
 
   // const fetchData = async (date: any, request_id: any, phone_no: any, name: any, status: any, page: any, limit: any) => {
   const fetchData = async (page: any) => {
-    
-    
+
+    setLoading(true);
+    try {
+      const statusRes = await fetch("/api/get_status_master", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
+        },
+        body: JSON.stringify({
+          "request_type": 1
+        })
+
+      });
+      const statuses = await statusRes.json();
+
+      if (statuses.status == 1) {
+        setStatusMasterData(statuses.data)
+      }
+      const res = await fetch("/api/get_delearship_requests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // 🔥 Important for raw JSON
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
+        },
+        body: JSON.stringify({
+          date: dataFilters.date,
+          enquiry_id: dataFilters.enquiry_id,
+          whatsapp_no: dataFilters.whatsapp_no,
+          city: dataFilters.city,
+          state: dataFilters.state,
+          status: dataFilters.status,
+          page: dataFilters.page == page ? dataFilters.page : page,
+          limit: dataFilters.limit
+        }),
+      });
+      const response = await res.json();
+
+      if (response.status == 1 && response.data.length > 0) {
+        setLoading(false);
+
+        setDealershipEnqList(response.data)
+        if (response.data.length < dataFilters.limit) {
+          setHasMoreData(false);
+
+        } else {
+          setHasMoreData(true);
+        }
+      } else if (response.status == 1 && response.data.length == 0) {
+        setLoading(false);
+        setDealershipEnqList([])
+        setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page }))
+
+        setHasMoreData(false);
+      }
+      else {
+        setDataFilters((prev) => ({ ...prev, ['pageNumber']: response.pageNumber }))
+
+
+        setHasMoreData(false)
+        setLoading(false);
+        setShowAlert(true);
+        setAlertTitle("Error")
+        setAlertStartContent(response.message);
+        setAlertForSuccess(2)
+
+      }
+
+    } catch (e) {
+
+
+      setLoading(false);
+      setShowAlert(true);
+      setAlertTitle("Exception")
+      setAlertStartContent("Exception occured! Something went wrong.");
+      setAlertForSuccess(2)
+    }
+
   }
 
   function changePage(page: any) {
@@ -75,7 +153,7 @@ const WarrantyRequestListing = () => {
     window.location.reload();
     setDataFilters({
 
-      date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
+      date: '', enquiry_id: '', city: '', state: '', status: '', whatsapp_no: '', page: 1, limit: 10
     });
     fetchData(dataFilters.page);
   }
@@ -127,31 +205,111 @@ const WarrantyRequestListing = () => {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
 
-      <LeftPanelMenus selectedMenu={3} showLeftPanel={false} rightBoxUI={
+      <LeftPanelMenus selectedMenu={5} showLeftPanel={false} rightBoxUI={
         <div className="container warranty_mainbox">
           <div className="row mt-4">
             <div className="col-lg-12">
 
               <div className="row" id="top">
-                
-                  <div className="col-lg-12 mb-3">
-                    <div className="heading25">
-                      Dealership Enquiries
-                      <button className="blue_btn" style={{ float: "right" }} onClick={downloadExport}>Export Data</button>
-                    </div>
+
+                <div className="col-lg-12 mb-3">
+                  <div className="heading25">
+                    Dealership Enquiries
+                    <button className="blue_btn" style={{ float: "right" }} onClick={downloadExport}>Export Data</button>
+                  </div>
                 </div>
 
                 <div className="col-lg-12 mb-4 ">
                   <div className="attendance_filter_box" id="filter_whitebox_open">
                     <div className="row" style={{ alignItems: "center" }}>
-
+                      <div className="col-lg-2">
+                        <div className="form_box ">
+                          <label htmlFor="formFile" className="form-label">Enquiry ID: </label>
+                          <input type="text" id="request_id" name="request_id" value={dataFilters.enquiry_id} onChange={handleInputChange} />
+                        </div>
+                      </div>
+                      <div className="col-lg-2">
+                        <div className="form_box ">
+                          <label htmlFor="formFile" className="form-label">Customer Phone : </label>
+                          <input type="text" id="request_id" name="request_id" value={dataFilters.city} onChange={handleInputChange} />
+                        </div>
+                      </div>
+                      <div className="col-lg-2">
+                        <div className="form_box ">
+                          <label htmlFor="formFile" className="form-label">City: </label>
+                          <input type="text" id="request_id" name="request_id" value={dataFilters.city} onChange={handleInputChange} />
+                        </div>
+                      </div>
+                      <div className="col-lg-2">
+                        <div className="form_box ">
+                          <label htmlFor="formFile" className="form-label">State: </label>
+                          <input type="text" id="request_id" name="request_id" value={dataFilters.state} onChange={handleInputChange} />
+                        </div>
+                      </div>
+                      <div className="col-lg-2">
+                        <div className="form_box ">
+                          <label htmlFor="formFile" className="form-label">Status: </label>
+                          <input type="text" id="request_id" name="request_id" value={dataFilters.status} onChange={handleInputChange} />
+                        </div>
+                      </div>
+                      <div className="col-lg-2">
+                        <div className="form_box ">
+                          <label htmlFor="formFile" className="form-label">Date: </label>
+                          <input type="date" id="date" name="date" value={dataFilters.date} onChange={handleInputChange} />
+                        </div>
+                      </div>
+                      <div className="col-lg-12 pt-4">
+                        <div style={{ float: "right", margin: "0 0 -30px 0" }}>
+                          <a className="blue_btn" onClick={() => { fetchData(dataFilters.page); }}>Submit</a> <a className="blue_btn" onClick={() => resetFilter()}>Reset</a>
+                        </div>
+                      </div>
 
                     </div>
                   </div>
                 </div>
 
               </div>
-              
+              <div className="row mb-3">
+                <div className="col-lg-12">
+                  <div className="grey_box" style={{ backgroundColor: "#fff", position: "relative", padding: "20px 60px 20px 30px" }}>
+                    <div className="row list_label mb-4">
+                      <div className="col-lg-3 text-center"><div className="label">Enquiry <br></br>ID</div></div>
+                      <div className="col-lg-2 text-center"><div className="label">Enquiry <br></br>Date</div></div>
+                      <div className="col-lg-2 text-center"><div className="label">Customer <br></br>Phone</div></div>
+                      <div className="col-lg-2 text-center"><div className="label">City</div></div>
+                      <div className="col-lg-2 text-center"><div className="label">State</div></div>
+                      <div className="col-lg-1 text-center"><div className="label">Status</div></div>
+                      {/* <div className="col-lg-1 text-center"><div className="label">Action</div></div> */}
+
+                    </div>
+
+                    {dealershipEnqList && dealershipEnqList.length > 0 &&
+                      dealershipEnqList.map((request) => (
+                        <div className="row list_listbox" style={{ alignItems: "center", cursor: "pointer" }} key={request.pk_deal_id} onClick={() => { }}>
+                          <div className="col-lg-3 text-center"><div className="label">{request.dealership_id}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{formatDateYYYYMMDD(request.created_at)}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{request.raised_whatsapp_no}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{request.city}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{request.state_address}</div></div>
+                          <div className="col-lg-1 text-center"><div className="label">{request.request_status}</div></div>
+
+                          <div className=""><div className="label viewbtn" onClick={() => {
+                            setGlobalState({
+                              selectedViewID: request.pk_deal_id + '',
+                              auth_id: auth_id,
+                              userName: userName
+                            });
+                            router.push(pageURL_WarrantyRequestDetails);
+                          }}><img src={staticIconsBaseURL + "/images/view_icon.png"} alt="Varroc Excellence" className="img-fluid" style={{ maxHeight: "18px" }} /></div>
+                          </div>
+                        </div>
+                      ))}
+
+
+                  </div>
+                </div>
+              </div>
+
               <div className="row">
                 <div className="col-lg-12">
                   <div className="pagination_box mb-3">
@@ -169,4 +327,4 @@ const WarrantyRequestListing = () => {
   )
 }
 
-export default WarrantyRequestListing
+export default LeadRequestListing
