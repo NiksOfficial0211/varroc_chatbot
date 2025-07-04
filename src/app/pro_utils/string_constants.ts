@@ -41,3 +41,8 @@ export const complaint_status_new=6;
 export const complaint_status_Investigating=7;
 export const complaint_status_resolved=8;
 export const complaint_status_rejected=9;
+
+export const lead_status_new=10;
+export const lead_status_contacted=11;
+export const lead_status_qualified=12;
+export const lead_status_disqualified=13;

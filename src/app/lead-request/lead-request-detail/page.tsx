@@ -9,7 +9,7 @@ import { WarrantyRequestDetailResponseModel } from '@/app/datamodels/WarrantyReq
 import PageErrorCenterContent from '@/app/components/pageError';
 import useSessionRedirect from '@/app/pro_utils/manage_session';
 import LeftPanelMenus from '@/app/components/leftPanel';
-import { getImageApiURL, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
+import { getImageApiURL, lead_status_contacted, lead_status_disqualified, lead_status_new, lead_status_qualified, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
 import moment from 'moment';
 import { RejectMSGMasterDataModel, StatusMasterDataModel } from '@/app/datamodels/CommonDataModels';
 import { useRouter } from 'next/navigation';
@@ -100,7 +100,7 @@ const WarrantyRequestDetails = () => {
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
          body:JSON.stringify({
-            "request_type":2
+            "request_type":3
         })
 
       });
@@ -147,17 +147,28 @@ const WarrantyRequestDetails = () => {
     console.log("this is the form vals", formVal);
     if (!validate()) return;
     setLoading(true);
+    let rejectionSelectedMsg=""
+    for(let i=0;i<rejectionMasterData.length;i++){
+      if(formVal.rejection_id==rejectionMasterData[i].pk_reject_id){
+        rejectionSelectedMsg=rejectionMasterData[i].rejection_msg;
+      }
+    }
     // pk_request_id
     try {
-      const response = await fetch("/api/update_warranty_request", {
+      const response = await fetch("/api/update_dealership_request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
-        body: JSON.stringify({
+        body: 
+              formVal.status_id == lead_status_disqualified ? JSON.stringify({
+
+              }):JSON.stringify({
+
+              })
           
-        }) 
+        
       });
       const resJson = await response.json();
       if (resJson && resJson.status == 1) {
@@ -304,7 +315,7 @@ const WarrantyRequestDetails = () => {
                         </div>
                         
                         {leadDetailsResponse.duplicate_data && leadDetailsResponse.duplicate_data.map((duplicates, index) => (
-                          <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }}>
+                          <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }} key={index}>
 
                             <div className="row">
                               <div className="col-lg-4 mb-3">
@@ -362,7 +373,7 @@ const WarrantyRequestDetails = () => {
 
                       }
 
-                      {leadDetailsResponse.enq_data[0].status_id != status_Pending ?
+                      {leadDetailsResponse.enq_data[0].status_id == lead_status_new || leadDetailsResponse.enq_data[0].status_id == lead_status_contacted  ?
                         <div>
                           <form onSubmit={handleSubmit}>
                             <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>
@@ -384,7 +395,7 @@ const WarrantyRequestDetails = () => {
                                     </div>
                                   </div>
                                 </div>
-                                {formVal.status_id == status_Rejected &&
+                                {formVal.status_id == lead_status_disqualified &&
                                   <div className="col-lg-5">
                                     <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Rejection Cause:</div>
                                     <div className="col-lg-12 mb-3">

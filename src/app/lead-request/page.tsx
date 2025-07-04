@@ -8,7 +8,7 @@ import { data } from 'jquery';
 import { staticIconsBaseURL, status_Rejected } from '../pro_utils/string_constants'
 import { useGlobalContext } from '../contextProviders/globalContext';
 import { useRouter } from 'next/navigation';
-import { pageURL_ComplaintDetails, pageURL_WarrantyRequestDetails } from '../pro_utils/string_routes';
+import { pageURL_ComplaintDetails, pageURL_LeadDetails, pageURL_WarrantyRequestDetails } from '../pro_utils/string_routes';
 import useSessionRedirect from '../pro_utils/manage_session';
 import LeftPanelMenus from '../components/leftPanel';
 import moment from 'moment';
@@ -61,7 +61,7 @@ const LeadRequestListing = () => {
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
         body: JSON.stringify({
-          "request_type": 1
+          "request_type": 3
         })
 
       });
@@ -299,7 +299,7 @@ const LeadRequestListing = () => {
                               auth_id: auth_id,
                               userName: userName
                             });
-                            router.push(pageURL_WarrantyRequestDetails);
+                            router.push(pageURL_LeadDetails);
                           }}><img src={staticIconsBaseURL + "/images/view_icon.png"} alt="Varroc Excellence" className="img-fluid" style={{ maxHeight: "18px" }} /></div>
                           </div>
                         </div>
