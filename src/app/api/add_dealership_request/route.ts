@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
                 `,[hash]);
   if(hashPresent.length == 0){              
   // try{
-    const activityAdded = await AddCommonLog(null,null,"Complaint Raised Body",body)
+    const activityAdded = await AddCommonLog(null,null,"DealerShip Raised Body",body)
   // }catch(err){
   //   return NextResponse.json({ status: 0, error: err }, { status: 500 });
   // }
@@ -168,14 +168,14 @@ export async function POST(request: NextRequest) {
         if (aisensyApiJson.success == 'true') {
           await connection.query(
           `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-          ["Add Complaint Request Reference ID ",null,3, JSON.stringify(aisensyPayload), new Date()]
+          ["Add DealerShip Request Reference ID ",null,3, JSON.stringify(aisensyPayload), new Date()]
         );
           return NextResponse.json({ status: 1, message: "Request received reference id sent to customer" });
         }
         else {
           await connection.query(
           `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-          ["Add Complaint Request Send Reference ID Failed",null,3, JSON.stringify(aisensyPayload), new Date()]
+          ["Add DealerShip Request Send Reference ID Failed",null,3, JSON.stringify(aisensyPayload), new Date()]
         );
           return NextResponse.json({ status: 1, message: "Request received but message delivery failed to customer" });
         }
@@ -211,20 +211,20 @@ export async function POST(request: NextRequest) {
     if(aisensyApiRes){
       await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Add Complaint Request DB add exception But Exception message sent",null,1, JSON.stringify(failedAisensyPayload), new Date()]
+      ["Add DealerShip Request DB add exception But Exception message sent",null,1, JSON.stringify(failedAisensyPayload), new Date()]
     );
     return NextResponse.json({ status: 0, error: err }, { status: 500 });
     }else{
       await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Add Complaint Request DB add exception But Exception message sent",null,1, JSON.stringify(failedAisensyPayload), new Date()]
+      ["Add DealerShip Request DB add exception But Exception message sent",null,1, JSON.stringify(failedAisensyPayload), new Date()]
     );
     return NextResponse.json({ status: 0, error: err }, { status: 500 });
     }
   }        
   }
 }else{
-      const activityAdded = await AddCommonLog(null,null,"Complaint Raised Body duplicate entry",body);
+      const activityAdded = await AddCommonLog(null,null,"DealerShip Raised Body duplicate entry",body);
         return NextResponse.json({ status: 1, message:"Already Request is Registered" }, { status: 200 });
 
 
