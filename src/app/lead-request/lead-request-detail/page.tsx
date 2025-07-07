@@ -314,6 +314,13 @@ const WarrantyRequestDetails = () => {
                           </div>
                         </div>
                         
+                        {leadDetailsResponse.duplicate_data && leadDetailsResponse.duplicate_data.length>0 && <div className="col-lg-12">
+                          <div className="row">
+                            <div className="col-lg-12">
+                              <div className='masterrecord_heading'>Previous/Duplicate Request</div>
+                            </div>
+                          </div>
+                        </div>}
                         {leadDetailsResponse.duplicate_data && leadDetailsResponse.duplicate_data.map((duplicates, index) => (
                           <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }} key={index}>
 
