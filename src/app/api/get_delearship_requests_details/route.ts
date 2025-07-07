@@ -82,7 +82,7 @@ export async function POST(request: Request) {
   } catch (e) {
     console.log(e);
     
-    return NextResponse.json({ status: 0, error: "Exception Occured" })
+    return NextResponse.json({ status: 0, message: "Exception Occured", error:e })
   }finally{
     if(connection) connection.release();
   }

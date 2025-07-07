@@ -45,7 +45,7 @@ export async function  POST(request:Request){
     }
 
     if (request_id) {
-      conditions.push(`udr.complaint__id = ?`);
+      conditions.push(`udr.dealership_id = ?`);
       values.push(request_id);
     }
 
@@ -115,7 +115,7 @@ export async function  POST(request:Request){
     }catch(e){
         console.log(e);
         
-        return NextResponse.json({status:0,message:"Exception Occured"})
+        return NextResponse.json({status:0,message:"Exception Occured",error:e})
     }finally{
       if(connection!) connection.release; 
     }
