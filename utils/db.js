@@ -18,6 +18,9 @@ const pool = mysql.createPool({
   password: process.env.NEXT_PUBLIC_DB_PASSWORD,
   database: process.env.NEXT_PUBLIC_DB_DATABASE,
   port: process.env.NEXT_PUBLIC_DB_PORT ? parseInt(process.env.NEXT_PUBLIC_DB_PORT) : 3306,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
 
 export default pool;

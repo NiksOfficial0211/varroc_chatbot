@@ -168,10 +168,22 @@ const WarrantyRequestListing = () => {
     fetchData(dataFilters.page);
   }
 
-  function formatDateYYYYMMDD(date: string) {
-    if (!date) return '';
-    const parsedDate = moment(date);
-    return parsedDate.format('YYYY-MM-DD');
+  function formatDateYYYYMMDD(inputDate: string,timeZone = 'Asia/Kolkata') {
+    const date = new Date(inputDate);
+
+    const formatter = new Intl.DateTimeFormat('en-IN', {
+        timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+
+    const parts = formatter.formatToParts(date);
+    const get = (type: string) => parts.find(p => p.type === type)?.value;
+    return `${get('day')}-${get('month')}-${get('year')} ${get('hour')}:${get('minute')} ${get('dayPeriod')}`;
   }
 
   const downloadExport = async () => {
