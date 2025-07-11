@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
                 (hash_key,created_at) VALUES (?,?)
                 `,[hash,new Date()]); 
     const [resultID] = await connection.execute<any[]>(`SELECT dealership_id FROM user_dealership_request
-                WHERE DATE(created_at) = CURDATE()
+                WHERE DATE(created_at) >= CURDATE()
                 ORDER BY created_at DESC
                 LIMIT 1`);
 

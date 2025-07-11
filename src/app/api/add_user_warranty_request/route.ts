@@ -262,7 +262,7 @@ if (hashPresent.length == 0) {
     await connection.beginTransaction();
 
     const [resultID] = await connection.execute<any[]>(`SELECT request_id FROM user_warranty_requests
-                WHERE DATE(created_at) = CURDATE()
+                WHERE DATE(created_at) >= CURDATE()
                 ORDER BY created_at DESC
                 LIMIT 1`);
 
