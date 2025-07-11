@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { auth_id, pk_id, comments, status,request_id, request_type, rejection_id, rejection_other, isRejected,isDuplicate, customer_phone } = body;
+  const { auth_id, pk_id, comments, status,request_id, request_type, rejection_id,selectedRejection, rejection_other, isRejected,isDuplicate, customer_phone } = body;
 
   let connection;
 
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
       campaignName:"warranty_registration_status",
       destination: `${customer_phone}`,
       userName: "Varroc Aftermarket",
-      templateParams: [request_id, isRejected ?  comments && comments.length>0?`Rejected ${comments}`:"Rejected" : isDuplicate?"Duplicate Request": "Approved"],
+      templateParams: [request_id, isRejected ?  comments && comments.length>0?`Rejected ${selectedRejection}-${comments}`:"Rejected" : isDuplicate?"Duplicate Request": "Approved"],
       source: "new-landing-page form",
       media: {},
       buttons: [],
