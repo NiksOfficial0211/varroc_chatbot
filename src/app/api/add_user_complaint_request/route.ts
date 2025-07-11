@@ -57,7 +57,8 @@ export async function POST(request: NextRequest) {
     await connection.beginTransaction();
 
     const [resultID] = await connection.execute<any[]>(`SELECT complaint__id FROM user_complaint_requests
-                WHERE DATE(created_at) = CURDATE()
+                WHERE created_at >= CURDATE()
+                ORDER BY created_at DESC
                 ORDER BY created_at DESC
                 LIMIT 1`);
 
