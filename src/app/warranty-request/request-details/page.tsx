@@ -139,7 +139,7 @@ const WarrantyRequestDetails = () => {
   const formatDateDDMMYYYY = (date: any, isTime = false) => {
     if (!date) return '';
     const parsedDate = moment(date);
-    return parsedDate.format('YYYY-MM-DD');
+    return parsedDate.format('DD-MM-YYYY');
   };
 
   const validate = () => {
@@ -271,18 +271,22 @@ const WarrantyRequestDetails = () => {
     setFormVal((prev) => ({ ...prev, [name]: value }));
   }
 
-  function formatDate(date: Date): string {
-    // return date.toISOString().slice(0, 19).replace("T", " ");
-    const localDate = new Date(date); // assumes input is a Date object (still in UTC under the hood)
+  function formatDate(inputDate: string,timeZone = 'Asia/Kolkata') {
+    const date = new Date(inputDate);
 
-  const year = localDate.getFullYear();
-  const month = String(localDate.getMonth() + 1).padStart(2, '0');
-  const day = String(localDate.getDate()).padStart(2, '0');
-  const hours = String(localDate.getHours()).padStart(2, '0');
-  const minutes = String(localDate.getMinutes()).padStart(2, '0');
-  const seconds = String(localDate.getSeconds()).padStart(2, '0');
+    const formatter = new Intl.DateTimeFormat('en-IN', {
+        timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
 
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    const parts = formatter.formatToParts(date);
+    const get = (type: string) => parts.find(p => p.type === type)?.value;
+    return `${get('day')}-${get('month')}-${get('year')} ${get('hour')}:${get('minute')} ${get('dayPeriod')}`;
   }
 
   return (
@@ -343,7 +347,7 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Request Date:
-                            <span>{formatDateDDMMYYYY(warrantyRequestData.request[0].created_at)}</span>
+                            <span>{formatDate(warrantyRequestData.request[0].created_at)}</span>
 
                           </div>
                         </div>
@@ -513,7 +517,7 @@ const WarrantyRequestDetails = () => {
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated Date:
-                                  <span>{formatDate(new Date(warrantyRequestData.addressedData[0].updated_at))}</span>
+                                  <span>{formatDate(warrantyRequestData.addressedData[0].updated_at)}</span>
                                 </div>
                               </div>
                               {warrantyRequestData.addressedData[0].fk_rejection_id ? <div className="col-lg-4 mb-3">

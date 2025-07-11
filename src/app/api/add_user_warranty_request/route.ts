@@ -478,14 +478,14 @@ if (hashPresent.length == 0) {
           if (aisensyApiRes && aisensyApiRes.ok) {
                       await connection.query(
                 `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-                ["Add Warranty Request Media Upload failed message ",null,1, failedAisensyPayload, new Date()]
+                ["Add Warranty Request Media Upload failed message ",null,1, JSON.stringify(failedAisensyPayload), new Date()]
               );
               connection.release();
               return NextResponse.json({ status: 0, message: "Failed to get and upload images"}, { status: 200 });
           }else{
             await connection.query(
                   `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-                  ["Add Warranty Request Media Upload failed send message failed",null,1, failedAisensyPayload, new Date()]
+                  ["Add Warranty Request Media Upload failed send message failed",null,1, JSON.stringify(failedAisensyPayload), new Date()]
                 );
                 connection.release();
               return NextResponse.json({ status: 0, message: "Failed to get and upload images"}, { status: 200 });
