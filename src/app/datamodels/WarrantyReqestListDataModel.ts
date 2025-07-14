@@ -34,4 +34,5 @@ export interface WarrantyRequestDataModel {
     rejection_msg: string
     created_at: string
     updated_at: string
+    addressedBY: string
   }

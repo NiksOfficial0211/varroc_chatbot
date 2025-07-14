@@ -41,19 +41,18 @@ export async function POST(request: NextRequest) {
                 WHERE hash_key = ?
                 `,[hash]);
   if(hashPresent.length == 0){              
-  // try{
+  
     const activityAdded = await AddCommonLog(null,null,"Complaint Raised Body",body)
-  // }catch(err){
-  //   return NextResponse.json({ status: 0, error: err }, { status: 500 });
-  // }
-
+  
+    const [addHash] = await connection.execute<any[]>(`INSERT INTO all_request_hash
+                (hash_key,created_at) VALUES (?,?)
+                `,[hash,new Date()]); 
 
   const { whatsapp_number,mobile_number,serial_number,
     complaint_type, complaint_description, same_mobile, documents } = body;
     
   try {
 
-    connection = await pool.getConnection();
     await connection.beginTransaction();
 
     const [resultID] = await connection.execute<any[]>(`SELECT complaint__id FROM user_complaint_requests
@@ -62,9 +61,7 @@ export async function POST(request: NextRequest) {
                 LIMIT 1`);
 
     const requestIDstring = generateComplaintID(resultID)
-    const [hashPresent] = await connection.execute<any[]>(`INSERT INTO all_request_hash
-                (hash_key,created_at) VALUES (?,?)
-                `,[hash,new Date()]);  
+     
     const cleanedWhatsAppNumber =
       whatsapp_number?.trim() !== '' ? whatsapp_number.trim() : null;
 
@@ -102,7 +99,7 @@ export async function POST(request: NextRequest) {
         requestIDstring,
         cleanedSerialNo,
         parseInt(same_mobile),
-        cleanedPhone,
+        mobile_number !== undefined && mobile_number !== null?cleanedPhone: cleanedWhatsAppNumber,
         cleanedComplaintType,
         cleanedComplaintDesc,
         cleanedWhatsAppNumber,
@@ -313,29 +310,38 @@ export async function POST(request: NextRequest) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(failedAisensyPayload),
         });
+
+    const extendedPayload = {
+        ...failedAisensyPayload,
+        actualException: err,
+        timestamp: new Date().toISOString()
+      }     
     if(connection){    
     if(aisensyApiRes){
       await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Add Complaint Request DB add exception But Exception message sent",null,1, JSON.stringify(failedAisensyPayload), new Date()]
+      ["Add Complaint Request DB add exception But Exception message sent",null,1, JSON.stringify(extendedPayload), new Date()]
     );
     return NextResponse.json({ status: 0, error: err }, { status: 500 });
     }else{
       await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Add Complaint Request DB add exception But Exception message sent",null,1, JSON.stringify(failedAisensyPayload), new Date()]
+      ["Add Complaint Request DB add exception But Exception message sent",null,1, JSON.stringify(extendedPayload), new Date()]
     );
     return NextResponse.json({ status: 0, error: err }, { status: 500 });
     }
   }        
   }
 }else{
+  const [addHash] = await connection.execute<any[]>(`INSERT INTO all_request_hash
+                (hash_key,created_at) VALUES (?,?)
+                `,[hash,new Date()]);
       const activityAdded = await AddCommonLog(null,null,"Complaint Raised Body duplicate entry",body);
         return NextResponse.json({ status: 1, message:"Already Request is Registered" }, { status: 200 });
 
-
 }
 }catch(e){
+  
 return NextResponse.json({ status: 0, error: e }, { status: 500 });
 }finally{
     if (connection) connection.release();

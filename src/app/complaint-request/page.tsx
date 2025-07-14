@@ -296,7 +296,7 @@ const WarrantyRequestListing = () => {
                           <div className="col-lg-2 text-center"><div className="label">{complaints.complaint_type}</div></div>
                           {/* <div className="col-lg-2 text-center"><div className="label">{complaints.complaint_description}</div></div> */}
                           <div className="col-lg-1 text-center"><div className="label">{complaints.request_status}</div></div>
-                          <div className="col-lg-2 text-center"><div className="label">{complaints.addressedDetails && complaints.addressedDetails.length>0?complaints.addressedDetails[0].auth_user_id:"--"}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{complaints.addressedDetails && complaints.addressedDetails.length>0?complaints.addressedDetails[0].addressedBY:"--"}</div></div>
                           <div className=""><div className="label viewbtn" onClick={() => {
                             setGlobalState({
                               selectedViewID: complaints.pk_id + '',

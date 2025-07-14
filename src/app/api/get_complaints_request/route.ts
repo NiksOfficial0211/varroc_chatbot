@@ -77,8 +77,11 @@ export async function  POST(request:Request){
           `SELECT
           ura.*,
           rt.request_type AS request_type,
-          rs.status AS request_status 
+          rs.status AS request_status,
+          aut.username as addressedBY 
           FROM user_request_addressed ura
+          
+          JOIN auth aut ON ura.auth_user_id = aut.auth_id
           JOIN request_types rt ON ura.request_type = rt.request_type_id 
           JOIN request_status rs ON ura.request_status = rs.status_id`;
 
@@ -87,7 +90,7 @@ export async function  POST(request:Request){
       const values: any[] = [];
 
       conditions.push(`ura.fk_request_id = ?`);
-      values.push(request.complaint__id); 
+      values.push(request.pk_id); 
     
     if (conditions.length > 0) {
       addressedQuery += ` WHERE ` + conditions.join(" AND ");

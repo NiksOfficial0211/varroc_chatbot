@@ -22,6 +22,12 @@ export async function  POST(request:Request){
         const [totalWarrantyRequestRows] = await connection.execute<CountResult[]>(
             'SELECT COUNT(*) AS total FROM user_warranty_requests'
           );
+          const [totalComplaintRequests] = await connection.execute<CountResult[]>(
+            'SELECT COUNT(*) AS total FROM user_complaint_requests'
+          );
+          const [totalDealershipRequest] = await connection.execute<CountResult[]>(
+            'SELECT COUNT(*) AS total FROM user_dealership_request'
+          );
         const [totalAddressedCount] = await connection.execute<CountResult[]>(
             'SELECT COUNT(*) AS total FROM user_request_addressed'
           );
@@ -31,6 +37,9 @@ export async function  POST(request:Request){
           );  
           const [complaintPendingRequests] = await connection.execute<CountResult[]>(
             'SELECT COUNT(*) AS total FROM user_complaint_requests where status_id=6'//6=new
+          ); 
+          const [dealershipPendingRequests] = await connection.execute<CountResult[]>(
+            'SELECT COUNT(*) AS total FROM user_dealership_request where status_id=10'//6=new
           );  
         const [userActivities] = await connection.execute(`SELECT 
                 ua.pk_activity_id,ua.name,
@@ -48,12 +57,12 @@ export async function  POST(request:Request){
             `);
             
         return NextResponse.json({status:1,message:"Data Received",data:{
-            total_Request:totalWarrantyRequestRows[0].total + complaintPendingRequests[0].total,
+            total_Request:totalWarrantyRequestRows[0].total + totalComplaintRequests[0].total+totalDealershipRequest[0].total,
             total_Warranty_Request:totalWarrantyRequestRows[0].total,
             addressed_count:totalAddressedCount[0].total,
             warranty_pending_request:warrantyPendingRequests[0].total,
             complaints_pending_request:complaintPendingRequests[0].total,
-            business_pending_requests:0,
+            business_pending_requests:dealershipPendingRequests[0].total,
             activities:userActivities
         }});
     }catch(e){

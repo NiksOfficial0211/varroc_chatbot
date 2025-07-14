@@ -245,7 +245,7 @@ export async function POST(request: NextRequest) {
 
 if (hashPresent.length == 0) {
   const activityAdded = await AddCommonLog(null,null,"Request Raised Body",body)
-  const [hashPresent] = await connection.execute<any[]>(`INSERT INTO all_request_hash
+  const [addHash] = await connection.execute<any[]>(`INSERT INTO all_request_hash
                 (hash_key,created_at) VALUES (?,?)
                 `,[hash,new Date()]);  
   const { whatsapp_number, user_name,
@@ -567,19 +567,22 @@ if (hashPresent.length == 0) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(failedAisensyPayload),
         });
-    console.log(aisensyApiRes);
-        
+        const extendedPayload = {
+        ...failedAisensyPayload,
+        actualException: err,
+        timestamp: new Date().toISOString()
+      } 
     if(connection){    
     if(aisensyApiRes){
       await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Add Warranty Request DB add exception But Exception message sent",null,1, JSON.stringify(failedAisensyPayload), new Date()]
+      ["Add Warranty Request DB add exception But Exception message sent",null,1, JSON.stringify(extendedPayload), new Date()]
     );
     return NextResponse.json({ status: 0, error: err }, { status: 500 });
     }else{
       await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Add Warranty Request DB add exception But Exception message sent",null,1, JSON.stringify(failedAisensyPayload), new Date()]
+      ["Add Warranty Request DB add exception But Exception message sent",null,1, JSON.stringify(extendedPayload), new Date()]
     );
     return NextResponse.json({ status: 0, error: err }, { status: 500 });
     }
@@ -588,6 +591,9 @@ if (hashPresent.length == 0) {
     if (connection) connection.release();
   }
 }else{
+  const [addHash] = await connection.execute<any[]>(`INSERT INTO all_request_hash
+                (hash_key,created_at) VALUES (?,?)
+                `,[hash,new Date()]);
   const activityAdded = await AddCommonLog(null,null,"Request Raised Body Duplicate Entry",body);
   return NextResponse.json({ status: 1, message:"Already Request is Registered" }, { status: 200 });
 

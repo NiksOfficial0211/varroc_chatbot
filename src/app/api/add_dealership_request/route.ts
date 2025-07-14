@@ -46,17 +46,18 @@ export async function POST(request: NextRequest) {
   // }catch(err){
   //   return NextResponse.json({ status: 0, error: err }, { status: 500 });
   // }
-
+  const [addHash] = await connection.execute<any[]>(`INSERT INTO all_request_hash
+                (hash_key,created_at) VALUES (?,?)
+                `,[hash,new Date()]); 
 
   const { whatsapp_number,full_name,contact_number,pincode,state_address,business_age,shop_type } = body;
     
   try {
 
-    connection = await pool.getConnection();
+    
     await connection.beginTransaction();
-    const [hashPresent] = await connection.execute<any[]>(`INSERT INTO all_request_hash
-                (hash_key,created_at) VALUES (?,?)
-                `,[hash,new Date()]); 
+    
+
     const [resultID] = await connection.execute<any[]>(`SELECT dealership_id FROM user_dealership_request
                 WHERE DATE(created_at) >= CURDATE()
                 ORDER BY created_at DESC
@@ -122,14 +123,14 @@ export async function POST(request: NextRequest) {
 
     const [insertActivity] = await connection.execute(
             `INSERT INTO user_activities 
-             (phone,
+             (name,phone,
               request_type_id,
               status_id,
               request_id,
               go_activity_id,created_at)
-             VALUES (?,?,?,?,?,?)`,
+             VALUES (?,?,?,?,?,?,?)`,
             [
-                cleanedWhatsAppNumber,
+                cleanedFullName,cleanedWhatsAppNumber,
                 3,
                 1,
                 requestIDstring,
@@ -207,23 +208,33 @@ export async function POST(request: NextRequest) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(failedAisensyPayload),
         });
+
+     const extendedPayload = {
+        ...failedAisensyPayload,
+        actualException: err,
+        timestamp: new Date().toISOString()
+      }   
     if(connection){    
     if(aisensyApiRes){
       await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Add DealerShip Request DB add exception But Exception message sent",null,1, JSON.stringify(failedAisensyPayload), new Date()]
+      ["Add DealerShip Request DB add exception But Exception message sent",null,1, JSON.stringify(extendedPayload), new Date()]
     );
     return NextResponse.json({ status: 0, error: err }, { status: 500 });
     }else{
       await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Add DealerShip Request DB add exception But Exception message sent",null,1, JSON.stringify(failedAisensyPayload), new Date()]
+      ["Add DealerShip Request DB add exception But Exception message sent",null,1, JSON.stringify(extendedPayload), new Date()]
     );
     return NextResponse.json({ status: 0, error: err }, { status: 500 });
     }
   }        
   }
-}else{
+}
+else{
+  const [addHash] = await connection.execute<any[]>(`INSERT INTO all_request_hash
+                (hash_key,created_at) VALUES (?,?)
+                `,[hash,new Date()]);
       const activityAdded = await AddCommonLog(null,null,"DealerShip Raised Body duplicate entry",body);
         return NextResponse.json({ status: 1, message:"Already Request is Registered" }, { status: 200 });
 

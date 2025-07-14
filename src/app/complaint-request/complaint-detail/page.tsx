@@ -9,7 +9,7 @@ import { WarrantyRequestDetailResponseModel } from '@/app/datamodels/WarrantyReq
 import PageErrorCenterContent from '@/app/components/pageError';
 import useSessionRedirect from '@/app/pro_utils/manage_session';
 import LeftPanelMenus from '@/app/components/leftPanel';
-import { complaint_status_new, complaint_status_rejected, complaint_status_resolved, getImageApiURL, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
+import { complaint_status_Investigating, complaint_status_new, complaint_status_rejected, complaint_status_resolved, getImageApiURL, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
 import moment from 'moment';
 import { RejectMSGMasterDataModel, StatusMasterDataModel } from '@/app/datamodels/CommonDataModels';
 import { useRouter } from 'next/navigation';
@@ -98,7 +98,7 @@ const WarrantyRequestDetails = () => {
         
         setWarrantyEndDate(expiryDate)
         
-        const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 18));
         if(daysRemaining>0){
             setWarrantyRemainingDays(daysRemaining)
         }else{
@@ -164,7 +164,7 @@ const WarrantyRequestDetails = () => {
   const formatDateDDMMYYYY = (date: any, isTime = false) => {
     if (!date) return '';
     const parsedDate = moment(date);
-    return parsedDate.format('YYYY-MM-DD');
+    return parsedDate.format('DD-MM-YYYY');
   };
   
 
@@ -346,7 +346,7 @@ const WarrantyRequestDetails = () => {
                                     complaintData.complaint_data[0].user_phone : "--"
                                     :complaintData.warrantyRaised && complaintData.warrantyRaised.length>0 
                                     && complaintData.warrantyRaised[complaintData.warrantyRaised.length-1].raised_whatsapp_number!=null?
-                                    complaintData.warrantyRaised[complaintData.warrantyRaised.length-1].raised_whatsapp_number+"": "--"}</span>
+                                    complaintData.warrantyRaised[complaintData.warrantyRaised.length-1].raised_whatsapp_number+"": complaintData.complaint_data[0].raised_whatsapp_no}</span>
 
                           </div>
                         </div>
@@ -468,7 +468,7 @@ const WarrantyRequestDetails = () => {
                             </div>
                           </div>))}
 
-                {complaintData.warrantyRaised && complaintData.warrantyRaised.length>0 && <div className="col-lg-12">
+                        {complaintData.warrantyRaised && complaintData.warrantyRaised.length>0 && <div className="col-lg-12">
                           <div className="row">
                             <div className="col-lg-12">
                               <div className='masterrecord_heading'>Warranty Request</div>
@@ -536,6 +536,8 @@ const WarrantyRequestDetails = () => {
                                   <span>{complaintData.addressedData[complaintData.addressedData.length-1].request_status}</span>
                                 </div>
                               </div>
+                             
+                              
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated By:
@@ -548,6 +550,18 @@ const WarrantyRequestDetails = () => {
                                   <span>{formatDate(complaintData.addressedData[complaintData.addressedData.length-1].updated_at)}</span>
                                 </div>
                               </div>
+                               <div className="col-lg-4 mb-3">
+                                <div className="request_list">
+                                  Rejection Reason:
+                                  <span>{complaintData.addressedData[complaintData.addressedData.length-1].rejection_msg}</span>
+                                </div>
+                              </div>
+                              <div className="col-lg-8 mb-3">
+                                <div className="request_list">
+                                  Coments:
+                                  <span>{complaintData.addressedData[complaintData.addressedData.length-1].comments}</span>
+                                </div>
+                              </div>
 
 
 
@@ -557,7 +571,7 @@ const WarrantyRequestDetails = () => {
 
                       }
 
-                      {complaintData.complaint_data[0].status_id == complaint_status_new ?
+                      {complaintData.complaint_data[0].status_id == complaint_status_new || complaintData.complaint_data[0].status_id == complaint_status_Investigating?
                         <div>
                           
                             <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>

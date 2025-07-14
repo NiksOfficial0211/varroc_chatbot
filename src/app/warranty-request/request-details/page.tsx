@@ -373,6 +373,12 @@ const WarrantyRequestDetails = () => {
                             <span>{warrantyRequestData.request[0].product_serial_no}</span>
                           </div>
                         </div>
+                        <div className="col-lg-4 mb-3">
+                          <div className="request_list ">
+                            Pin Code:
+                            <span>{warrantyRequestData.request[0].user_pin_code}</span>
+                          </div>
+                        </div>
                         {warrantyRequestData.request[0].retailer_city_name && warrantyRequestData.request[0].retailer_city_name.length > 0 ? <div className="col-lg-4 mb-3">
                           <div className="request_list ">
                             City:
@@ -409,7 +415,7 @@ const WarrantyRequestDetails = () => {
                             <div className="col-lg-4 mb-3">
                               <div className="request_list">
                                 Request Status:
-                                <span>{warrantyRequestData.request[0].request_status}</span>
+                                <span>{warrantyRequestData &&warrantyRequestData.request && warrantyRequestData.request.length>0 ?warrantyRequestData.request[0].request_status :"--"}</span>
 
                               </div>
                             </div>
@@ -506,28 +512,30 @@ const WarrantyRequestDetails = () => {
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Request Status:
-                                  <span>{warrantyRequestData.addressedData[0].request_status}</span>
+                                  <span>{warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 ?warrantyRequestData.addressedData[0].request_status:"--"}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated By:
-                                  <span>{warrantyRequestData.addressedData[0].addressedBY}</span>
+                                  <span>{warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 ?warrantyRequestData.addressedData[0].addressedBY:"--"}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated Date:
-                                  <span>{formatDate(warrantyRequestData.addressedData[0].updated_at)}</span>
+                                  <span>{warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 ?formatDate(warrantyRequestData.addressedData[0].updated_at):"--"}</span>
                                 </div>
                               </div>
-                              {warrantyRequestData.addressedData[0].fk_rejection_id ? <div className="col-lg-4 mb-3">
+                              {warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 && warrantyRequestData.addressedData[0].fk_rejection_id ? <div className="col-lg-4 mb-3">
                                 <div className="request_list">
-                                  Rejection message:
-                                  <span>{warrantyRequestData.addressedData[0].other_rejection && warrantyRequestData.addressedData[0].other_rejection.length > 0 ? warrantyRequestData.addressedData[0].other_rejection : warrantyRequestData.addressedData[0].rejection_msg}</span>
+                                  Rejection reason:
+                                  <span>{warrantyRequestData.addressedData[0].rejection_msg}</span>
                                 </div>
                               </div> : <></>}
-                              {warrantyRequestData.addressedData[0].other_rejection && warrantyRequestData.addressedData[0].other_rejection.length > 0 && <div className="col-lg-4 mb-3">
+                              
+                              {warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 && warrantyRequestData.addressedData[0].other_rejection && warrantyRequestData.addressedData[0].other_rejection.length > 0 && 
+                              <div className="col-lg-8 mb-3">
                                 <div className="request_list">
                                   Comments:
                                   <span>{warrantyRequestData.addressedData[0].comments}</span>
