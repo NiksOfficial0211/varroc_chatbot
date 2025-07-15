@@ -100,7 +100,7 @@ export async function POST(request: Request) {
     }else{
     aisensyPayload={
       apiKey: process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-      campaignName:"warranty_reg_status",
+      campaignName:"approved_status_warranty_reg",
       destination: `${customer_phone}`,
       userName: "Varroc Aftermarket",
       templateParams: [
