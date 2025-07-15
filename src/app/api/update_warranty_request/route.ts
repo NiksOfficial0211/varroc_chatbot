@@ -38,10 +38,10 @@ export async function POST(request: Request) {
       `UPDATE user_warranty_requests 
        SET status_id = ?, addressed_id = ?, fk_reject_id = ?,warranty_start_date=?,warranty_end_date=?
        WHERE pk_request_id = ?`,
-      [status, auth_id, rejection_id, pk_id,
+      [status, auth_id, rejection_id,
         warranty_start_date ? moment(warranty_start_date).isValid() ? moment(warranty_start_date).format("YYYY-MM-DD") : null : null
 ,
-        warranty_end_date ? moment(warranty_end_date).isValid() ? moment(warranty_end_date).format("YYYY-MM-DD") : null : null
+        warranty_end_date ? moment(warranty_end_date).isValid() ? moment(warranty_end_date).format("YYYY-MM-DD") : null : null, pk_id
 ]
     );
 
