@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import pool from "../../../../utils/db";
+import moment from "moment";
 
 export async function POST(request: Request) {
   const authHeader = request.headers.get("Authorization");
@@ -37,7 +38,11 @@ export async function POST(request: Request) {
       `UPDATE user_warranty_requests 
        SET status_id = ?, addressed_id = ?, fk_reject_id = ?,warranty_start_date=?,warranty_end_date=?
        WHERE pk_request_id = ?`,
-      [status, auth_id, rejection_id, pk_id,warranty_start_date && warranty_start_date.length>0?warranty_start_date:null,warranty_end_date && warranty_end_date.length>0?warranty_end_date:null]
+      [status, auth_id, rejection_id, pk_id,
+        warranty_start_date ? moment(warranty_start_date).isValid() ? moment(warranty_start_date).format("YYYY-MM-DD") : null : null
+,
+        warranty_end_date ? moment(warranty_end_date).isValid() ? moment(warranty_end_date).format("YYYY-MM-DD") : null : null
+]
     );
 
     // Step 3: Insert into logs
