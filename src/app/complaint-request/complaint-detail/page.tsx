@@ -265,6 +265,8 @@ const WarrantyRequestDetails = () => {
   }
 
   function formatDate(inputDate: string,timeZone = 'Asia/Kolkata') {
+    console.log(inputDate);
+    
     const date = new Date(inputDate);
 
     const formatter = new Intl.DateTimeFormat('en-IN', {
@@ -334,6 +336,13 @@ const WarrantyRequestDetails = () => {
                           <div className="request_list">
                             Request Date:
                             <span>{formatDate(complaintData.complaint_data[0].created_at)}</span>
+
+                          </div>
+                        </div>
+                        <div className="col-lg-4 mb-3">
+                          <div className="request_list">
+                            Customer Name:
+                            <span>{complaintData.complaint_data[0].customer_name}</span>
 
                           </div>
                         </div>

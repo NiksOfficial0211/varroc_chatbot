@@ -118,13 +118,14 @@ export async function POST(request: NextRequest) {
 
     const [insertActivity] = await connection.execute(
             `INSERT INTO user_activities 
-             (phone,
+             (name,phone,
               request_type_id,
               status_id,
               request_id,
               go_activity_id,created_at)
-             VALUES (?,?,?,?,?,?)`,
+             VALUES (?,?,?,?,?,?,?)`,
             [
+                cleanedCustomerName,
                 mobile_number !== undefined && mobile_number !== null?cleanedPhone: cleanedWhatsAppNumber,
                 2,
                 1,

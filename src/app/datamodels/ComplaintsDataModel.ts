@@ -32,6 +32,7 @@ export interface ComplaintDataModel {
   complaint__id: string
   battery_serial_no: string
   same_number: number
+  customer_name:string
   user_phone: number
   complaint_type: string
   complaint_description: string
