@@ -229,7 +229,7 @@ const WarrantyRequestDetails = () => {
           rejection_other: formVal.comments,
           battery_serial_no:warrantyRequestData?.request[0].product_serial_no,
           isRejected: true,
-          date_of_purchase:warrantyRequestData?.request[0].product_purchase_date?formatDate(warrantyRequestData?.request[0].product_purchase_date):"",
+          date_of_purchase:warrantyRequestData?.request[0].product_purchase_date?formatDateDDMMYYYY(warrantyRequestData?.request[0].product_purchase_date):"",
           customer_phone: warrantyRequestData?.request[0].user_phone
         }) : JSON.stringify({
           auth_id: auth_id,
@@ -242,9 +242,9 @@ const WarrantyRequestDetails = () => {
           isDuplicate: formVal.status_id == status_Duplicate ? true : false,
           customer_phone: warrantyRequestData?.request[0].user_phone,
           battery_serial_no:warrantyRequestData?.request[0].product_serial_no,
-          date_of_purchase:warrantyRequestData?.request[0].product_purchase_date?formatDate(warrantyRequestData?.request[0].product_purchase_date):"",
-          warranty_start_date:formVal.warranty_start_date,
-          warranty_end_date:formVal.warranty_end_date
+          date_of_purchase:warrantyRequestData?.request[0].product_purchase_date?formatDateDDMMYYYY(warrantyRequestData?.request[0].product_purchase_date):"",
+          warranty_start_date:formatDateDDMMYYYY(formVal.warranty_start_date),
+          warranty_end_date:formatDateDDMMYYYY(formVal.warranty_end_date)
 
         }),
       });
