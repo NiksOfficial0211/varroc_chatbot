@@ -68,12 +68,16 @@ const WarrantyRequestListing = () => {
   }); // fallback if invalid
           fetchData(dataFilters);
         }
+      }else{
+        setDataFilters({
+        date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
+      }); // fallback
+      fetchData(dataFilters);
       }
     } catch (error) {
       setDataFilters({
-    date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
-
-  }); // fallback
+        date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
+      }); // fallback
       fetchData(dataFilters);
     }
 
@@ -176,11 +180,17 @@ const WarrantyRequestListing = () => {
   function changePage(page: any) {
     if (hasMoreData) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
-      fetchData(dataFilters.page + page);
+      fetchData({
+
+      date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: dataFilters.page+page, limit: 10
+    });
     }
     else if (!hasMoreData && dataFilters.page > 1) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
-      fetchData(dataFilters.page + page);
+      fetchData({
+
+      date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: dataFilters.page+page, limit: 10
+    });
     }
 
   }

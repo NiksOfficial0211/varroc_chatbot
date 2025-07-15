@@ -14,6 +14,8 @@ export interface WarrantyRequestDataModel {
   status_id: number
   fk_reject_id: any
   addressed_id: any
+  warranty_start_date:any
+  warranty_end_date:any
   created_at: string
   updated_at: string
   request_type: string

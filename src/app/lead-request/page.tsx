@@ -42,15 +42,53 @@ const LeadRequestListing = () => {
   });
   const [hasMoreData, setHasMoreData] = useState(true);
   const router = useRouter();
+  const FILTER_KEY = 'lead_list_filter';
 
   useEffect(() => {
     // fetchData(dataFilters.date, dataFilters.request_id, dataFilters.phone_no, dataFilters.name, dataFilters.status, dataFilters.page, dataFilters.limit);
-    fetchData(dataFilters.page);
+    const stored = sessionStorage.getItem(FILTER_KEY);
+    console.log("stored filter data :----- --------",stored);
+    
+    try {
+      if (stored) {
+        const parsed = JSON.parse(stored);
+
+        // Optional: basic validation
+        if (
+          typeof parsed === 'object' &&
+          parsed !== null &&
+          'page' in parsed &&
+          'limit' in parsed
+        ) {
+          fetchData(parsed);
+          setDataFilters(parsed);
+          
+        } else {
+          setDataFilters({
+    date: '', enquiry_id: '', city: '', state: '', status: '', whatsapp_no: '', page: 1, limit: 10
+
+  }); // fallback if invalid
+          fetchData(dataFilters);
+        }
+      }else{
+       setDataFilters({
+    date: '', enquiry_id: '', city: '', state: '', status: '', whatsapp_no: '', page: 1, limit: 10
+
+  }); // fallback
+        fetchData(dataFilters);
+      }
+    } catch (error) {
+      setDataFilters({
+    date: '', enquiry_id: '', city: '', state: '', status: '', whatsapp_no: '', page: 1, limit: 10
+
+  }); // fallback
+      fetchData(dataFilters);
+    }
 
   }, [])
 
   // const fetchData = async (date: any, request_id: any, phone_no: any, name: any, status: any, page: any, limit: any) => {
-  const fetchData = async (page: any) => {
+  const fetchData = async (filter: DataFilters) => {
 
     setLoading(true);
     try {
@@ -77,14 +115,14 @@ const LeadRequestListing = () => {
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
         body: JSON.stringify({
-          date: dataFilters.date,
-          enquiry_id: dataFilters.enquiry_id,
-          whatsapp_no: dataFilters.whatsapp_no,
-          city: dataFilters.city,
-          state: dataFilters.state,
-          status: dataFilters.status,
-          page: dataFilters.page == page ? dataFilters.page : page,
-          limit: dataFilters.limit
+          date: filter.date,
+          enquiry_id: filter.enquiry_id,
+          whatsapp_no: filter.whatsapp_no,
+          city: filter.city,
+          state: filter.state,
+          status: filter.status,
+          page: dataFilters.page == filter.page ? dataFilters.page : filter.page,
+          limit: filter.limit
         }),
       });
       const response = await res.json();
@@ -93,7 +131,7 @@ const LeadRequestListing = () => {
         setLoading(false);
 
         setDealershipEnqList(response.data)
-        if (response.data.length < dataFilters.limit) {
+        if (response.data.length < filter.limit) {
           setHasMoreData(false);
 
         } else {
@@ -102,7 +140,7 @@ const LeadRequestListing = () => {
       } else if (response.status == 1 && response.data.length == 0) {
         setLoading(false);
         setDealershipEnqList([])
-        setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page }))
+        setDataFilters((prev) => ({ ...prev, ['page']: filter.page }))
 
         setHasMoreData(false);
       }
@@ -134,11 +172,15 @@ const LeadRequestListing = () => {
   function changePage(page: any) {
     if (hasMoreData) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
-      fetchData(dataFilters.page + page);
+      fetchData({
+        date: '', enquiry_id: '', city: '', state: '', status: '', whatsapp_no: '', page: dataFilters.page+page, limit: 10
+      });
     }
     else if (!hasMoreData && dataFilters.page > 1) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
-      fetchData(dataFilters.page + page);
+      fetchData({
+        date: '', enquiry_id: '', city: '', state: '', status: '', whatsapp_no: '', page: dataFilters.page+page, limit: 10
+      });
     }
 
   }
@@ -272,7 +314,7 @@ const LeadRequestListing = () => {
                       </div>
                       <div className="col-lg-12 pt-4">
                         <div style={{ float: "right", margin: "0 0 -30px 0" }}>
-                          <a className="blue_btn" onClick={() => { fetchData(dataFilters.page); }}>Submit</a> <a className="blue_btn" onClick={() => resetFilter()}>Reset</a>
+                          <a className="blue_btn" onClick={() => { fetchData(dataFilters); }}>Submit</a> <a className="blue_btn" onClick={() => resetFilter()}>Reset</a>
                         </div>
                       </div>
 

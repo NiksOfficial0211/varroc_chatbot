@@ -526,6 +526,7 @@ const WarrantyRequestDetails = () => {
                                   <span>{warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 ?warrantyRequestData.addressedData[warrantyRequestData.addressedData.length-1].request_status:"--"}</span>
                                 </div>
                               </div>
+                              
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated By:

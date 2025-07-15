@@ -67,6 +67,12 @@ const WarrantyRequestListing = () => {
           }); // fallback if invalid
           fetchData(dataFilters);
         }
+      }else{
+       setDataFilters({
+            date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
+
+          }); // fallback
+        fetchData(dataFilters);
       }
     } catch (error) {
       setDataFilters({
