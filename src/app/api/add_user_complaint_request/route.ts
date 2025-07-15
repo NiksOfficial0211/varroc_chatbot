@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
                 (hash_key,created_at) VALUES (?,?)
                 `,[hash,new Date()]); 
 
-  const { whatsapp_number,mobile_number,serial_number,
+  const { whatsapp_number,mobile_number,serial_number,customer_name,
     complaint_type, complaint_description, same_mobile, documents } = body;
     
   try {
@@ -72,6 +72,10 @@ export async function POST(request: NextRequest) {
       complaint_type?.trim() !== ''
         ? complaint_type.trim()
         : null;
+    const cleanedCustomerName =
+      customer_name?.trim() !== ''
+        ? customer_name.trim()
+        : null;
     const cleanedComplaintDesc =
      complaint_description && complaint_description.length>0 ? complaint_description?.trim() !== ''
         ? complaint_description.trim()
@@ -86,19 +90,21 @@ export async function POST(request: NextRequest) {
       `INSERT INTO user_complaint_requests 
      (complaint__id,
       battery_serial_no, 
-      same_number, 
+      same_number,
+      customer_name, 
       user_phone,
       complaint_type, 
       complaint_description,
       raised_whatsapp_no, 
       status_id, 
       created_at)
-   VALUES (?,?,?,?,?,?,?,?,?)`,
+   VALUES (?,?,?,?,?,?,?,?,?,?)`,
 
       [
         requestIDstring,
         cleanedSerialNo,
         parseInt(same_mobile),
+        cleanedCustomerName,
         mobile_number !== undefined && mobile_number !== null?cleanedPhone: cleanedWhatsAppNumber,
         cleanedComplaintType,
         cleanedComplaintDesc,

@@ -132,7 +132,7 @@ const LeftPanelMenus = ({ selectedMenu, rightBoxUI }: LeftPanelProps) => {
                 <div className='rightbox_inner'>
                     {rightBoxUI}
                 </div>
-                <div className='footer'>Copyright © 2024 Varroc</div>
+                <div className='footer'>Copyright © 2025 Varroc</div>
             </div>
 
         </div>
