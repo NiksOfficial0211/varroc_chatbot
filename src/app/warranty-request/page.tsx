@@ -41,14 +41,46 @@ const WarrantyRequestListing = () => {
   const [hasMoreData, setHasMoreData] = useState(true);
   const router = useRouter();
 
+  const FILTER_KEY = 'warranty_list_filter';
+
   useEffect(() => {
-    // fetchData(dataFilters.date, dataFilters.request_id, dataFilters.phone_no, dataFilters.name, dataFilters.status, dataFilters.page, dataFilters.limit);
-    fetchData(dataFilters.page);
+    const stored = sessionStorage.getItem(FILTER_KEY);
+    console.log("stored filter data :----- --------",stored);
+    
+    try {
+      if (stored) {
+        const parsed = JSON.parse(stored);
+
+        // Optional: basic validation
+        if (
+          typeof parsed === 'object' &&
+          parsed !== null &&
+          'page' in parsed &&
+          'limit' in parsed
+        ) {
+          fetchData(parsed);
+          setDataFilters(parsed);
+          
+        } else {
+          setDataFilters({
+    date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
+
+  }); // fallback if invalid
+          fetchData(dataFilters);
+        }
+      }
+    } catch (error) {
+      setDataFilters({
+    date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
+
+  }); // fallback
+      fetchData(dataFilters);
+    }
 
   }, [])
 
   // const fetchData = async (date: any, request_id: any, phone_no: any, name: any, status: any, page: any, limit: any) => {
-  const fetchData = async (page: any) => {
+  const fetchData = async (filters:DataFilters) => {
     setLoading(true);
     try {
       const statusRes = await fetch("/api/get_status_master", {
@@ -90,14 +122,14 @@ const WarrantyRequestListing = () => {
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
         body: JSON.stringify({
-          date: dataFilters.date,
-          request_id: dataFilters.request_id,
-          phone_no: dataFilters.phone_no,
-          name: dataFilters.name,
-          status: dataFilters.status,
-          reject_id: dataFilters.reject_id,
-          page: dataFilters.page == page ? dataFilters.page : page,
-          limit: dataFilters.limit
+          date: filters.date,
+          request_id: filters.request_id,
+          phone_no: filters.phone_no,
+          name: filters.name,
+          status: filters.status,
+          reject_id: filters.reject_id,
+          page: dataFilters.page == filters.page ? dataFilters.page : filters.page,
+          limit: filters.limit
         }),
       });
 
@@ -299,7 +331,7 @@ const WarrantyRequestListing = () => {
 
                       <div className="col-lg-12 pt-4">
                         <div style={{float:"right", margin:"0 0 -30px 0"}}>
-                          <a className="blue_btn" onClick={() => { fetchData(dataFilters.page); }}>Submit</a> <a className="blue_btn" onClick={() => resetFilter()}>Reset</a>
+                          <a className="blue_btn" onClick={() => { fetchData(dataFilters); }}>Submit</a> <a className="blue_btn" onClick={() => resetFilter()}>Reset</a>
                         </div>
                       </div>
 

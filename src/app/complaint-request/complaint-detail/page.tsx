@@ -558,7 +558,7 @@ const WarrantyRequestDetails = () => {
                               </div>
                               <div className="col-lg-8 mb-3">
                                 <div className="request_list">
-                                  Coments:
+                                  Comments:
                                   <span>{complaintData.addressedData[complaintData.addressedData.length-1].comments}</span>
                                 </div>
                               </div>

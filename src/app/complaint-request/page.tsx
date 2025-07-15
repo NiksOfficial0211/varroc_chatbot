@@ -21,6 +21,7 @@ interface DataFilters {
 
 const WarrantyRequestListing = () => {
   useSessionRedirect();
+  const FILTER_KEY = 'complaint_list_filter';
 
   const [isLoading, setLoading] = useState(false);
   const { auth_id, userName, setGlobalState } = useGlobalContext();
@@ -42,13 +43,47 @@ const WarrantyRequestListing = () => {
   const router = useRouter();
 
   useEffect(() => {
+    const stored = sessionStorage.getItem(FILTER_KEY);
+    console.log("stored filter data :----- --------",stored);
+    
+    try {
+      if (stored) {
+        const parsed = JSON.parse(stored);
+
+        // Optional: basic validation
+        if (
+          typeof parsed === 'object' &&
+          parsed !== null &&
+          'page' in parsed &&
+          'limit' in parsed
+        ) {
+          fetchData(parsed);
+          setDataFilters(parsed);
+          
+        } else {
+          setDataFilters({
+            date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
+
+          }); // fallback if invalid
+          fetchData(dataFilters);
+        }
+      }
+    } catch (error) {
+      setDataFilters({
+        date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
+
+      }); // fallback
+      fetchData(dataFilters);
+    }
     // fetchData(dataFilters.date, dataFilters.request_id, dataFilters.phone_no, dataFilters.name, dataFilters.status, dataFilters.page, dataFilters.limit);
-    fetchData(dataFilters.page);
+    
 
   }, [])
 
   // const fetchData = async (date: any, request_id: any, phone_no: any, name: any, status: any, page: any, limit: any) => {
-  const fetchData = async (page: any) => {
+  const fetchData = async (filter: DataFilters) => {
+    setDataFilters(filter);
+    sessionStorage.setItem(FILTER_KEY, JSON.stringify(filter));
     setLoading(true);
     try {
       const statusRes = await fetch("/api/get_status_master", {
@@ -57,8 +92,8 @@ const WarrantyRequestListing = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
-        body:JSON.stringify({
-            "request_type":2
+        body: JSON.stringify({
+          "request_type": 2
         })
 
       });
@@ -67,7 +102,7 @@ const WarrantyRequestListing = () => {
       if (statuses.status == 1) {
         setStatusMasterData(statuses.data)
       }
-     
+
       const res = await fetch("/api/get_complaints_request", {
         method: "POST",
         headers: {
@@ -75,13 +110,13 @@ const WarrantyRequestListing = () => {
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
         body: JSON.stringify({
-          date: dataFilters.date,
-          request_id: dataFilters.request_id,
-          phone_no: dataFilters.phone_no,
-          name: dataFilters.name,
-          status: dataFilters.status,
-          page: dataFilters.page == page ? dataFilters.page : page,
-          limit: dataFilters.limit
+          date: filter.date,
+          request_id: filter.request_id,
+          phone_no: filter.phone_no,
+          name: filter.name,
+          status: filter.status,
+          page: dataFilters.page == filter.page ? dataFilters.page : filter.page,
+          limit: filter.limit
         }),
       });
 
@@ -128,11 +163,15 @@ const WarrantyRequestListing = () => {
   function changePage(page: any) {
     if (hasMoreData) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
-      fetchData(dataFilters.page + page);
+      fetchData({
+      date: '', request_id: '', phone_no: '', name: '', status: '', page: dataFilters.page + page, limit: 10
+    });
     }
     else if (!hasMoreData && dataFilters.page > 1) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
-      fetchData(dataFilters.page + page);
+      fetchData({
+      date: '', request_id: '', phone_no: '', name: '', status: '', page: dataFilters.page + page, limit: 10
+    });
     }
 
   }
@@ -142,6 +181,7 @@ const WarrantyRequestListing = () => {
     // console.log("Form values updated:", formValues);
     setDataFilters((prev) => ({ ...prev, [name]: value }));
   }
+  
   const resetFilter = async () => {
 
     window.location.reload();
@@ -149,21 +189,25 @@ const WarrantyRequestListing = () => {
 
       date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
     });
-    fetchData(dataFilters.page);
+    sessionStorage.removeItem(FILTER_KEY);
+
+    fetchData({
+      date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
+    });
   }
 
-  function formatDateYYYYMMDD(inputDate: string,timeZone = 'Asia/Kolkata') {
+  function formatDateYYYYMMDD(inputDate: string, timeZone = 'Asia/Kolkata') {
     const date = new Date(inputDate);
 
     const formatter = new Intl.DateTimeFormat('en-IN', {
-        timeZone,
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
 
     const parts = formatter.formatToParts(date);
     const get = (type: string) => parts.find(p => p.type === type)?.value;
@@ -181,9 +225,9 @@ const WarrantyRequestListing = () => {
       },
       body: JSON.stringify({
         date: dataFilters.date,
-          request_id: dataFilters.request_id,
-          phone_no: dataFilters.phone_no,
-          status: dataFilters.status,
+        request_id: dataFilters.request_id,
+        phone_no: dataFilters.phone_no,
+        status: dataFilters.status,
       }),
     });
     const blob = await response.blob();
@@ -216,12 +260,12 @@ const WarrantyRequestListing = () => {
             <div className="col-lg-12">
 
               <div className="row" id="top">
-                
-                  <div className="col-lg-12 mb-3">
-                    <div className="heading25">
-                      Complaints / Claims
-                      <button className="blue_btn" style={{ float: "right" }} onClick={downloadExport}>Export Data</button>
-                    </div>
+
+                <div className="col-lg-12 mb-3">
+                  <div className="heading25">
+                    Complaints / Claims
+                    <button className="blue_btn" style={{ float: "right" }} onClick={downloadExport}>Export Data</button>
+                  </div>
                 </div>
 
                 <div className="col-lg-12 mb-4 ">
@@ -244,7 +288,7 @@ const WarrantyRequestListing = () => {
                       <div className="col-lg-2">
                         <div className="form_box ">
                           <label htmlFor="formFile" className="form-label">Status: </label>
-                          <select id="status" name="status" onChange={handleInputChange}>
+                          <select id="status" name="status" value={dataFilters.status} onChange={handleInputChange}>
                             <option value="">Select</option>
                             {statusMasterData.map((singleStatus) => (
                               <option value={singleStatus.status_id} key={singleStatus.status_id}>{singleStatus.status}</option>
@@ -253,7 +297,7 @@ const WarrantyRequestListing = () => {
                           {/* <input type="text" id="status" name="status" value={dataFilters.status} onChange={handleInputChange} /> */}
                         </div>
                       </div>
-                      
+
                       <div className="col-lg-2">
                         <div className="form_box ">
                           <label htmlFor="formFile" className="form-label">Date: </label>
@@ -262,8 +306,8 @@ const WarrantyRequestListing = () => {
                       </div>
 
                       <div className="col-lg-12 pt-4">
-                        <div style={{float:"right", margin:"0 0 -30px 0"}}>
-                          <a className="blue_btn" onClick={() => { fetchData(dataFilters.page); }}>Submit</a> <a className="blue_btn" onClick={() => resetFilter()}>Reset</a>
+                        <div style={{ float: "right", margin: "0 0 -30px 0" }}>
+                          <a className="blue_btn" onClick={() => { fetchData(dataFilters); }}>Submit</a> <a className="blue_btn" onClick={() => resetFilter()}>Reset</a>
                         </div>
                       </div>
 
@@ -274,7 +318,7 @@ const WarrantyRequestListing = () => {
               </div>
               <div className="row mb-3">
                 <div className="col-lg-12">
-                  <div className="grey_box" style={{ backgroundColor: "#fff", position:"relative", padding:"20px 60px 20px 30px" }}>
+                  <div className="grey_box" style={{ backgroundColor: "#fff", position: "relative", padding: "20px 60px 20px 30px" }}>
                     <div className="row list_label mb-4">
                       <div className="col-lg-3 text-center"><div className="label">Complaint <br></br>ID</div></div>
                       <div className="col-lg-2 text-center"><div className="label">Complaint <br></br>Date</div></div>
@@ -296,7 +340,7 @@ const WarrantyRequestListing = () => {
                           <div className="col-lg-2 text-center"><div className="label">{complaints.complaint_type}</div></div>
                           {/* <div className="col-lg-2 text-center"><div className="label">{complaints.complaint_description}</div></div> */}
                           <div className="col-lg-1 text-center"><div className="label">{complaints.request_status}</div></div>
-                          <div className="col-lg-2 text-center"><div className="label">{complaints.addressedDetails && complaints.addressedDetails.length>0?complaints.addressedDetails[0].addressedBY:"--"}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{complaints.addressedDetails && complaints.addressedDetails.length > 0 ? complaints.addressedDetails[0].addressedBY : "--"}</div></div>
                           <div className=""><div className="label viewbtn" onClick={() => {
                             setGlobalState({
                               selectedViewID: complaints.pk_id + '',
@@ -307,7 +351,7 @@ const WarrantyRequestListing = () => {
                           }}><img src={staticIconsBaseURL + "/images/view_icon.png"} alt="Varroc Excellence" className="img-fluid" style={{ maxHeight: "18px" }} /></div>
                           </div>
                         </div>
-                       ))} 
+                      ))}
                   </div>
                 </div>
               </div>

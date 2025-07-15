@@ -9,7 +9,7 @@ import { WarrantyRequestDetailResponseModel } from '@/app/datamodels/WarrantyReq
 import PageErrorCenterContent from '@/app/components/pageError';
 import useSessionRedirect from '@/app/pro_utils/manage_session';
 import LeftPanelMenus from '@/app/components/leftPanel';
-import { getImageApiURL, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
+import { getImageApiURL, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected, status_Verified } from '@/app/pro_utils/string_constants';
 import moment from 'moment';
 import { RejectMSGMasterDataModel, StatusMasterDataModel } from '@/app/datamodels/CommonDataModels';
 import { useRouter } from 'next/navigation';
@@ -20,7 +20,9 @@ import DialogImagePop from '@/app/components/dialog_DocViewer';
 interface formValues {
   status_id: any,
   comments: string
-  rejection_id: any
+  rejection_id: any,
+  warranty_start_date:any,
+  warranty_end_date:any,
 }
 
 
@@ -45,7 +47,7 @@ const WarrantyRequestDetails = () => {
   const [statusMasterData, setStatusMasterData] = useState<StatusMasterDataModel[]>([]);
   const [rejectionMasterData, setRejectionMasterData] = useState<RejectMSGMasterDataModel[]>([]);
   const [formVal, setFormVal] = useState<formValues>({
-    status_id: 0, comments: "", rejection_id: 0
+    status_id: 0, comments: "", rejection_id: 0,warranty_start_date:"",warranty_end_date:""
   });
   const { selectedViewID } = useGlobalContext()
   const [errors, setErrors] = useState<Partial<formValues>>({});
@@ -83,7 +85,9 @@ const WarrantyRequestDetails = () => {
         setFormVal({
           status_id: response.data.request[0].status_id,
           comments: '',
-          rejection_id: 0
+          rejection_id: 0,
+          warranty_start_date:'',
+          warranty_end_date:''
         });
       } else {
         setLoading(false);
@@ -223,7 +227,9 @@ const WarrantyRequestDetails = () => {
           request_type: warrantyRequestData?.request[0].request_type_id,
           rejection_id: formVal.rejection_id,
           rejection_other: formVal.comments,
+          battery_serial_no:warrantyRequestData?.request[0].product_serial_no,
           isRejected: true,
+          date_of_purchase:warrantyRequestData?.request[0].product_purchase_date?formatDate(warrantyRequestData?.request[0].product_purchase_date):"",
           customer_phone: warrantyRequestData?.request[0].user_phone
         }) : JSON.stringify({
           auth_id: auth_id,
@@ -234,7 +240,12 @@ const WarrantyRequestDetails = () => {
           request_type: warrantyRequestData?.request[0].request_type_id,
           isRejected: false,
           isDuplicate: formVal.status_id == status_Duplicate ? true : false,
-          customer_phone: warrantyRequestData?.request[0].user_phone
+          customer_phone: warrantyRequestData?.request[0].user_phone,
+          battery_serial_no:warrantyRequestData?.request[0].product_serial_no,
+          date_of_purchase:warrantyRequestData?.request[0].product_purchase_date?formatDate(warrantyRequestData?.request[0].product_purchase_date):"",
+          warranty_start_date:formVal.warranty_start_date,
+          warranty_end_date:formVal.warranty_end_date
+
         }),
       });
       const resJson = await response.json();
@@ -512,33 +523,33 @@ const WarrantyRequestDetails = () => {
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Request Status:
-                                  <span>{warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 ?warrantyRequestData.addressedData[0].request_status:"--"}</span>
+                                  <span>{warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 ?warrantyRequestData.addressedData[warrantyRequestData.addressedData.length-1].request_status:"--"}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated By:
-                                  <span>{warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 ?warrantyRequestData.addressedData[0].addressedBY:"--"}</span>
+                                  <span>{warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 ?warrantyRequestData.addressedData[warrantyRequestData.addressedData.length-1].addressedBY:"--"}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated Date:
-                                  <span>{warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 ?formatDate(warrantyRequestData.addressedData[0].updated_at):"--"}</span>
+                                  <span>{warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 ?formatDate(warrantyRequestData.addressedData[warrantyRequestData.addressedData.length-1].updated_at):"--"}</span>
                                 </div>
                               </div>
-                              {warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 && warrantyRequestData.addressedData[0].fk_rejection_id ? <div className="col-lg-4 mb-3">
+                              {warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 && warrantyRequestData.addressedData[warrantyRequestData.addressedData.length-1].fk_rejection_id ? <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Rejection reason:
                                   <span>{warrantyRequestData.addressedData[0].rejection_msg}</span>
                                 </div>
                               </div> : <></>}
                               
-                              {warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 && warrantyRequestData.addressedData[0].other_rejection && warrantyRequestData.addressedData[0].other_rejection.length > 0 && 
+                              {warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 && warrantyRequestData.addressedData[warrantyRequestData.addressedData.length-1].other_rejection && warrantyRequestData.addressedData[warrantyRequestData.addressedData.length-1].other_rejection.length > 0 && 
                               <div className="col-lg-8 mb-3">
                                 <div className="request_list">
                                   Comments:
-                                  <span>{warrantyRequestData.addressedData[0].comments}</span>
+                                  <span>{warrantyRequestData.addressedData[warrantyRequestData.addressedData.length-1].comments}</span>
                                 </div>
                               </div>}
                               {/* <div className="col-lg-4 mb-3">
@@ -558,7 +569,7 @@ const WarrantyRequestDetails = () => {
                           {/* <form onSubmit={handleSubmit}> */}
                             <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>
                               <div className="row">
-                                <div className="col-lg-6">
+                                <div className="col-lg-6 mb-3">
 
 
                                   <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Status:</div>
@@ -591,6 +602,26 @@ const WarrantyRequestDetails = () => {
                                       </div>
                                     </div>
                                   </div>}
+                                {formVal.status_id== status_Verified &&
+                                 <div className="col-lg-5">
+                                    <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Warranty Start Date:</div>
+                                    <div className="col-lg-12 mb-3">
+                                      <div className='form_box'>
+                                    <input type="date" id="date" name="date" value={formVal.warranty_start_date} onChange={handleInputChange} />
+                                  </div>
+                                  </div>
+                                </div>
+                                }
+                                {formVal.status_id== status_Verified &&
+                                 <div className="col-lg-5">
+                                    <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Warranty End Date:</div>
+                                    <div className="col-lg-12 mb-3">
+                                      <div className='form_box'>
+                                      <input type="date" id="date" name="date" value={formVal.warranty_end_date} onChange={handleInputChange} />
+                                  </div>
+                                </div>
+                                </div>
+                                }  
                               </div>
 
                               <div className="col-lg-12 mb-1 mt-3" style={{ fontFamily: "GothamMedium" }}>Any Comment:</div>

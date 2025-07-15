@@ -458,7 +458,7 @@ if (hashPresent.length == 0) {
           
           const failedAisensyPayload = {
             "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-            "campaignName": "form_failed_warranty_reg",
+            "campaignName": "form_fail_technical_issue",
             "destination": `${cleanedWhatsAppNumber}`,
             "userName": "Varroc Aftermarket",
             "templateParams": [],
@@ -495,7 +495,7 @@ if (hashPresent.length == 0) {
 
     const aisensyPayload = {
       "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-      "campaignName": "warranty_registration_form_id",
+      "campaignName": "WARRANTY_REG_ID",
       "destination": `${cleanedWhatsAppNumber}`,
       "userName": "Varroc Aftermarket",
       "templateParams": [
@@ -550,7 +550,7 @@ if (hashPresent.length == 0) {
       whatsapp_number?.trim() !== '' ? whatsapp_number.trim() : null;
     const failedAisensyPayload = {
       "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-      "campaignName": "form_failed_warranty_reg",
+      "campaignName": "form_fail_technical_issue",
       "destination": `${cleanedWhatsAppNumber}`,
       "userName": "Varroc Aftermarket",
       "templateParams": [],

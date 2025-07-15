@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { auth_id, pk_id, comments, status,request_id, request_type, rejection_id,selectedRejection, rejection_other, isRejected,isDuplicate, customer_phone } = body;
+  const { auth_id, pk_id, comments, status,request_id, request_type, rejection_id,selectedRejection, rejection_other, isRejected,isDuplicate, customer_phone,warranty_start_date,warranty_end_date,battery_serial_no,date_of_purchase } = body;
 
   let connection;
 
@@ -35,9 +35,9 @@ export async function POST(request: Request) {
     );
     await connection.query(
       `UPDATE user_warranty_requests 
-       SET status_id = ?, addressed_id = ?, fk_reject_id = ?
+       SET status_id = ?, addressed_id = ?, fk_reject_id = ?,warranty_start_date=?,warranty_end_date=?
        WHERE pk_request_id = ?`,
-      [status, auth_id, rejection_id, pk_id]
+      [status, auth_id, rejection_id, pk_id,warranty_start_date && warranty_start_date.length>0?warranty_start_date:null,warranty_end_date && warranty_end_date.length>0?warranty_end_date:null]
     );
 
     // Step 3: Insert into logs
@@ -61,12 +61,27 @@ export async function POST(request: Request) {
     // Step 4: Send Aisensy message
     // const campaignName = "Reject_message";
 
-    const aisensyPayload = {
+    // This are the params now
+    // "reference id",
+    // "status",
+    // "Serial Number",
+    // "Date of Purchase",
+    // "FOC Warranty Start Date:,
+    // "FOC Warranty End Date:"
+
+    let aisensyPayload ;
+    if(isRejected){
+      // warranty_reg_reject_status
+      // isRejected ?  comments && comments.length>0?`Rejected ${selectedRejection}-${comments}`:"Rejected" : isDuplicate?"Duplicate Request": 
+      aisensyPayload={
       apiKey: process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-      campaignName:"warranty_registration_status",
+      campaignName:"warranty_reg_status",
       destination: `${customer_phone}`,
       userName: "Varroc Aftermarket",
-      templateParams: [request_id, isRejected ?  comments && comments.length>0?`Rejected ${selectedRejection}-${comments}`:"Rejected" : isDuplicate?"Duplicate Request": "Approved"],
+      templateParams: [
+        request_id, 
+        isRejected ?  comments && comments.length>0?`Rejected ${selectedRejection}-${comments}`:"Rejected" : isDuplicate?"Duplicate Request": "",
+      ],
       source: "new-landing-page form",
       media: {},
       buttons: [],
@@ -77,6 +92,31 @@ export async function POST(request: Request) {
         FirstName: "user"
       }
     };
+    }else{
+    aisensyPayload={
+      apiKey: process.env.NEXT_PUBLIC_AISENSY_API_KEY,
+      campaignName:"warranty_reg_status",
+      destination: `${customer_phone}`,
+      userName: "Varroc Aftermarket",
+      templateParams: [
+        request_id, 
+        "Approved",
+        battery_serial_no,
+        date_of_purchase,
+        warranty_start_date,
+        warranty_end_date
+      ],
+      source: "new-landing-page form",
+      media: {},
+      buttons: [],
+      carouselCards: [],
+      location: {},
+      attributes: {},
+      paramsFallbackValue: {
+        FirstName: "user"
+      }
+    };
+  }
 
     console.log("this is the payload for aisensy"+JSON.stringify(aisensyPayload));
     
@@ -107,7 +147,7 @@ export async function POST(request: Request) {
       await connection.rollback();
        await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Update Warranty Request Exception",pk_id,1, e, new Date()]
+      ["Update Warranty Request Exception",pk_id,1, JSON.stringify(e), new Date()]
     );
       connection.release();
     }

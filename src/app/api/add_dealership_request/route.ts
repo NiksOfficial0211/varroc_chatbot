@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
       whatsapp_number?.trim() !== '' ? whatsapp_number.trim() : null;
     const failedAisensyPayload = {
       "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-      "campaignName": "form_failed_warranty_reg",
+      "campaignName": "form_fail_technical_issue",
       "destination": `${cleanedWhatsAppNumber}`,
       "userName": "Varroc Aftermarket",
       "templateParams": [],

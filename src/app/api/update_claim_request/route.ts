@@ -95,7 +95,7 @@ export async function POST(request: Request) {
     }{
       await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Update Warranty Request Send Message Failed",pk_id,1, aisensyPayload, new Date()]
+      ["Update Warranty Request Send Message Failed",pk_id,1, JSON.stringify({...aisensyPayload,error:result}), new Date()]
     );
       return NextResponse.json({ status: 1, message: "Request updated but message delivery failed to customer"});
     }
