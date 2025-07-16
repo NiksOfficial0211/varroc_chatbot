@@ -43,6 +43,12 @@ const WarrantyRequestListing = () => {
   const router = useRouter();
 
   useEffect(() => {
+     const navEntry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
+
+    const isBackNavigation = navEntry?.type === "back_forward";    
+    if (!isBackNavigation) {
+          sessionStorage.removeItem(FILTER_KEY);
+        }
     const stored = sessionStorage.getItem(FILTER_KEY);
     console.log("stored filter data :----- --------",stored);
     
@@ -260,7 +266,7 @@ const WarrantyRequestListing = () => {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
 
-      <LeftPanelMenus selectedMenu={3} showLeftPanel={false} rightBoxUI={
+      <LeftPanelMenus selectedMenu={3} showLeftPanel={false} headertitle='Warranty Claims' rightBoxUI={
         <div className="container warranty_mainbox">
           <div className="row mt-4">
             <div className="col-lg-12">
@@ -269,7 +275,7 @@ const WarrantyRequestListing = () => {
 
                 <div className="col-lg-12 mb-3">
                   <div className="heading25">
-                    Complaints / Claims
+                    Warranty Claims
                     <button className="blue_btn" style={{ float: "right" }} onClick={downloadExport}>Export Data</button>
                   </div>
                 </div>

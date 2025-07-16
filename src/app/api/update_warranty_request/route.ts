@@ -131,7 +131,7 @@ export async function POST(request: Request) {
         "templateParams": [],
         "source": "new-landing-page form",
         "media": {
-          "url": `${getImageApiURL}uploads/sample_warranty_certificate.pdf`,
+          "url": `${getImageApiURL}/uploads/sample_warranty_certificate.pdf`,
           "filename": "sample_media"
         },
         "buttons": [],

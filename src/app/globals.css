@@ -1002,4 +1002,25 @@
 }
 /* -----------------bulk upload UI end ------------------------------------------------------*/
 
+.tooltip_box{
+  position: relative;
+}
+.tooltip_inner{
+    display: none;
+    position: absolute;
+    color: #000;
+    font-family: font_verdana;
+    font-size: 12px;
+    background-color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 10px;
+    z-index: 5;
+    left: 0;
+    top: 0;
+    box-shadow: 0 0 20px #0000002e;
+    margin: -40px 0 0 140px;
+}
+.tooltip_box:hover .tooltip_inner{
+  display: block;
+}
 /* -------------------------- Nikhil Css End------------------------------ */

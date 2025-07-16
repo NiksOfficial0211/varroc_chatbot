@@ -161,7 +161,7 @@ const BatteryListing = () => {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
 
-      <LeftPanelMenus selectedMenu={4} showLeftPanel={false} rightBoxUI={
+      <LeftPanelMenus selectedMenu={4} showLeftPanel={false} headertitle='Warranty Claim Details' rightBoxUI={
         <div className="container">
           <div className="row mt-4">
             <div className="col-lg-12">

@@ -44,6 +44,12 @@ const WarrantyRequestListing = () => {
   const FILTER_KEY = 'warranty_list_filter';
 
   useEffect(() => {
+ const navEntry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
+
+  const isBackNavigation = navEntry?.type === "back_forward";    
+  if (!isBackNavigation) {
+        sessionStorage.removeItem(FILTER_KEY);
+      }
     const stored = sessionStorage.getItem(FILTER_KEY);
     console.log("stored filter data :----- --------",stored);
     
@@ -63,21 +69,21 @@ const WarrantyRequestListing = () => {
           
         } else {
           setDataFilters({
-    date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
+            date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
 
-  }); // fallback if invalid
+          }); // fallback if invalid
           fetchData(dataFilters);
         }
       }else{
         setDataFilters({
-        date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
-      }); // fallback
+            date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
+          }); // fallback
       fetchData(dataFilters);
       }
     } catch (error) {
       setDataFilters({
-        date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
-      }); // fallback
+          date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
+        }); // fallback
       fetchData(dataFilters);
     }
 
@@ -85,6 +91,8 @@ const WarrantyRequestListing = () => {
 
   // const fetchData = async (date: any, request_id: any, phone_no: any, name: any, status: any, page: any, limit: any) => {
   const fetchData = async (filters:DataFilters) => {
+        sessionStorage.setItem(FILTER_KEY, JSON.stringify(filters));
+
     setLoading(true);
     try {
       const statusRes = await fetch("/api/get_status_master", {
@@ -270,7 +278,7 @@ const WarrantyRequestListing = () => {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
 
-      <LeftPanelMenus selectedMenu={2} showLeftPanel={false} rightBoxUI={
+      <LeftPanelMenus selectedMenu={2} showLeftPanel={false} headertitle='Warranty Requests' rightBoxUI={
         <div className="container warranty_mainbox">
           <div className="row mt-4">
             <div className="col-lg-12">

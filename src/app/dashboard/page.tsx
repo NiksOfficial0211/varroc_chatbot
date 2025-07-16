@@ -87,7 +87,7 @@ const Dashboard = () => {
       }} onCloseClicked={function (): void {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
-        <LeftPanelMenus selectedMenu={1} showLeftPanel={false} rightBoxUI={
+        <LeftPanelMenus selectedMenu={1} showLeftPanel={false} headertitle='Battery Dashboard' rightBoxUI={
         <div className="container">
           <div className="row mb-5">
             <div className="col-lg-12">

@@ -299,7 +299,7 @@ const WarrantyRequestDetails = () => {
       }} onCloseClicked={function (): void {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
-      <LeftPanelMenus selectedMenu={3} showLeftPanel={false} rightBoxUI={
+      <LeftPanelMenus selectedMenu={3} showLeftPanel={false} headertitle='Warranty Claim Details' rightBoxUI={
         <div className="container">
           <div className="row mt-4 mb-5">
 

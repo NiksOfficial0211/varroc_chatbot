@@ -21,8 +21,8 @@ interface formValues {
   status_id: any,
   comments: string
   rejection_id: any,
-  warranty_start_date:any,
-  warranty_end_date:any,
+  warranty_start_date: any,
+  warranty_end_date: any,
 }
 
 
@@ -47,7 +47,7 @@ const WarrantyRequestDetails = () => {
   const [statusMasterData, setStatusMasterData] = useState<StatusMasterDataModel[]>([]);
   const [rejectionMasterData, setRejectionMasterData] = useState<RejectMSGMasterDataModel[]>([]);
   const [formVal, setFormVal] = useState<formValues>({
-    status_id: 0, comments: "", rejection_id: 0,warranty_start_date:"",warranty_end_date:""
+    status_id: 0, comments: "", rejection_id: 0, warranty_start_date: "", warranty_end_date: ""
   });
   const { selectedViewID } = useGlobalContext()
   const [errors, setErrors] = useState<Partial<formValues>>({});
@@ -86,8 +86,8 @@ const WarrantyRequestDetails = () => {
           status_id: response.data.request[0].status_id,
           comments: '',
           rejection_id: 0,
-          warranty_start_date:'',
-          warranty_end_date:''
+          warranty_start_date: formatDateYYYYMMDD(response.data.request[0].product_purchase_date),
+          warranty_end_date: formatDateYYYYMMDD(addMonths(new Date(response.data.request[0].product_purchase_date)))
         });
       } else {
         setLoading(false);
@@ -102,8 +102,8 @@ const WarrantyRequestDetails = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
-         body:JSON.stringify({
-            "request_type":1
+        body: JSON.stringify({
+          "request_type": 1
         })
 
       });
@@ -118,8 +118,8 @@ const WarrantyRequestDetails = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
-        body:JSON.stringify({
-            "request_type":1
+        body: JSON.stringify({
+          "request_type": 1
         })
 
       });
@@ -140,10 +140,20 @@ const WarrantyRequestDetails = () => {
     }
   }
 
+  function addMonths(date: Date): Date {
+    const result = new Date(date);
+    result.setMonth(result.getMonth() + 18);
+    return result;
+  }
   const formatDateDDMMYYYY = (date: any, isTime = false) => {
     if (!date) return '';
     const parsedDate = moment(date);
     return parsedDate.format('DD-MM-YYYY');
+  };
+  const formatDateYYYYMMDD = (date: any, isTime = false) => {
+    if (!date) return '';
+    const parsedDate = moment(date);
+    return parsedDate.format('YYYY-MM-DD');
   };
 
   const validate = () => {
@@ -203,10 +213,10 @@ const WarrantyRequestDetails = () => {
     console.log("this is the form vals", formVal);
     if (!validate()) return;
     setLoading(true);
-    let rejectionSelectedMsg=""
-    for(let i=0;i<rejectionMasterData.length;i++){
-      if(formVal.rejection_id==rejectionMasterData[i].pk_reject_id){
-        rejectionSelectedMsg=rejectionMasterData[i].rejection_msg;
+    let rejectionSelectedMsg = ""
+    for (let i = 0; i < rejectionMasterData.length; i++) {
+      if (formVal.rejection_id == rejectionMasterData[i].pk_reject_id) {
+        rejectionSelectedMsg = rejectionMasterData[i].rejection_msg;
       }
     }
     // pk_request_id
@@ -220,16 +230,16 @@ const WarrantyRequestDetails = () => {
         body: formVal.status_id == status_Rejected ? JSON.stringify({
           auth_id: auth_id,
           pk_id: warrantyRequestData?.request[0].pk_request_id,
-          comments: formVal.comments && formVal.comments.length>0?formVal.comments: rejectionSelectedMsg,
-          selectedRejection:formVal.comments && formVal.comments.length>0 && rejectionSelectedMsg!=formVal.comments?rejectionSelectedMsg:"",
+          comments: formVal.comments && formVal.comments.length > 0 ? formVal.comments : rejectionSelectedMsg,
+          selectedRejection: formVal.comments && formVal.comments.length > 0 && rejectionSelectedMsg != formVal.comments ? rejectionSelectedMsg : "",
           status: formVal.status_id,
           request_id: warrantyRequestData?.request[0].request_id,
           request_type: warrantyRequestData?.request[0].request_type_id,
           rejection_id: formVal.rejection_id,
           rejection_other: formVal.comments,
-          battery_serial_no:warrantyRequestData?.request[0].product_serial_no,
+          battery_serial_no: warrantyRequestData?.request[0].product_serial_no,
           isRejected: true,
-          date_of_purchase:warrantyRequestData?.request[0].product_purchase_date?formatDateDDMMYYYY(warrantyRequestData?.request[0].product_purchase_date):"",
+          date_of_purchase: warrantyRequestData?.request[0].product_purchase_date ? formatDateDDMMYYYY(warrantyRequestData?.request[0].product_purchase_date) : "",
           customer_phone: warrantyRequestData?.request[0].user_phone
         }) : JSON.stringify({
           auth_id: auth_id,
@@ -241,10 +251,10 @@ const WarrantyRequestDetails = () => {
           isRejected: false,
           isDuplicate: formVal.status_id == status_Duplicate ? true : false,
           customer_phone: warrantyRequestData?.request[0].user_phone,
-          battery_serial_no:warrantyRequestData?.request[0].product_serial_no,
-          date_of_purchase:warrantyRequestData?.request[0].product_purchase_date?formatDateDDMMYYYY(warrantyRequestData?.request[0].product_purchase_date):"",
-          warranty_start_date:formatDateDDMMYYYY(formVal.warranty_start_date),
-          warranty_end_date:formatDateDDMMYYYY(formVal.warranty_end_date)
+          battery_serial_no: warrantyRequestData?.request[0].product_serial_no,
+          date_of_purchase: warrantyRequestData?.request[0].product_purchase_date ? formatDateDDMMYYYY(warrantyRequestData?.request[0].product_purchase_date) : "",
+          warranty_start_date: formatDateDDMMYYYY(formVal.warranty_start_date),
+          warranty_end_date: formatDateDDMMYYYY(formVal.warranty_end_date)
 
         }),
       });
@@ -278,23 +288,25 @@ const WarrantyRequestDetails = () => {
 
   const handleInputChange = async (e: any) => {
     const { name, value } = e.target;
-
+    if (name == "warranty_start_date") {
+      setFormVal((prev) => ({ ...prev, ["warranty_end_date"]: formatDateYYYYMMDD(addMonths(new Date(value))) }));
+    }
 
     setFormVal((prev) => ({ ...prev, [name]: value }));
   }
 
-  function formatDate(inputDate: string,timeZone = 'Asia/Kolkata') {
+  function formatDate(inputDate: string, timeZone = 'Asia/Kolkata') {
     const date = new Date(inputDate);
 
     const formatter = new Intl.DateTimeFormat('en-IN', {
-        timeZone,
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
 
     const parts = formatter.formatToParts(date);
     const get = (type: string) => parts.find(p => p.type === type)?.value;
@@ -309,14 +321,14 @@ const WarrantyRequestDetails = () => {
         setShowAlert(false)
         if (navigateBack) {
           router.back()
-        }else{
+        } else {
           fetchData()
         }
 
       }} onCloseClicked={function (): void {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
-      <LeftPanelMenus selectedMenu={2} showLeftPanel={false} rightBoxUI={
+      <LeftPanelMenus selectedMenu={2} headertitle='Warranty Request Detail' showLeftPanel={false} rightBoxUI={
         <div className="container">
           <div className="row mt-4 mb-5">
 
@@ -402,7 +414,7 @@ const WarrantyRequestDetails = () => {
                               Pin code:
                               <div className="row mt-2">
                                 <div className="col-lg-4 form_box">
-                                  <input type="text" id="proposed_mrp" name="proposed_mrp" value={pinCode} onChange={(e) => setPinCode(e.target.value)} style={{padding:"8px"}}/>
+                                  <input type="text" id="proposed_mrp" name="proposed_mrp" value={pinCode} onChange={(e) => setPinCode(e.target.value)} style={{ padding: "8px" }} />
                                   {cityError && <span className="error" style={{ color: "red" }}>{cityError}</span>}
 
                                 </div>
@@ -416,8 +428,11 @@ const WarrantyRequestDetails = () => {
                         }
                         <div className="col-lg-12">
                           <div className="row">
-                            <div className="col-lg-12">
-                              <div className='masterrecord_heading'>Master Record</div>
+                            <div className="col-lg-12 tooltip_box">
+                              <div className='masterrecord_heading'>Master Record
+                                <div className="tooltip_inner">
+                                  The battery data will be displayed only when the serial number entered by the user matches an existing record in our battery database.                                  </div>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -426,7 +441,7 @@ const WarrantyRequestDetails = () => {
                             <div className="col-lg-4 mb-3">
                               <div className="request_list">
                                 Request Status:
-                                <span>{warrantyRequestData &&warrantyRequestData.request && warrantyRequestData.request.length>0 ?warrantyRequestData.request[0].request_status :"--"}</span>
+                                <span>{warrantyRequestData && warrantyRequestData.request && warrantyRequestData.request.length > 0 ? warrantyRequestData.request[0].request_status : "--"}</span>
 
                               </div>
                             </div>
@@ -478,8 +493,13 @@ const WarrantyRequestDetails = () => {
 
                         {warrantyRequestData.duplicate_data && warrantyRequestData.duplicate_data.length > 0 && <div className="col-lg-12">
                           <div className="row">
-                            <div className="col-lg-12">
-                              <div className='masterrecord_heading'>Duplicate Record</div>
+                            <div className="col-lg-12 tooltip_box">
+                              <div className='masterrecord_heading'>Duplicate Record
+                                <div className="tooltip_inner">
+                                  These records represent multiple requests made by the user using the same battery serial number.
+                                </div>
+
+                              </div>
                             </div>
                           </div>
                         </div>}
@@ -511,9 +531,18 @@ const WarrantyRequestDetails = () => {
                             </div>
                           </div>))}
 
-                        {warrantyRequestData.battery_details.length == 0 && <div className="request_list_heading mb-4 ml-3" style={{ width: "auto", margin: "0" }}>
-                          <span style={{ color: "#D93731" }}>Serial Number does not match</span>
-                        </div>}
+                        {warrantyRequestData.battery_details.length == 0 && 
+                        <div className="row">
+                          <div className="col-lg-12 tooltip_box">
+                            <div className="request_list_heading mb-4 ml-3" style={{ width: "auto", margin: "0" }}>
+                              <span style={{ color: "#D93731" }}>Serial Number does not match
+                                <div className="tooltip_inner">
+                                  This message appears when the serial number entered by the user does not match any record in our battery master database.                                </div>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        }
 
                       </div>
                       {warrantyRequestData.request[0].status_id != status_Pending ?
@@ -523,36 +552,36 @@ const WarrantyRequestDetails = () => {
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Request Status:
-                                  <span>{warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 ?warrantyRequestData.addressedData[warrantyRequestData.addressedData.length-1].request_status:"--"}</span>
+                                  <span>{warrantyRequestData && warrantyRequestData.addressedData && warrantyRequestData.addressedData.length > 0 ? warrantyRequestData.addressedData[warrantyRequestData.addressedData.length - 1].request_status : "--"}</span>
                                 </div>
                               </div>
-                              
+
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated By:
-                                  <span>{warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 ?warrantyRequestData.addressedData[warrantyRequestData.addressedData.length-1].addressedBY:"--"}</span>
+                                  <span>{warrantyRequestData && warrantyRequestData.addressedData && warrantyRequestData.addressedData.length > 0 ? warrantyRequestData.addressedData[warrantyRequestData.addressedData.length - 1].addressedBY : "--"}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated Date:
-                                  <span>{warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 ?formatDate(warrantyRequestData.addressedData[warrantyRequestData.addressedData.length-1].updated_at):"--"}</span>
+                                  <span>{warrantyRequestData && warrantyRequestData.addressedData && warrantyRequestData.addressedData.length > 0 ? formatDate(warrantyRequestData.addressedData[warrantyRequestData.addressedData.length - 1].updated_at) : "--"}</span>
                                 </div>
                               </div>
-                              {warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 && warrantyRequestData.addressedData[warrantyRequestData.addressedData.length-1].fk_rejection_id ? <div className="col-lg-4 mb-3">
+                              {warrantyRequestData && warrantyRequestData.addressedData && warrantyRequestData.addressedData.length > 0 && warrantyRequestData.addressedData[warrantyRequestData.addressedData.length - 1].fk_rejection_id ? <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Rejection reason:
                                   <span>{warrantyRequestData.addressedData[0].rejection_msg}</span>
                                 </div>
                               </div> : <></>}
-                              
-                              {warrantyRequestData &&warrantyRequestData.addressedData && warrantyRequestData.addressedData.length>0 && warrantyRequestData.addressedData[warrantyRequestData.addressedData.length-1].other_rejection && warrantyRequestData.addressedData[warrantyRequestData.addressedData.length-1].other_rejection.length > 0 && 
-                              <div className="col-lg-8 mb-3">
-                                <div className="request_list">
-                                  Comments:
-                                  <span>{warrantyRequestData.addressedData[warrantyRequestData.addressedData.length-1].comments}</span>
-                                </div>
-                              </div>}
+
+                              {warrantyRequestData && warrantyRequestData.addressedData && warrantyRequestData.addressedData.length > 0 && warrantyRequestData.addressedData[warrantyRequestData.addressedData.length - 1].other_rejection && warrantyRequestData.addressedData[warrantyRequestData.addressedData.length - 1].other_rejection.length > 0 &&
+                                <div className="col-lg-8 mb-3">
+                                  <div className="request_list">
+                                    Comments:
+                                    <span>{warrantyRequestData.addressedData[warrantyRequestData.addressedData.length - 1].comments}</span>
+                                  </div>
+                                </div>}
                               {/* <div className="col-lg-4 mb-3">
                             <div className="request_list">
                               Rejected Reason:
@@ -568,79 +597,79 @@ const WarrantyRequestDetails = () => {
                       {warrantyRequestData.request[0].status_id == status_Pending || warrantyRequestData.request[0].status_id == status_Duplicate ?
                         <div>
                           {/* <form onSubmit={handleSubmit}> */}
-                            <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>
-                              <div className="row">
-                                <div className="col-lg-6 mb-3">
+                          <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>
+                            <div className="row">
+                              <div className="col-lg-6 mb-3">
 
 
-                                  <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Status:</div>
+                                <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Status:</div>
+                                <div className="col-lg-12 mb-3">
+                                  <div className='form_box'>
+                                    <select id="status_id" name="status_id" value={formVal.status_id} onChange={handleInputChange}>
+                                      <option value="">Select</option>
+                                      {statusMasterData.map((singleStatus) => (
+                                        <option value={singleStatus.status_id} key={singleStatus.status_id}>{singleStatus.status}</option>
+                                      ))}
+                                    </select>
+                                    {errors.status_id && <span className="error" style={{ color: "red" }}>{errors.status_id}</span>}
+
+                                  </div>
+                                </div>
+                              </div>
+                              {formVal.status_id == status_Rejected &&
+                                <div className="col-lg-5">
+                                  <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Rejection Cause:</div>
                                   <div className="col-lg-12 mb-3">
                                     <div className='form_box'>
-                                      <select id="status_id" name="status_id" value={formVal.status_id} onChange={handleInputChange}>
+                                      <select id="rejection_id" name="rejection_id" onChange={handleInputChange}>
                                         <option value="">Select</option>
-                                        {statusMasterData.map((singleStatus) => (
-                                          <option value={singleStatus.status_id} key={singleStatus.status_id}>{singleStatus.status}</option>
+                                        {rejectionMasterData.map((rejectMSG) => (
+                                          <option value={rejectMSG.pk_reject_id} key={rejectMSG.pk_reject_id}>{rejectMSG.rejection_msg}</option>
                                         ))}
                                       </select>
-                                      {errors.status_id && <span className="error" style={{ color: "red" }}>{errors.status_id}</span>}
+                                      {errors.rejection_id && <span className="error" style={{ color: "red" }}>{errors.rejection_id}</span>}
 
                                     </div>
                                   </div>
-                                </div>
-                                {formVal.status_id == status_Rejected &&
-                                  <div className="col-lg-5">
-                                    <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Rejection Cause:</div>
-                                    <div className="col-lg-12 mb-3">
-                                      <div className='form_box'>
-                                        <select id="rejection_id" name="rejection_id" onChange={handleInputChange}>
-                                          <option value="">Select</option>
-                                          {rejectionMasterData.map((rejectMSG) => (
-                                            <option value={rejectMSG.pk_reject_id} key={rejectMSG.pk_reject_id}>{rejectMSG.rejection_msg}</option>
-                                          ))}
-                                        </select>
-                                        {errors.rejection_id && <span className="error" style={{ color: "red" }}>{errors.rejection_id}</span>}
-
-                                      </div>
+                                </div>}
+                              {formVal.status_id == status_Verified &&
+                                <div className="col-lg-5">
+                                  <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Warranty Start Date:</div>
+                                  <div className="col-lg-12 mb-3">
+                                    <div className='form_box'>
+                                      <input type="date" id="warranty_start_date" name="warranty_start_date" value={formVal.warranty_start_date} min={formVal.warranty_start_date} onChange={handleInputChange} />
                                     </div>
-                                  </div>}
-                                {formVal.status_id== status_Verified &&
-                                 <div className="col-lg-5">
-                                    <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Warranty Start Date:</div>
-                                    <div className="col-lg-12 mb-3">
-                                      <div className='form_box'>
-                                    <input type="date" id="warranty_start_date" name="warranty_start_date" value={formVal.warranty_start_date} onChange={handleInputChange} />
-                                  </div>
                                   </div>
                                 </div>
-                                }
-                                {formVal.status_id== status_Verified &&
-                                 <div className="col-lg-5">
-                                    <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Warranty End Date:</div>
-                                    <div className="col-lg-12 mb-3">
-                                      <div className='form_box'>
-                                      <input type="date" id="warranty_end_date" name="warranty_end_date" value={formVal.warranty_end_date} onChange={handleInputChange} />
+                              }
+                              {formVal.status_id == status_Verified &&
+                                <div className="col-lg-5">
+                                  <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Warranty End Date:</div>
+                                  <div className="col-lg-12 mb-3">
+                                    <div className='form_box'>
+                                      <input type="date" id="warranty_end_date" name="warranty_end_date" value={formVal.warranty_end_date} max={formVal.warranty_end_date} onChange={handleInputChange} />
+                                    </div>
                                   </div>
                                 </div>
-                                </div>
-                                }  
-                              </div>
-
-                              <div className="col-lg-12 mb-1 mt-3" style={{ fontFamily: "GothamMedium" }}>Any Comment:</div>
-                              <div className="col-lg-11 mb-2">
-                                <div className='form_box'>
-                                  <textarea name="comments" id="comments" value={formVal.comments} style={{ width: "100%", height: "75px" }} onChange={(e) => setFormVal((prev) => ({ ...prev, ["comments"]: e.target.value }))}></textarea>
-                                  {errors.comments && <span className="error" style={{ color: "red" }}>{errors.comments}</span>}
-
-                                </div>
-                              </div>
-                              <div className="col-lg-11">
-                                <button className="blue_btn" onClick={(e) => handleSubmit(e)}>Submit</button>
-                                <button className="blue_btn m-2" onClick={() => {
-                                  router.back();
-                                }}>Back</button>
-                              </div>
-
+                              }
                             </div>
+
+                            <div className="col-lg-12 mb-1 mt-3" style={{ fontFamily: "GothamMedium" }}>Any Comment:</div>
+                            <div className="col-lg-11 mb-2">
+                              <div className='form_box'>
+                                <textarea name="comments" id="comments" value={formVal.comments} style={{ width: "100%", height: "75px" }} onChange={(e) => setFormVal((prev) => ({ ...prev, ["comments"]: e.target.value }))}></textarea>
+                                {errors.comments && <span className="error" style={{ color: "red" }}>{errors.comments}</span>}
+
+                              </div>
+                            </div>
+                            <div className="col-lg-11">
+                              <button className="blue_btn" onClick={(e) => handleSubmit(e)}>Submit</button>
+                              <button className="blue_btn m-2" onClick={() => {
+                                router.back();
+                              }}>Back</button>
+                            </div>
+
+                          </div>
                           {/* </form> */}
                         </div> : <></>
                       }
@@ -653,7 +682,7 @@ const WarrantyRequestDetails = () => {
                       {warrantyRequestData?.images && warrantyRequestData?.images.length > 0 &&
                         warrantyRequestData?.images.map((imageURL, index) =>
                           <div className="invoice_attach_box">
-                            <FileViewer fileUrl={imageURL.image_url.includes("uploads")? getImageApiURL + "/" + imageURL.image_url:imageURL.image_url} isDialogView={false} set_height={150} key={index} /><br></br>
+                            <FileViewer fileUrl={imageURL.image_url.includes("uploads") ? getImageApiURL + "/" + imageURL.image_url : imageURL.image_url} isDialogView={false} set_height={150} key={index} /><br></br>
                             <button className="blue_btn" onClick={() => { setShowImagePop(true); setImagePopURL(imageURL.image_url) }}>View</button>
 
                           </div>

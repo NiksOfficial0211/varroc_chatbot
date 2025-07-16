@@ -3,6 +3,7 @@ import { RowDataPacket } from "mysql2";
 import { NextRequest, NextResponse } from "next/server";
 import Papa from "papaparse";
 import pool from "../../../../utils/db";
+import moment from "moment";
 
 
 export async function POST(req: NextRequest) {
@@ -21,17 +22,35 @@ export async function POST(req: NextRequest) {
         const connection = await pool.getConnection();
    
         let query = `
-      SELECT 
-        ua.*,
-        rt.request_type AS request_type,
-        rs.status AS request_status,
-        pi.*,
-        DATE_FORMAT(pi.manufacturing_date, '%Y-%m-%d') AS manufacturing_date
-        FROM user_warranty_requests ua
-        JOIN request_types rt ON ua.request_type_id = rt.request_type_id 
-        JOIN request_status rs ON ua.status_id = rs.status_id
-        LEFT JOIN product_info pi ON pi.battery_serial_number = ua.product_serial_no
-    `;
+  SELECT 
+    ua.pk_request_id,
+    ua.request_id,
+    ua.product_serial_no,
+    ua.product_purchase_date,
+    ua.user_name,
+    ua.user_phone,
+    ua.status_id,
+    ua.request_type_id,
+    ua.warranty_start_date,
+    ua.warranty_end_date,
+    ua.created_at AS ua_created_at,
+    ua.updated_at AS ua_updated_at,
+    rt.request_type AS request_type,
+    rs.status AS request_status,
+    
+    pi.battery_serial_number,
+    pi.battery_model,
+    pi.varroc_part_code,
+    pi.manufacturing_date,
+    DATE_FORMAT(pi.manufacturing_date, '%Y-%m-%d') AS formatted_manufacturing_date,
+    pi.proposed_mrp,
+    pi.battery_description
+
+  FROM user_warranty_requests ua
+  JOIN request_types rt ON ua.request_type_id = rt.request_type_id 
+  JOIN request_status rs ON ua.status_id = rs.status_id
+  LEFT JOIN product_info pi ON pi.battery_serial_number = ua.product_serial_no
+`;
 
     // Dynamic WHERE conditions
     const conditions: string[] = [];
@@ -107,26 +126,29 @@ export async function POST(req: NextRequest) {
         };
       })
     );
-
+    console.log(enrichedRequests);
+    
     // return NextResponse.json({data:enrichedRequests})
 
     const flatData = enrichedRequests.map((item:any,index:any) => ({
             sr_no: index,
             request_id:item.request_id,
-            request_date:item.created_at,
+            request_date:formatDate(item.ua_created_at),
             customer_name:item.user_name,
             customer_phone:item.user_phone,
             serial_no:item.product_serial_no,
-            purchase_date:item.product_purchase_date,
+            purchase_date:formatDateDDMMYYYY(item.product_purchase_date),
             request_type:item.request_type,
             request_status:item.request_status,
+            warranty_start_date:formatDateDDMMYYYY(item.warranty_start_date),
+            warranty_end_date:formatDateDDMMYYYY(item.warranty_end_date),
             request_comments:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].comments?item.addressedDetails[0].comments:"",
-            requst_updated_date:item.updated_at,
+            requst_updated_date:formatDate(item.ua_updated_at),
             updated_by:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].addressedBY? item.addressedDetails[0].addressedBY:"",
             master_serial_no:item.battery_serial_number,
             master_battery_model:item.battery_model,
             master_varroc_part_code:item.varroc_part_code,
-            manufacturing_date:item.manufacturing_date,
+            manufacturing_date:formatDateDDMMYYYY(item.manufacturing_date),
             proposed_mrp:item.proposed_mrp,
             description:item.battery_description,
       }));
@@ -147,3 +169,28 @@ export async function POST(req: NextRequest) {
     return funSendApiException(e)
 }
 }
+
+
+function formatDate(inputDate: string,timeZone = 'Asia/Kolkata') {
+    const date = new Date(inputDate);
+
+    const formatter = new Intl.DateTimeFormat('en-IN', {
+        timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+
+    const parts = formatter.formatToParts(date);
+    const get = (type: string) => parts.find(p => p.type === type)?.value;
+    return `${get('day')}-${get('month')}-${get('year')} ${get('hour')}:${get('minute')} ${get('dayPeriod')}`;
+  }
+
+  const formatDateDDMMYYYY = (date: any, isTime = false) => {
+      if (!date) return '';
+      const parsedDate = moment(date);
+      return parsedDate.format('DD-MM-YYYY');
+    };

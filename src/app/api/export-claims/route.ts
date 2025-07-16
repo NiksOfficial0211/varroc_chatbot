@@ -3,6 +3,7 @@ import { RowDataPacket } from "mysql2";
 import { NextRequest, NextResponse } from "next/server";
 import Papa from "papaparse";
 import pool from "../../../../utils/db";
+import moment from "moment";
 
 
 export async function POST(req: NextRequest) {
@@ -21,12 +22,21 @@ export async function POST(req: NextRequest) {
         const connection = await pool.getConnection();
    
         let query = `
-      SELECT 
-        ucr.*,
-        rs.status AS request_status
-      FROM user_complaint_requests ucr
-      JOIN request_status rs ON ucr.status_id = rs.status_id
-    `;
+              SELECT 
+          ucr.pk_complaint_id,
+          ucr.complaint_id,
+          ucr.user_name,
+          ucr.user_phone,
+          ucr.complaint_type_id,
+          ucr.description,
+          ucr.status_id,
+          ucr.created_at AS ucr_created_at,
+          ucr.updated_at AS ucr_updated_at,
+
+            rs.status AS request_status
+          FROM user_complaint_requests ucr
+          JOIN request_status rs ON ucr.status_id = rs.status_id
+      `;
 
     // Dynamic WHERE conditions
     const conditions: string[] = [];
@@ -104,18 +114,18 @@ export async function POST(req: NextRequest) {
     const flatData = enrichedRequests.map((item:any,index:any) => ({
             sr_no: index,
             complaint__id:item.complaint__id,
-            request_date:item.created_at,
+            request_date:formatDate(item.created_at),
             customer_phone:item.user_phone?item.user_phone : item.raised_whatsapp_no,
             serial_no:item.battery_serial_no,
             request_type:item.request_type,
             request_status:item.request_status,
             request_comments:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].comments?item.addressedDetails[0].comments:"--",
-            requst_updated_date:item.updated_at,
+            requst_updated_date:formatDate(item.updated_at),
             updated_by:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].addressedBY? item.addressedDetails[0].addressedBY:"--",
             master_serial_no:item.battery_serial_number,
             master_battery_model:item.battery_model,
             master_varroc_part_code:item.varroc_part_code,
-            manufacturing_date:item.manufacturing_date,
+            manufacturing_date:formatDateDDMMYYYY(item.manufacturing_date),
             proposed_mrp:item.proposed_mrp,
             description:item.battery_description,
       }));
@@ -141,3 +151,28 @@ export async function POST(req: NextRequest) {
     return funSendApiException(e)
 }
 }
+
+
+function formatDate(inputDate: string,timeZone = 'Asia/Kolkata') {
+    const date = new Date(inputDate);
+
+    const formatter = new Intl.DateTimeFormat('en-IN', {
+        timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+
+    const parts = formatter.formatToParts(date);
+    const get = (type: string) => parts.find(p => p.type === type)?.value;
+    return `${get('day')}-${get('month')}-${get('year')} ${get('hour')}:${get('minute')} ${get('dayPeriod')}`;
+  }
+
+  const formatDateDDMMYYYY = (date: any, isTime = false) => {
+      if (!date) return '';
+      const parsedDate = moment(date);
+      return parsedDate.format('DD-MM-YYYY');
+    };

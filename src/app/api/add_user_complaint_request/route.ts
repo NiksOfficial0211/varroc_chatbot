@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
         : null:null;
 
     const cleanedPhone =
-      mobile_number !== undefined && mobile_number !== null ? parseInt(mobile_number) : null;
+      mobile_number !== undefined && mobile_number !== null ? parseInt(mobile_number.length==10?"91"+mobile_number:mobile_number) : null;
 
 
     // const cleanedDate = convertDDMMYYYYtoYYYYMMDD(product_purchase_date.trim());

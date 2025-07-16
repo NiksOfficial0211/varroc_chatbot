@@ -6,16 +6,18 @@ import BulkUploadForm from './bulkUpload';
 
 
 type LeftPanelProps = {
-    selectedMenu: number;
-    showLeftPanel: boolean;
-    rightBoxUI: React.ReactNode;
+    selectedMenu: number,
+    headertitle:string,
+    showLeftPanel: boolean,
+    rightBoxUI: React.ReactNode,
 
 };
 
-const LeftPanelMenus = ({ selectedMenu, rightBoxUI }: LeftPanelProps) => {
+const LeftPanelMenus = ({ selectedMenu,headertitle, rightBoxUI }: LeftPanelProps) => {
     const [toggleClass, setToggleClass] = useState("middle_box");
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [menuIndex, setMenuIndex] = useState(selectedMenu);
+    const [headerTitle,setHeaderTitle]=useState(headertitle);
 
 
     const middle_box = () => {
@@ -40,7 +42,7 @@ const LeftPanelMenus = ({ selectedMenu, rightBoxUI }: LeftPanelProps) => {
                         <div className="col-lg-12 left_menu">
                             <ul>
                                 <li className={menuIndex == 1 ? "selected" : ""}>
-                                    <a href={pageURL_dashboard} onClick={() => setMenuIndex(1)}>
+                                    <a href={pageURL_dashboard} onClick={() => {setMenuIndex(1),setHeaderTitle("Battery Dashboard")}}>
                                         <div className="iconbox">
                                             <img src={staticIconsBaseURL + "/images/dashboard_icon.png"} alt="icon" className="img-fluid" />
                                         </div>
@@ -51,7 +53,7 @@ const LeftPanelMenus = ({ selectedMenu, rightBoxUI }: LeftPanelProps) => {
                                     </a>
                                 </li>
                                 <li className={menuIndex == 2 ? "selected" : ""}>
-                                    <a href={pageURL_WarrantyRequestList} onClick={() => setMenuIndex(2)}>
+                                    <a href={pageURL_WarrantyRequestList} onClick={() => {setMenuIndex(2),setHeaderTitle("Warranty Requests")}}>
                                         <div className="iconbox">
                                             <img src={staticIconsBaseURL + "/images/request_icon.png"} alt="icon" className="img-fluid" />
                                         </div>
@@ -62,7 +64,7 @@ const LeftPanelMenus = ({ selectedMenu, rightBoxUI }: LeftPanelProps) => {
                                     </a>
                                 </li>
                                 <li className={menuIndex == 3 ? "selected" : ""}>
-                                            <a href={pageURL_ComplaintList} onClick={()=>setMenuIndex(3)}>
+                                            <a href={pageURL_ComplaintList} onClick={()=>{setMenuIndex(3),setHeaderTitle("Warranty Claims")}}>
                                                 <div className="iconbox">
                                                     <img src={staticIconsBaseURL + "/images/complaint_icon.png"} alt="icon" className="img-fluid"/>
                                                 </div>
@@ -73,7 +75,7 @@ const LeftPanelMenus = ({ selectedMenu, rightBoxUI }: LeftPanelProps) => {
                                             </a>
                                         </li>
                                 <li className={menuIndex == 4 ? "selected" : ""}>
-                                    <a href={pageURL_BatteryListingPage} onClick={() => setMenuIndex(4)}>
+                                    <a href={pageURL_BatteryListingPage} onClick={() => {setMenuIndex(4),setHeaderTitle("Battery Master")}}>
                                         <div className="iconbox">
                                             <img src={staticIconsBaseURL + "/images/list_icon.png"} alt="icon" className="img-fluid" />
                                         </div>
@@ -85,7 +87,7 @@ const LeftPanelMenus = ({ selectedMenu, rightBoxUI }: LeftPanelProps) => {
                                 </li>
                                 <li className={menuIndex == 5 ? "selected" : ""}>
                                             <a href={pageURL_LeadRequstList}>
-                                                <div className="iconbox" onClick={()=>setMenuIndex(5)}>
+                                                <div className="iconbox" onClick={()=>{setMenuIndex(5),setHeaderTitle("Dealership Enquiries")}}>
                                                     <img src={staticIconsBaseURL + "/images/dealershipenquire_icon.png"} alt="icon" className="img-fluid"/>
                                                 </div>
                                                 <div className="leftmenutext">                                        
@@ -123,12 +125,12 @@ const LeftPanelMenus = ({ selectedMenu, rightBoxUI }: LeftPanelProps) => {
                     </div>
                     <div className={showUploadDialog ? "rightpoup rightpoupopen" : "rightpoup"}>
 
-                        {showUploadDialog && <BulkUploadForm onClose={() => setShowUploadDialog(false)} />}
+                        {showUploadDialog && <BulkUploadForm onClose={() => {setShowUploadDialog(false)}} />}
                     </div>
                 </div>
             </div>
             <div className="right_mainbox">
-                <HeaderComponent />
+                <HeaderComponent title={headerTitle}/>
                 <div className='rightbox_inner'>
                     {rightBoxUI}
                 </div>

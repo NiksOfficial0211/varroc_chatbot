@@ -3,7 +3,7 @@ import { baseUrl, pageURL_dashboard } from '../pro_utils/string_routes'
 import { staticIconsBaseURL } from '../pro_utils/string_constants'
 import { useRouter } from 'next/navigation'
 
-const HeaderComponent = () => {
+const HeaderComponent = ({title}:{title:string}) => {
     const router =useRouter()
 
     const handleLogout = () => {
@@ -26,7 +26,8 @@ const HeaderComponent = () => {
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-11 welcome_text">
-                            Battery Dashboard
+                            {/* Battery Dashboard */}
+                            {title}
                         </div>
                         <div className="col-lg-1 text-center">
                             <a onClick={()=>handleLogout()}>

@@ -259,7 +259,7 @@ const LeadRequestListing = () => {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
 
-      <LeftPanelMenus selectedMenu={5} showLeftPanel={false} rightBoxUI={
+      <LeftPanelMenus selectedMenu={5} showLeftPanel={false} headertitle='Dealership Requests' rightBoxUI={
         <div className="container warranty_mainbox">
           <div className="row mt-4">
             <div className="col-lg-12">

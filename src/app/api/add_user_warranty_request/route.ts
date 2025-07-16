@@ -120,7 +120,7 @@ if (hashPresent.length == 0) {
         : null;
 
     const cleanedPhone =
-      user_phone !== undefined && user_phone !== null ? parseInt(user_phone) : null;
+      user_phone !== undefined && user_phone !== null ? parseInt(user_phone.length==10?"91"+user_phone:user_phone) : null;
 
 
     // const cleanedDate = convertDDMMYYYYtoYYYYMMDD(product_purchase_date.trim());
