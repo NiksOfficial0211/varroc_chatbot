@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import pool from "../../../../utils/db";
 import moment from "moment";
+import { getImageApiURL } from "@/app/pro_utils/string_constants";
 
 export async function POST(request: Request) {
   const authHeader = request.headers.get("Authorization");
@@ -75,6 +76,7 @@ export async function POST(request: Request) {
     // "FOC Warranty End Date:"
 
     let aisensyPayload ;
+    let pdfPayload=null;
     if(isRejected){
       // warranty_reg_reject_status
       // isRejected ?  comments && comments.length>0?`Rejected ${selectedRejection}-${comments}`:"Rejected" : isDuplicate?"Duplicate Request": 
@@ -121,6 +123,23 @@ export async function POST(request: Request) {
         FirstName: "user"
       }
     };
+    pdfPayload={
+        "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
+        "campaignName": "pdf_warranty_approve",
+        "destination": `${customer_phone}`,
+        "userName": "Varroc Aftermarket",
+        "templateParams": [],
+        "source": "new-landing-page form",
+        "media": {
+          "url": `${getImageApiURL}uploads/sample_warranty_certificate.pdf`,
+          "filename": "sample_media"
+        },
+        "buttons": [],
+        "carouselCards": [],
+        "location": {},
+        "attributes": {},
+        "paramsFallbackValue": {}
+      }
   }
 
     console.log("this is the payload for aisensy"+JSON.stringify(aisensyPayload));
@@ -139,6 +158,27 @@ export async function POST(request: Request) {
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
       ["Update Warranty Request Send Message Successful",pk_id,1, JSON.stringify({...aisensyPayload,message:"message sent to customer"}), new Date()]
     );
+
+      const res = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(pdfPayload),
+    });
+
+    const pdfResult = await res.json();
+    if(pdfResult.success==='true'){
+      await connection.query(
+      `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
+      ["Update Warranty Request Send PDF Successful",pk_id,1, JSON.stringify({...pdfPayload,message:"message sent to customer"}), new Date()]
+    );
+    }else{
+  await connection.query(
+      `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
+      ["Update Warranty Request Send PDF Failed",pk_id,1, JSON.stringify({...aisensyPayload,message:"Failed to send pdf to customer",response:result}), new Date()]
+    );
+    }
+
+      
       return NextResponse.json({ status: 1, message: "Request updated message sent to customer" });
     }{
       await connection.query(
