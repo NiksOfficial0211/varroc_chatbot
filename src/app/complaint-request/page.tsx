@@ -76,7 +76,6 @@ const WarrantyRequestListing = () => {
       }else{
        setDataFilters({
             date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
-
           }); // fallback
         fetchData(dataFilters);
       }
