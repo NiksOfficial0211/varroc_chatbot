@@ -95,6 +95,7 @@ export async function  POST(request:Request){
     if (conditions.length > 0) {
       addressedQuery += ` WHERE ` + conditions.join(" AND ");
     }
+    addressedQuery += ` ORDER BY ura.pk_id DESC LIMIT 1`;
     const [addressedData]=await connection.execute(addressedQuery,values)
         return {
           ...request,

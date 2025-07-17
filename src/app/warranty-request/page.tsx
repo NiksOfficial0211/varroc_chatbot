@@ -43,7 +43,7 @@ const WarrantyRequestListing = () => {
 
 
   useEffect(() => {
- sessionStorage.removeItem(COMPLAINT_FILTER_KEY);
+    sessionStorage.removeItem(COMPLAINT_FILTER_KEY);
      sessionStorage.removeItem(LEAD_FILTER_KEY);
     const stored = sessionStorage.getItem(WARRANTY_FILTER_KEY);
     console.log("stored filter data :----- --------",stored);
@@ -59,6 +59,8 @@ const WarrantyRequestListing = () => {
           'page' in parsed &&
           'limit' in parsed
         ) {
+          console.log(parsed);
+          
           fetchData(parsed);
           setDataFilters(parsed);
           
@@ -316,7 +318,7 @@ const WarrantyRequestListing = () => {
                       <div className="col-lg-2">
                         <div className="form_box ">
                           <label htmlFor="formFile" className="form-label">Status: </label>
-                          <select id="status" name="status" onChange={handleInputChange}>
+                          <select id="status" name="status" value={dataFilters.status} onChange={handleInputChange}>
                             <option value="">Select</option>
                             {statusMasterData.map((singleStatus) => (
                               <option value={singleStatus.status_id} key={singleStatus.status_id}>{singleStatus.status}</option>

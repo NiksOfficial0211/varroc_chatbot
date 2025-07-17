@@ -94,10 +94,8 @@ query += ` ORDER BY ua.created_at DESC LIMIT ${parsedLimit} OFFSET ${offset}`;
           JOIN request_status rs ON ura.request_status = rs.status_id `;
 
         
-        const conditions: string[] = [];
+      const conditions: string[] = [];
       const values: any[] = [];
-
-    
       conditions.push(`ura.fk_request_id = ?`);
       values.push(request.pk_request_id); // should be in 'YYYY-MM-DD' format
     

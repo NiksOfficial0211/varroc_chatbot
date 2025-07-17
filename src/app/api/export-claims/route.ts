@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
     const flatData = enrichedRequests.map((item:any,index:any) => ({
             sr_no: index,
             complaint__id:item.complaint__id,
-            request_date:item.created_at?formatDate(item.created_at):'',
+            request_date:item.ucr_created_at?formatDate(item.ucr_created_at):'',
             customer_name:item.customer_name,
             customer_phone:item.user_phone,
             serial_no:item.battery_serial_no,
@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
             request_status:item.request_status,
             whatsapp_number:item.raised_whatsapp_no,
             request_comments:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].comments?item.addressedDetails[0].comments:"--",
-            requst_updated_date:item.updated_at?formatDate(item.updated_at):'',
+            requst_updated_date:item.ucr_updated_at?formatDate(item.ucr_updated_at):'',
             updated_by:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].addressedBY? item.addressedDetails[0].addressedBY:"--",
             master_serial_no:item.battery_serial_number,
             master_battery_model:item.battery_model,
