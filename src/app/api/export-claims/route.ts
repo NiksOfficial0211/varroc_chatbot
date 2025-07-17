@@ -23,13 +23,16 @@ export async function POST(req: NextRequest) {
    
         let query = `
               SELECT 
-          ucr.pk_complaint_id,
-          ucr.complaint_id,
-          ucr.user_name,
+          ucr.pk_id,
+          ucr.complaint__id,
+          ucr.customer_name,
+          ucr.battery_serial_no,
           ucr.user_phone,
-          ucr.complaint_type_id,
-          ucr.description,
+          ucr.complaint_type,
+          ucr.raised_whatsapp_no,
+          ucr.complaint_description,
           ucr.status_id,
+          ucr.addressed_by,
           ucr.created_at AS ucr_created_at,
           ucr.updated_at AS ucr_updated_at,
 
@@ -48,7 +51,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (request_id) {
-      conditions.push(`ucr.request_id = ?`);
+      conditions.push(`ucr.complaint__id = ?`);
       values.push(request_id);
     }
 
@@ -114,13 +117,16 @@ export async function POST(req: NextRequest) {
     const flatData = enrichedRequests.map((item:any,index:any) => ({
             sr_no: index,
             complaint__id:item.complaint__id,
-            request_date:formatDate(item.created_at),
-            customer_phone:item.user_phone?item.user_phone : item.raised_whatsapp_no,
+            request_date:item.created_at?formatDate(item.created_at):'',
+            customer_name:item.customer_name,
+            customer_phone:item.user_phone,
             serial_no:item.battery_serial_no,
-            request_type:item.request_type,
+            complaint_type:item.complaint_type,
+            complaint_detscription:item.complaint_description,
             request_status:item.request_status,
+            whatsapp_number:item.raised_whatsapp_no,
             request_comments:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].comments?item.addressedDetails[0].comments:"--",
-            requst_updated_date:formatDate(item.updated_at),
+            requst_updated_date:item.updated_at?formatDate(item.updated_at):'',
             updated_by:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].addressedBY? item.addressedDetails[0].addressedBY:"--",
             master_serial_no:item.battery_serial_number,
             master_battery_model:item.battery_model,
@@ -129,6 +135,7 @@ export async function POST(req: NextRequest) {
             proposed_mrp:item.proposed_mrp,
             description:item.battery_description,
       }));
+          
     //-----------------------Convert data to CSV
 
     // return NextResponse.json({ status: 1, message: "Request received reference id sent to customer",data:flatData }, { status: 200 });

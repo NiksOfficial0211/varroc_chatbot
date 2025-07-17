@@ -45,7 +45,9 @@ const WarrantyRequestListing = () => {
   useEffect(() => {
      const navEntry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
 
-    const isBackNavigation = navEntry?.type === "back_forward";    
+    const isBackNavigation = navEntry?.type === "back_forward";
+    console.log(isBackNavigation);
+        
     if (!isBackNavigation) {
           sessionStorage.removeItem(FILTER_KEY);
         }
@@ -274,7 +276,7 @@ const WarrantyRequestListing = () => {
 
                 <div className="col-lg-12 mb-3">
                   <div className="heading25">
-                    Warranty Claims
+                    Claims
                     <button className="blue_btn" style={{ float: "right" }} onClick={downloadExport}>Export Data</button>
                   </div>
                 </div>

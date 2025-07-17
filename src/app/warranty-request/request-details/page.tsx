@@ -172,6 +172,7 @@ const WarrantyRequestDetails = () => {
     if (!pinCode) { setCityError("required"); return; };
 
     try {
+      setLoading(true);
       const response = await fetch("/api/set_city_manually", {
         method: "POST",
         headers: {
@@ -555,6 +556,28 @@ const WarrantyRequestDetails = () => {
                                   <span>{warrantyRequestData && warrantyRequestData.addressedData && warrantyRequestData.addressedData.length > 0 ? warrantyRequestData.addressedData[warrantyRequestData.addressedData.length - 1].request_status : "--"}</span>
                                 </div>
                               </div>
+
+                              {warrantyRequestData.request && warrantyRequestData.request.map((req,index)=>{
+                                  req.status_id == status_Verified &&
+                                    <div className="col-lg-4 mb-3">
+                                    <div className="request_list">
+                                      Warranty Start Date:
+                                      <span>{req.warranty_end_date}</span>
+                                    </div>
+                                  </div>
+                                  }
+                              )}
+                              {warrantyRequestData.request && warrantyRequestData.request.map((req,index)=>{
+                                  req.status_id == status_Verified &&
+                                  <div className="col-lg-4 mb-3">
+                                  <div className="request_list">
+                                    Warranty End Date:
+                                    <span>{req.warranty_end_date}</span>
+                                  </div>
+                                </div>
+                              }
+                              )}
+                              
 
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">

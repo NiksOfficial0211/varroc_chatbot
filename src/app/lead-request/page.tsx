@@ -259,7 +259,7 @@ const LeadRequestListing = () => {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
 
-      <LeftPanelMenus selectedMenu={5} showLeftPanel={false} headertitle='Dealership Requests' rightBoxUI={
+      <LeftPanelMenus selectedMenu={5} showLeftPanel={false} headertitle='Dealership Enquiries' rightBoxUI={
         <div className="container warranty_mainbox">
           <div className="row mt-4">
             <div className="col-lg-12">
@@ -268,7 +268,7 @@ const LeadRequestListing = () => {
 
                 <div className="col-lg-12 mb-3">
                   <div className="heading25">
-                    Dealership Enquiries
+                    Enquiries
                     <button className="blue_btn" style={{ float: "right" }} onClick={downloadExport}>Export Data</button>
                   </div>
                 </div>

@@ -77,17 +77,17 @@ export async function POST(request: Request) {
 
     let aisensyPayload ;
     let pdfPayload=null;
-    if(isRejected){
+    if(isRejected || isDuplicate){
       // warranty_reg_reject_status
       // isRejected ?  comments && comments.length>0?`Rejected ${selectedRejection}-${comments}`:"Rejected" : isDuplicate?"Duplicate Request": 
       aisensyPayload={
       apiKey: process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-      campaignName:"warranty_reg_status",
+      campaignName:"warranty_reg_reject_status",
       destination: `${customer_phone}`,
       userName: "Varroc Aftermarket",
       templateParams: [
         request_id, 
-        isRejected ?  comments && comments.length>0?`Rejected ${selectedRejection}-${comments}`:"Rejected" : isDuplicate?"Duplicate Request": "",
+        isRejected ?  comments && comments.length>0?`Rejected ${selectedRejection}-${comments} Please fill the form again`:"Rejected- please fill the form again" : isDuplicate?`Duplicate Request -${comments}`: "",
       ],
       source: "new-landing-page form",
       media: {},
@@ -107,11 +107,11 @@ export async function POST(request: Request) {
       userName: "Varroc Aftermarket",
       templateParams: [
         request_id, 
-        "Approved",
+        `Approved-${comments}`,
         battery_serial_no,
-        date_of_purchase,
-        warranty_start_date,
-        warranty_end_date
+        formatDateDDMMYYYY(date_of_purchase),
+        formatDateDDMMYYYY(warranty_start_date),
+        formatDateDDMMYYYY(warranty_end_date)
       ],
       source: "new-landing-page form",
       media: {},
@@ -132,7 +132,7 @@ export async function POST(request: Request) {
         "source": "new-landing-page form",
         "media": {
           "url": `${getImageApiURL}/uploads/sample_warranty_certificate.pdf`,
-          "filename": "sample_media"
+          "filename": "Certificate"
         },
         "buttons": [],
         "carouselCards": [],
@@ -204,3 +204,10 @@ export async function POST(request: Request) {
     );
   }
 }
+
+
+const formatDateDDMMYYYY = (date: any, isTime = false) => {
+      if (!date) return '';
+      const parsedDate = moment(date);
+      return parsedDate.format('DD/MM/YYYY');
+    };

@@ -166,7 +166,7 @@ const BatteryListing = () => {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
 
-      <LeftPanelMenus selectedMenu={4} showLeftPanel={false} headertitle='Warranty Claim Details' rightBoxUI={
+      <LeftPanelMenus selectedMenu={4} showLeftPanel={false} headertitle='Battery Master' rightBoxUI={
         <div className="container">
           <div className="row mt-4">
             <div className="col-lg-12">
@@ -174,7 +174,7 @@ const BatteryListing = () => {
               <div className="row" id="top">
                 <div className="col-lg-12 mb-3">
                   <div className="heading25">
-                    Battery Master
+                    Master Records
                     <button className="blue_btn" style={{float:"right"}} onClick={() => {
                       setAddProduct(true);
                       setShowUploadDialog(true);
@@ -236,7 +236,7 @@ const BatteryListing = () => {
                         <div className="row list_listbox" style={{ alignItems: "center", cursor: "pointer" }} key={battery.pk_id} >
                           <div className="col-lg-1 text-center"><div className="label">{battery.battery_model}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{battery.battery_serial_number}</div></div>
-                          <div className="col-lg-2 text-center"><div className="label">{battery.manufacturing_date}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{formatDateDDMMYYYY(battery.manufacturing_date)}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{battery.created_by_username}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{battery.updated_by_username?battery.updated_by_username:"--"}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{formatDateYYYYMMDD(battery.updated_at)}</div></div>
