@@ -152,7 +152,7 @@ const ErrorLogsListing = () => {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
 
-      <LeftPanelMenus selectedMenu={7} showLeftPanel={false} rightBoxUI={
+      <LeftPanelMenus selectedMenu={7} headertitle='Error Logs' showLeftPanel={false} rightBoxUI={
         <div className="container">
           <div className="row mt-4">
             <div className="col-lg-12">

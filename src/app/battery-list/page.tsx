@@ -148,6 +148,11 @@ const BatteryListing = () => {
   return `${get('day')}-${get('month')}-${get('year')} ${get('hour')}:${get('minute')} ${get('dayPeriod')}`;
 
   }
+   const formatDateDDMMYYYY = (date: any, isTime = false) => {
+      if (!date) return '';
+      const parsedDate = moment(date);
+      return parsedDate.format('DD-MM-YYYY');
+    };
 
 
   return (
@@ -199,7 +204,7 @@ const BatteryListing = () => {
                       <div className="col-lg-2">
                         <div className="form_box ">
                           <label htmlFor="formFile" className="form-label">Manufacturing Date: </label>
-                          <input type="date" id="manufacturing_date" name="manufacturing_date" value={dataFilters.manufacturing_date} onChange={handleInputChange} />
+                          <input type="date" id="manufacturing_date" name="manufacturing_date" value={formatDateDDMMYYYY(dataFilters.manufacturing_date)} onChange={handleInputChange} />
                         </div>
                       </div>
 
