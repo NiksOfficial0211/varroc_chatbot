@@ -125,7 +125,7 @@ export async function POST(request: Request) {
     };
     pdfPayload={
         "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-        "campaignName": "pdf_warranty_approve",
+        "campaignName": "pdf_warranty_approves",
         "destination": `${customer_phone}`,
         "userName": "Varroc Aftermarket",
         "templateParams": [],

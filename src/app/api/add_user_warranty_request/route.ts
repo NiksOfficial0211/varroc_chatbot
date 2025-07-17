@@ -295,7 +295,7 @@ if (hashPresent.length == 0) {
 
     const aisensyPayload = {
       "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-      "campaignName": "WARRANTY_REG_ID",
+      "campaignName": "REG_WARRANTY_ID",
       "destination": `${cleanedWhatsAppNumber}`,
       "userName": "Varroc Aftermarket",
       "templateParams": [

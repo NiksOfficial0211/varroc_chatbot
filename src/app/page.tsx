@@ -269,7 +269,7 @@ export default function Home() {
 
       if (response.status == 1) {
         setLoading(false);
-        sessionStorage.setItem("session", JSON.stringify({ auth_id: response.user.auth_id, userName: response.user.username, is_login: true }));
+        localStorage.setItem("session", JSON.stringify({ auth_id: response.user.auth_id, userName: response.user.username, is_login: true }));
         setGlobalState({
           selectedViewID:'',
           auth_id:response.user.auth_id,

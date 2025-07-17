@@ -63,7 +63,7 @@ export async function POST(request: Request) {
 
     const aisensyPayload = {
               "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-              "campaignName": "warranty_claim_status",
+              "campaignName": "claim_warranty_status",
               "destination": `${customer_phone}`,
               "userName": "Varroc Aftermarket",
               "templateParams": [
