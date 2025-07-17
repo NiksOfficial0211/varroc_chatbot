@@ -91,7 +91,7 @@ query += ` ORDER BY ua.created_at DESC LIMIT ${parsedLimit} OFFSET ${offset}`;
           FROM user_request_addressed ura
           JOIN request_types rt ON ura.request_type = rt.request_type_id 
           LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
-          JOIN request_status rs ON ura.request_status = rs.status_id`;
+          JOIN request_status rs ON ura.request_status = rs.status_id `;
 
         
         const conditions: string[] = [];
@@ -104,6 +104,7 @@ query += ` ORDER BY ua.created_at DESC LIMIT ${parsedLimit} OFFSET ${offset}`;
     if (conditions.length > 0) {
       addressedQuery += ` WHERE ` + conditions.join(" AND ");
     }
+    addressedQuery += ` ORDER BY ura.pk_id DESC LIMIT 1`;
     const [addressedData]=await connection.execute(addressedQuery,values)
         return {
           ...request,

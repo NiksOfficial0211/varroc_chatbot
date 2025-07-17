@@ -115,7 +115,7 @@ export async function POST(request: Request) {
       userName: "Varroc Aftermarket",
       templateParams: [
         request_id, 
-        `Approved-${comments}`,
+        `Approved. ${comments}`,
         battery_serial_no,
         date_of_pur,
         war_start_date,
@@ -130,7 +130,12 @@ export async function POST(request: Request) {
       paramsFallbackValue: {
         FirstName: "user"
       }
+
+      
+      
     };
+    console.log(aisensyPayload);
+    
     pdfPayload={
         "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
         "campaignName": "pdf_warranty_approves",
