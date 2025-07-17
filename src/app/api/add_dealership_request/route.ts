@@ -186,6 +186,9 @@ export async function POST(request: NextRequest) {
     if (connection) {
       await connection.rollback();
     }
+    const [addHash] = await connection.execute<any[]>(`INSERT INTO all_request_hash
+                (hash_key,created_at) VALUES (?,?)
+                `,[hash,new Date()]);
     console.error('DB Error:', err);
     const cleanedWhatsAppNumber =
       whatsapp_number?.trim() !== '' ? whatsapp_number.trim() : null;
@@ -232,9 +235,7 @@ export async function POST(request: NextRequest) {
   }
 }
 else{
-  const [addHash] = await connection.execute<any[]>(`INSERT INTO all_request_hash
-                (hash_key,created_at) VALUES (?,?)
-                `,[hash,new Date()]);
+  
       const activityAdded = await AddCommonLog(null,null,"DealerShip Raised Body duplicate entry",body);
         return NextResponse.json({ status: 1, message:"Already Request is Registered" }, { status: 200 });
 

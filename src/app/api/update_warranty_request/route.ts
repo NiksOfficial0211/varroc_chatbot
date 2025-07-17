@@ -100,6 +100,10 @@ export async function POST(request: Request) {
       }
     };
     }else{
+      console.log(formatDateDDMMYYYY(date_of_purchase)+"-----DOP------------"+
+        formatDateDDMMYYYY(warranty_start_date)+"-----WSD------------"+
+        formatDateDDMMYYYY(warranty_end_date)+"-----WED------------");
+      
     aisensyPayload={
       apiKey: process.env.NEXT_PUBLIC_AISENSY_API_KEY,
       campaignName:"approved_status_warranty_reg",
