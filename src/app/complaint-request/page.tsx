@@ -5,7 +5,7 @@ import LoadingDialog from '../components/PageLoader';
 import ShowAlertMessage from '../components/alert';
 import { WarrantyRequestDataModel } from '../datamodels/WarrantyReqestListDataModel';
 import { data } from 'jquery';
-import { staticIconsBaseURL, status_Rejected } from '../pro_utils/string_constants'
+import { COMPLAINT_FILTER_KEY, LEAD_FILTER_KEY, staticIconsBaseURL, status_Rejected, WARRANTY_FILTER_KEY } from '../pro_utils/string_constants'
 import { useGlobalContext } from '../contextProviders/globalContext';
 import { useRouter } from 'next/navigation';
 import { pageURL_ComplaintDetails, pageURL_WarrantyRequestDetails } from '../pro_utils/string_routes';
@@ -21,7 +21,6 @@ interface DataFilters {
 
 const WarrantyRequestListing = () => {
   useSessionRedirect();
-  const FILTER_KEY = 'complaint_list_filter';
 
   const [isLoading, setLoading] = useState(false);
   const { auth_id, userName, setGlobalState } = useGlobalContext();
@@ -43,15 +42,10 @@ const WarrantyRequestListing = () => {
   const router = useRouter();
 
   useEffect(() => {
-     const navEntry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
-
-    const isBackNavigation = navEntry?.type === "back_forward";
-    console.log(isBackNavigation);
-        
-    if (!isBackNavigation) {
-          sessionStorage.removeItem(FILTER_KEY);
-        }
-    const stored = sessionStorage.getItem(FILTER_KEY);
+    
+      sessionStorage.removeItem(WARRANTY_FILTER_KEY);
+          sessionStorage.removeItem(LEAD_FILTER_KEY);
+    const stored = sessionStorage.getItem(COMPLAINT_FILTER_KEY);
     console.log("stored filter data :----- --------",stored);
     
     try {
@@ -96,7 +90,7 @@ const WarrantyRequestListing = () => {
   // const fetchData = async (date: any, request_id: any, phone_no: any, name: any, status: any, page: any, limit: any) => {
   const fetchData = async (filter: DataFilters) => {
     setDataFilters(filter);
-    sessionStorage.setItem(FILTER_KEY, JSON.stringify(filter));
+    sessionStorage.setItem(COMPLAINT_FILTER_KEY, JSON.stringify(filter));
     setLoading(true);
     try {
       const statusRes = await fetch("/api/get_status_master", {
@@ -202,7 +196,7 @@ const WarrantyRequestListing = () => {
 
       date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
     });
-    sessionStorage.removeItem(FILTER_KEY);
+    sessionStorage.removeItem(COMPLAINT_FILTER_KEY);
 
     fetchData({
       date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10

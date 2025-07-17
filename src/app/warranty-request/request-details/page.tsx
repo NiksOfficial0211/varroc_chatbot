@@ -556,27 +556,31 @@ const WarrantyRequestDetails = () => {
                                   <span>{warrantyRequestData && warrantyRequestData.addressedData && warrantyRequestData.addressedData.length > 0 ? warrantyRequestData.addressedData[warrantyRequestData.addressedData.length - 1].request_status : "--"}</span>
                                 </div>
                               </div>
-
-                              {warrantyRequestData.request && warrantyRequestData.request.map((req,index)=>{
-                                  req.status_id == status_Verified &&
-                                    <div className="col-lg-4 mb-3">
+                               {warrantyRequestData.request && warrantyRequestData.request.map((req,index)=>
+                               req.status_id==status_Verified && <div className="col-lg-4 mb-3" key={index}>
+                                    
                                     <div className="request_list">
                                       Warranty Start Date:
-                                      <span>{req.warranty_end_date}</span>
+                                      <span>{formatDateDDMMYYYY(warrantyRequestData.request[0].warranty_end_date)}</span>
                                     </div>
-                                  </div>
-                                  }
-                              )}
-                              {warrantyRequestData.request && warrantyRequestData.request.map((req,index)=>{
-                                  req.status_id == status_Verified &&
-                                  <div className="col-lg-4 mb-3">
+                                  </div>)}
+                              {warrantyRequestData.request && warrantyRequestData.request.map((req,index)=>
+                               req.status_id==status_Verified && <div className="col-lg-4 mb-3" key={index}>
                                   <div className="request_list">
                                     Warranty End Date:
-                                    <span>{req.warranty_end_date}</span>
+                                    <span>{formatDateDDMMYYYY(warrantyRequestData.request[0].warranty_end_date)}</span>
                                   </div>
-                                </div>
-                              }
+                                </div>)}
+                              {/* {warrantyRequestData.request.map((req,index)=>{
+                                  
+                                   
+                                  }
                               )}
+                              {warrantyRequestData.request.map((req,index)=>{
+                                  
+                                  
+                              }
+                              )} */}
                               
 
                               <div className="col-lg-4 mb-3">
@@ -598,11 +602,11 @@ const WarrantyRequestDetails = () => {
                                 </div>
                               </div> : <></>}
 
-                              {warrantyRequestData && warrantyRequestData.addressedData && warrantyRequestData.addressedData.length > 0 && warrantyRequestData.addressedData[warrantyRequestData.addressedData.length - 1].other_rejection && warrantyRequestData.addressedData[warrantyRequestData.addressedData.length - 1].other_rejection.length > 0 &&
+                              {warrantyRequestData && warrantyRequestData.addressedData && warrantyRequestData.addressedData.length > 0 && 
                                 <div className="col-lg-8 mb-3">
                                   <div className="request_list">
                                     Comments:
-                                    <span>{warrantyRequestData.addressedData[warrantyRequestData.addressedData.length - 1].comments}</span>
+                                    <span>{warrantyRequestData.addressedData[warrantyRequestData.addressedData.length - 1].comments || "--"}</span>
                                   </div>
                                 </div>}
                               {/* <div className="col-lg-4 mb-3">

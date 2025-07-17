@@ -4,7 +4,7 @@ import HeaderComponent from '../components/header'
 import useSessionRedirect from '../pro_utils/manage_session';
 import LoadingDialog from '../components/PageLoader';
 import ShowAlertMessage from '../components/alert';
-import { staticIconsBaseURL } from '../pro_utils/string_constants'
+import { COMPLAINT_FILTER_KEY, LEAD_FILTER_KEY, staticIconsBaseURL, WARRANTY_FILTER_KEY } from '../pro_utils/string_constants'
 import { useRouter } from 'next/navigation';
 import { pageURL_ComplaintDetails, pageURL_LeadDetails, pageURL_WarrantyRequestDetails, pageURL_WarrantyRequestList } from '../pro_utils/string_routes';
 import { useScrollCounter } from '../hooks/DashboardCountHook/dashboardCountHook';
@@ -28,8 +28,11 @@ const Dashboard = () => {
   const router = useRouter();
 
   useEffect(() => {
+    sessionStorage.removeItem(WARRANTY_FILTER_KEY);
+    sessionStorage.removeItem(COMPLAINT_FILTER_KEY);
+              sessionStorage.removeItem(LEAD_FILTER_KEY);
     fetchData();
-    fetchData();
+    // fetchData();
         const intervalId = setInterval(() => {
             // fetchActivities();
             fetchData();

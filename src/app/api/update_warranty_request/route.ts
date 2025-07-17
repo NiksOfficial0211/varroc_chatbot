@@ -103,6 +103,10 @@ export async function POST(request: Request) {
       console.log(formatDateDDMMYYYY(date_of_purchase)+"-----DOP------------"+
         formatDateDDMMYYYY(warranty_start_date)+"-----WSD------------"+
         formatDateDDMMYYYY(warranty_end_date)+"-----WED------------");
+
+    const date_of_pur=    formatDateDDMMYYYY(date_of_purchase)
+    const war_start_date=    formatDateDDMMYYYY(date_of_purchase)
+    const war_end_date=    formatDateDDMMYYYY(date_of_purchase)
       
     aisensyPayload={
       apiKey: process.env.NEXT_PUBLIC_AISENSY_API_KEY,
@@ -113,9 +117,9 @@ export async function POST(request: Request) {
         request_id, 
         `Approved-${comments}`,
         battery_serial_no,
-        formatDateDDMMYYYY(date_of_purchase),
-        formatDateDDMMYYYY(warranty_start_date),
-        formatDateDDMMYYYY(warranty_end_date)
+        date_of_pur,
+        war_start_date,
+        war_end_date
       ],
       source: "new-landing-page form",
       media: {},

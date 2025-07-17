@@ -5,7 +5,7 @@ import LoadingDialog from '../components/PageLoader';
 import ShowAlertMessage from '../components/alert';
 import { WarrantyRequestDataModel } from '../datamodels/WarrantyReqestListDataModel';
 import { data } from 'jquery';
-import { staticIconsBaseURL, status_Rejected } from '../pro_utils/string_constants'
+import { COMPLAINT_FILTER_KEY, LEAD_FILTER_KEY, staticIconsBaseURL, status_Rejected, WARRANTY_FILTER_KEY } from '../pro_utils/string_constants'
 import { useGlobalContext } from '../contextProviders/globalContext';
 import { useRouter } from 'next/navigation';
 import { pageURL_ComplaintDetails, pageURL_LeadDetails, pageURL_WarrantyRequestDetails } from '../pro_utils/string_routes';
@@ -42,11 +42,12 @@ const LeadRequestListing = () => {
   });
   const [hasMoreData, setHasMoreData] = useState(true);
   const router = useRouter();
-  const FILTER_KEY = 'lead_list_filter';
 
   useEffect(() => {
+    sessionStorage.removeItem(COMPLAINT_FILTER_KEY);
+    sessionStorage.removeItem(WARRANTY_FILTER_KEY);
     // fetchData(dataFilters.date, dataFilters.request_id, dataFilters.phone_no, dataFilters.name, dataFilters.status, dataFilters.page, dataFilters.limit);
-    const stored = sessionStorage.getItem(FILTER_KEY);
+    const stored = sessionStorage.getItem(LEAD_FILTER_KEY);
     console.log("stored filter data :----- --------",stored);
     
     try {
@@ -89,7 +90,7 @@ const LeadRequestListing = () => {
 
   // const fetchData = async (date: any, request_id: any, phone_no: any, name: any, status: any, page: any, limit: any) => {
   const fetchData = async (filter: DataFilters) => {
-
+  sessionStorage.setItem(LEAD_FILTER_KEY, JSON.stringify(filter));
     setLoading(true);
     try {
       const statusRes = await fetch("/api/get_status_master", {
@@ -193,6 +194,8 @@ const LeadRequestListing = () => {
   const resetFilter = async () => {
 
     window.location.reload();
+    sessionStorage.removeItem(LEAD_FILTER_KEY);
+    
     setDataFilters({
 
       date: '', enquiry_id: '', city: '', state: '', status: '', whatsapp_no: '', page: 1, limit: 10

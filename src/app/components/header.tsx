@@ -1,6 +1,6 @@
 import React from 'react'
 import { baseUrl, pageURL_dashboard } from '../pro_utils/string_routes'
-import { staticIconsBaseURL } from '../pro_utils/string_constants'
+import { COMPLAINT_FILTER_KEY, LEAD_FILTER_KEY, staticIconsBaseURL, WARRANTY_FILTER_KEY } from '../pro_utils/string_constants'
 import { useRouter } from 'next/navigation'
 
 const HeaderComponent = ({title}:{title:string}) => {
@@ -8,8 +8,11 @@ const HeaderComponent = ({title}:{title:string}) => {
 
     const handleLogout = () => {
         // Clear sessionStorage
-        sessionStorage.removeItem("session");
+        localStorage.removeItem("session");
         sessionStorage.removeItem("globalState");
+        sessionStorage.removeItem(WARRANTY_FILTER_KEY);
+            sessionStorage.removeItem(COMPLAINT_FILTER_KEY);
+                      sessionStorage.removeItem(LEAD_FILTER_KEY);
         
         // Optional: Clear all session storage
         // sessionStorage.clear();

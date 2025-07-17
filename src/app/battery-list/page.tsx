@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import HeaderComponent from '../components/header';
 import LoadingDialog from '../components/PageLoader';
 import ShowAlertMessage from '../components/alert';
-import { staticIconsBaseURL } from '../pro_utils/string_constants'
+import { COMPLAINT_FILTER_KEY, LEAD_FILTER_KEY, staticIconsBaseURL, WARRANTY_FILTER_KEY } from '../pro_utils/string_constants'
 import { useGlobalContext } from '../contextProviders/globalContext';
 import { forbidden, useRouter } from 'next/navigation';
 import useSessionRedirect from '../pro_utils/manage_session';
@@ -40,6 +40,9 @@ const BatteryListing = () => {
   const router = useRouter();
 
   useEffect(() => {
+    sessionStorage.removeItem(WARRANTY_FILTER_KEY);
+        sessionStorage.removeItem(COMPLAINT_FILTER_KEY);
+                  sessionStorage.removeItem(LEAD_FILTER_KEY);
     // fetchData(dataFilters.date, dataFilters.request_id, dataFilters.phone_no, dataFilters.name, dataFilters.status, dataFilters.page, dataFilters.limit);
     fetchData(dataFilters.page);
 
