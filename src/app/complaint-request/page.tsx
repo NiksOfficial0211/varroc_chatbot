@@ -333,7 +333,7 @@ const WarrantyRequestListing = () => {
                       <div className="col-lg-2 text-center"><div className="label">Complaint <br></br>Type</div></div>
                       {/* <div className="col-lg-2 text-center"><div className="label">Description</div></div> */}
                       <div className="col-lg-1 text-center"><div className="label">Status</div></div>
-                      <div className="col-lg-2 text-center"><div className="label">Addressed By</div></div>
+                      <div className="col-lg-2 text-center"><div className="label">Updated By</div></div>
                       {/* <div className="col-lg-1 text-center"><div className="label">Action</div></div> */}
 
                     </div>

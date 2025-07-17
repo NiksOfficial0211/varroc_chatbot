@@ -336,7 +336,7 @@ const WarrantyRequestDetails = () => {
             <div className="col-lg-12">
               <div className="row" id="top">
                 <div className="col-lg-12 mb-5">
-                  <div className="heading25" style={{ paddingLeft: "20px" }}>Requests Details</div>
+                  <div className="heading25" style={{ paddingLeft: "20px" }}>Request Details</div>
                 </div>
 
               </div>

@@ -187,7 +187,7 @@ export async function POST(request: Request) {
     }else{
   await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Update Warranty Request Send PDF Failed",pk_id,1, JSON.stringify({...aisensyPayload,message:"Failed to send pdf to customer",response:result}), new Date()]
+      ["Update Warranty Request Send PDF Failed",pk_id,1, JSON.stringify({...pdfPayload,message:"Failed to send pdf to customer",response:result}), new Date()]
     );
     }
 

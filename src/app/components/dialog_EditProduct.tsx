@@ -252,7 +252,7 @@ const AddEditProductDetail = ({ isAddProduct, product_id, onClose }: { isAddProd
                     </div>
                     <div className="col-lg-6 mb-3">
                         <div className="form_box">
-                            <label htmlFor="formFile" className="form-label">Proposed mrp*: </label>
+                            <label htmlFor="formFile" className="form-label">Proposed MRP*: </label>
                             <input type="text" id="proposed_mrp" name="proposed_mrp" value={formValues.proposed_mrp} onChange={handleInputChange} />
                             {errors.proposed_mrp && <span className="error" style={{ color: "red" }}>{errors.proposed_mrp}</span>}
                         </div>

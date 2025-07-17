@@ -186,16 +186,14 @@ const WarrantyRequestListing = () => {
     if (hasMoreData) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-
-      date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: dataFilters.page+page, limit: 10
-    });
+        date: dataFilters.date, request_id: dataFilters.request_id, phone_no: dataFilters.phone_no, name: dataFilters.name, status: dataFilters.status, reject_id: dataFilters.reject_id, page: dataFilters.page+page, limit: 10
+      });
     }
     else if (!hasMoreData && dataFilters.page > 1) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-
-      date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: dataFilters.page+page, limit: 10
-    });
+        date: dataFilters.date, request_id: dataFilters.request_id, phone_no: dataFilters.phone_no, name: dataFilters.name, status: dataFilters.status, reject_id: dataFilters.reject_id, page: dataFilters.page+page, limit: 10
+      });
     }
 
   }
