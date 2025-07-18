@@ -40,9 +40,8 @@ export async function POST(request: Request) {
        SET status_id = ?, addressed_id = ?, fk_reject_id = ?,warranty_start_date=?,warranty_end_date=?
        WHERE pk_request_id = ?`,
       [status, auth_id, rejection_id,
-        warranty_start_date ? moment(warranty_start_date).isValid() ? moment(warranty_start_date).format("YYYY-MM-DD") : null : null
-,
-        warranty_end_date ? moment(warranty_end_date).isValid() ? moment(warranty_end_date).format("YYYY-MM-DD") : null : null, pk_id
+        warranty_start_date ?  moment(warranty_start_date).format("YYYY-MM-DD") : null ,
+        warranty_end_date ? moment(warranty_end_date).format("YYYY-MM-DD") : null , pk_id
 ]
     );
 
@@ -100,13 +99,7 @@ export async function POST(request: Request) {
       }
     };
     }else{
-      console.log(formatDateDDMMYYYY(date_of_purchase)+"-----DOP------------"+
-        formatDateDDMMYYYY(warranty_start_date)+"-----WSD------------"+
-        formatDateDDMMYYYY(warranty_end_date)+"-----WED------------");
-
-    const date_of_pur=    formatDateDDMMYYYY(date_of_purchase)
-    const war_start_date=    formatDateDDMMYYYY(date_of_purchase)
-    const war_end_date=    formatDateDDMMYYYY(date_of_purchase)
+    
       
     aisensyPayload={
       apiKey: process.env.NEXT_PUBLIC_AISENSY_API_KEY,
@@ -117,9 +110,9 @@ export async function POST(request: Request) {
         request_id, 
         `Approved. ${comments}`,
         battery_serial_no,
-        date_of_pur,
-        war_start_date,
-        war_end_date
+        date_of_purchase,
+        warranty_start_date,
+        warranty_end_date
       ],
       source: "new-landing-page form",
       media: {},
@@ -224,3 +217,7 @@ const formatDateDDMMYYYY = (date: any, isTime = false) => {
       const parsedDate = moment(date);
       return parsedDate.format('DD/MM/YYYY');
     };
+
+
+
+    
