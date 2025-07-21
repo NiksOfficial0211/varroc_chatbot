@@ -17,7 +17,7 @@ import { ComplaintListDataModel } from '../datamodels/ComplaintsDataModel';
 import { DealershipEnqListingDataModel } from '../datamodels/DealershipEnqDataModel';
 
 interface DataFilters {
-  date: any, enquiry_id: any, city: any, state: any, status: any, whatsapp_no: any, page: any, limit: any
+  date: any, enquiry_id: any, city: any, state: any, status: any, customerPhone: any, page: any, limit: any
 }
 
 const LeadRequestListing = () => {
@@ -37,7 +37,7 @@ const LeadRequestListing = () => {
 
 
   const [dataFilters, setDataFilters] = useState<DataFilters>({
-    date: '', enquiry_id: '', city: '', state: '', status: '', whatsapp_no: '', page: 1, limit: 10
+    date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10
 
   });
   const [hasMoreData, setHasMoreData] = useState(true);
@@ -66,21 +66,21 @@ const LeadRequestListing = () => {
           
         } else {
           setDataFilters({
-    date: '', enquiry_id: '', city: '', state: '', status: '', whatsapp_no: '', page: 1, limit: 10
+    date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10
 
   }); // fallback if invalid
           fetchData(dataFilters);
         }
       }else{
        setDataFilters({
-    date: '', enquiry_id: '', city: '', state: '', status: '', whatsapp_no: '', page: 1, limit: 10
+    date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10
 
   }); // fallback
         fetchData(dataFilters);
       }
     } catch (error) {
       setDataFilters({
-    date: '', enquiry_id: '', city: '', state: '', status: '', whatsapp_no: '', page: 1, limit: 10
+    date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10
 
   }); // fallback
       fetchData(dataFilters);
@@ -118,7 +118,7 @@ const LeadRequestListing = () => {
         body: JSON.stringify({
           date: filter.date,
           enquiry_id: filter.enquiry_id,
-          whatsapp_no: filter.whatsapp_no,
+          whatsapp_no: filter.customerPhone,
           city: filter.city,
           state: filter.state,
           status: filter.status,
@@ -174,13 +174,13 @@ const LeadRequestListing = () => {
     if (hasMoreData) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-        date: '', enquiry_id: '', city: '', state: '', status: '', whatsapp_no: '', page: dataFilters.page+page, limit: 10
+        date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: dataFilters.page+page, limit: 10
       });
     }
     else if (!hasMoreData && dataFilters.page > 1) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-        date: '', enquiry_id: '', city: '', state: '', status: '', whatsapp_no: '', page: dataFilters.page+page, limit: 10
+        date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: dataFilters.page+page, limit: 10
       });
     }
 
@@ -198,7 +198,7 @@ const LeadRequestListing = () => {
     
     setDataFilters({
 
-      date: '', enquiry_id: '', city: '', state: '', status: '', whatsapp_no: '', page: 1, limit: 10
+      date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10
     });
     fetchData(dataFilters.page);
   }
@@ -282,32 +282,36 @@ const LeadRequestListing = () => {
                       <div className="col-lg-2">
                         <div className="form_box ">
                           <label htmlFor="formFile" className="form-label">Enquiry ID: </label>
-                          <input type="text" id="request_id" name="request_id" value={dataFilters.enquiry_id} onChange={handleInputChange} />
+                          <input type="text" id="enquiry_id" name="enquiry_id" value={dataFilters.enquiry_id} onChange={handleInputChange} />
                         </div>
                       </div>
                       <div className="col-lg-2">
                         <div className="form_box ">
                           <label htmlFor="formFile" className="form-label">Customer Phone : </label>
-                          <input type="text" id="request_id" name="request_id" value={dataFilters.city} onChange={handleInputChange} />
+                          <input type="text" id="customerPhone" name="customerPhone" value={dataFilters.customerPhone} onChange={handleInputChange} />
                         </div>
                       </div>
                       <div className="col-lg-2">
                         <div className="form_box ">
                           <label htmlFor="formFile" className="form-label">City: </label>
-                          <input type="text" id="request_id" name="request_id" value={dataFilters.city} onChange={handleInputChange} />
+                          <input type="text" id="city" name="city" value={dataFilters.city} onChange={handleInputChange} />
                         </div>
                       </div>
                       <div className="col-lg-2">
                         <div className="form_box ">
                           <label htmlFor="formFile" className="form-label">State: </label>
-                          <input type="text" id="request_id" name="request_id" value={dataFilters.state} onChange={handleInputChange} />
+                          <input type="text" id="state" name="state" value={dataFilters.state} onChange={handleInputChange} />
                         </div>
                       </div>
                       <div className="col-lg-2">
                         <div className="form_box ">
                           <label htmlFor="formFile" className="form-label">Status: </label>
-                          <input type="text" id="request_id" name="request_id" value={dataFilters.status} onChange={handleInputChange} />
-                        </div>
+                      <select id="status" name="status" value={dataFilters.status} onChange={handleInputChange}>
+                            <option value="">Select</option>
+                            {statusMasterData.map((singleStatus) => (
+                              <option value={singleStatus.status_id} key={singleStatus.status_id}>{singleStatus.status}</option>
+                            ))}
+                          </select>                        </div>
                       </div>
                       <div className="col-lg-2">
                         <div className="form_box ">

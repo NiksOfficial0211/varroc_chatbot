@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
     
         const aisensyPayload = {
           "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-          "campaignName": "enquiry_form_id",
+          "campaignName": "Dealership_enquiry_id",
           "destination": `${cleanedWhatsAppNumber}`,
           "userName": "Varroc Aftermarket",
           "templateParams": [

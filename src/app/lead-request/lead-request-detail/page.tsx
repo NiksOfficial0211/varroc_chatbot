@@ -131,10 +131,10 @@ const WarrantyRequestDetails = () => {
 
     if (!formVal.status_id) newErrors.status_id = "Status is required";
     if(formVal.status_id && formVal.status_id==0 || formVal.status_id==status_Pending)newErrors.status_id="Please select other status to update"
-    
-    if (formVal.status_id && formVal.status_id == status_Pending) newErrors.status_id = "Please change status";
-    if (formVal.status_id && formVal.status_id == status_Rejected && !formVal.rejection_id) newErrors.rejection_id = "Please select rejection reason";
-    if (formVal.rejection_id && formVal.rejection_id == 1 && !formVal.comments) newErrors.comments = "Please enter rejection reason";// here 1 is for other and need to add comments also
+    if(!formVal.comments) newErrors.status_id = "Please enter comments"
+    // if (formVal.status_id && formVal.status_id == status_Pending) newErrors.status_id = "Please change status";
+    // if (formVal.status_id && formVal.status_id == status_Rejected && !formVal.rejection_id) newErrors.rejection_id = "Please select rejection reason";
+    // if (formVal.rejection_id && formVal.rejection_id == 1 && !formVal.comments) newErrors.comments = "Please enter rejection reason";// here 1 is for other and need to add comments also
 
     console.log(newErrors);
     setErrors(newErrors);
@@ -147,12 +147,7 @@ const WarrantyRequestDetails = () => {
     console.log("this is the form vals", formVal);
     if (!validate()) return;
     setLoading(true);
-    let rejectionSelectedMsg=""
-    for(let i=0;i<rejectionMasterData.length;i++){
-      if(formVal.rejection_id==rejectionMasterData[i].pk_reject_id){
-        rejectionSelectedMsg=rejectionMasterData[i].rejection_msg;
-      }
-    }
+    
     // pk_request_id
     try {
       const response = await fetch("/api/update_dealership_request", {
@@ -162,10 +157,14 @@ const WarrantyRequestDetails = () => {
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
         body: 
-              formVal.status_id == lead_status_disqualified ? JSON.stringify({
-
-              }):JSON.stringify({
-
+              JSON.stringify({
+                      auth_id: auth_id,
+                      pk_id: leadDetailsResponse?.enq_data[0].pk_deal_id,
+                      comments: formVal.comments,
+                      status: formVal.status_id,
+                      request_id: leadDetailsResponse?.enq_data[0].dealership_id,
+                     
+                         
               })
           
         
@@ -307,13 +306,13 @@ const WarrantyRequestDetails = () => {
                         </div>
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
-                            Business Age :
-                            <span>{leadDetailsResponse.enq_data[0].business_age}</span>
+                            Business Age:
+                            <span>{leadDetailsResponse.enq_data[0].business_age.replace("_","-")} Years</span>
                           </div>
                         </div>
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
-                            Shop Type :
+                            Shop Type:
                             <span>{leadDetailsResponse.enq_data[0].shop_type}</span>
                           </div>
                         </div>
@@ -363,6 +362,7 @@ const WarrantyRequestDetails = () => {
                                   <span>{leadDetailsResponse.addressed_data[0].request_status}</span>
                                 </div>
                               </div>
+                              
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated By:
@@ -375,6 +375,12 @@ const WarrantyRequestDetails = () => {
                                   <span>{formatDate(leadDetailsResponse.addressed_data[0].updated_at)}</span>
                                 </div>
                               </div>
+                              <div className="col-lg-12 mb-3">
+                                <div className="request_list">
+                                  Request Comments:
+                                  <span>{leadDetailsResponse.addressed_data[0].comments}</span>
+                                </div>
+                              </div>
                               
                               
                               
@@ -384,7 +390,7 @@ const WarrantyRequestDetails = () => {
 
                       }
 
-                      {leadDetailsResponse.enq_data[0].status_id == lead_status_new || leadDetailsResponse.enq_data[0].status_id == lead_status_contacted  ?
+                      {leadDetailsResponse.enq_data[0].status_id == lead_status_new ?
                         <div>
                           <form onSubmit={handleSubmit}>
                             <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>

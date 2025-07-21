@@ -36,8 +36,8 @@ export async function POST(request: Request) {
     // Step 2: Update user_complaint_requests
     await connection.query(
       `UPDATE user_dealership_request 
-       SET status_id = ?, addressed_by = ?, fk_reject_id = ?
-       WHERE pk_id = ?`,
+       SET status_id = ?, addressed_by = ?, rejected_id = ?
+       WHERE pk_deal_id = ?`,
       [status, auth_id, rejection_id, pk_id]
     );
 
@@ -52,51 +52,16 @@ export async function POST(request: Request) {
 
     await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Update DealerShip Request",pk_id,1, JSON.stringify(createdJson), new Date()]
+      ["Update DealerShip Request",pk_id,3, JSON.stringify(createdJson), new Date()]
     );
 
     // ✅ COMMIT after all DB operations are successful
     await connection.commit();
     
 
-    // Step 4: Send Aisensy message
-
-    const aisensyPayload = {
-              "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-              "campaignName": "warranty_claim_status",
-              "destination": `${customer_phone}`,
-              "userName": "Varroc Aftermarket",
-              "templateParams": [
-                request_id,
-                isDisqualified ? comments && comments.length>0?`Disqalified ${comments}`:'Rejected' : status=="7"?`In progress`:"Resolved"
-              ],
-              "source": "new-landing-page form",
-              "media": {},
-              "buttons": [],
-              "carouselCards": [],
-              "location": {},
-              "attributes": {},
-              "paramsFallbackValue": {
-                "FirstName": "user"
-              }
-    };
-
-    const res = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(aisensyPayload),
-    });
-
-    const result = await res.json();
-    if(result.success==='true'){
-      return NextResponse.json({ status: 1, message: "Request updated message sent to customer" });
-    }{
-      await connection.query(
-      `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Update DealerShip Request Send Message Failed",pk_id,1, aisensyPayload, new Date()]
-    );
-      return NextResponse.json({ status: 1, message: "Request updated but message delivery failed to customer"});
-    }
+    
+    return NextResponse.json({ status: 1, message: "Request updated"});
+    
   } catch (e: any) {
     if (connection) {
       await connection.rollback();
