@@ -83,7 +83,7 @@ const WarrantyRequestDetails = () => {
 
         setComplaintData(response.data)
         if(response.data.warrantyRaised && response.data.warrantyRaised.length>0){
-        const purchaseDate = new Date(response.data.warrantyRaised[0].product_purchase_date);
+        const purchaseDate = new Date(response.data.warrantyRaised[0].warranty_start_date);
 
         // Step 1: Add 24 months
         const expiryDate = new Date(purchaseDate);
@@ -96,7 +96,7 @@ const WarrantyRequestDetails = () => {
         // Step 3: Calculate remaining days
         const timeDiff = expiryDate.getTime() - todayUTC.getTime();
         
-        setWarrantyEndDate(expiryDate)
+        setWarrantyEndDate(response.data.warrantyRaised[0].warranty_end_date)
         
         const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 18));
         if(daysRemaining>0){
@@ -502,8 +502,14 @@ const WarrantyRequestDetails = () => {
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list ">
+                                  Warranty start Date:
+                                  <span>{warrantyEndDate ? formatDateDDMMYYYY(warrantyreq.warranty_start_date):"--"}</span>
+                                </div>
+                              </div>
+                              <div className="col-lg-4 mb-3">
+                                <div className="request_list ">
                                   Warranty End Date:
-                                  <span>{warrantyEndDate ? formatDateDDMMYYYY(warrantyEndDate):"--"}</span>
+                                  <span>{warrantyEndDate ? formatDateDDMMYYYY(warrantyreq.warranty_end_date):"--"}</span>
                                 </div>
                               </div>
                                <div className="col-lg-4 mb-3">

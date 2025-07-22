@@ -59,16 +59,27 @@ export async function  POST(request:NextRequest){
 query += ` ORDER BY pro.created_at DESC LIMIT ${parsedLimit} OFFSET ${offset}`;
     // values.push(limit, offset);
     
-    const [userRequests] = await connection.execute<RowDataPacket[]>(query, values);
+    const [allBattery] = await connection.execute<RowDataPacket[]>(query, values);
     
-   
+   let countQuery = `SELECT COUNT(*) as total 
+    FROM FROM product_info pro
+      JOIN auth AS created_by_user ON pro.created_by = created_by_user.auth_id
+      LEFT JOIN auth AS updated_by_user ON pro.updated_by = updated_by_user.auth_id`;
+
+    if (conditions.length > 0) {
+      countQuery += ` WHERE ` + conditions.join(" AND ");
+    }
+    const [countResult] = await connection.execute<CountResult[]>(countQuery, values);
+    const totalCount = countResult[0]?.total || 0;
 
         connection.release();
-        return NextResponse.json({status:1,message:"Data Received",data:userRequests,pageNumber:page
+        return NextResponse.json({status:1,message:"Data Received",data:allBattery,pageNumber:page,total:totalCount,
+          from: offset + 1,
+          to: Math.min(offset + allBattery.length, totalCount),
         });
     }catch(e){
         console.log(e);
         
-        return NextResponse.json({status:0,error:"Exception Occured"})
+        return NextResponse.json({status:0,error:"Exception Occured",message:"Exception Occured"})
     }
 }

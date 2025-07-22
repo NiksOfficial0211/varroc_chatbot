@@ -5,16 +5,17 @@ import LoadingDialog from '../components/PageLoader';
 import ShowAlertMessage from '../components/alert';
 import { WarrantyRequestDataModel } from '../datamodels/WarrantyReqestListDataModel';
 import { data } from 'jquery';
-import { COMPLAINT_FILTER_KEY, LEAD_FILTER_KEY, staticIconsBaseURL, status_Rejected, WARRANTY_FILTER_KEY } from '../pro_utils/string_constants'
+import { COMPLAINT_FILTER_KEY, GENERAL_FILTER_KEY, LEAD_FILTER_KEY, staticIconsBaseURL, status_Rejected, WARRANTY_FILTER_KEY } from '../pro_utils/string_constants'
 import { useGlobalContext } from '../contextProviders/globalContext';
 import { useRouter } from 'next/navigation';
-import { pageURL_ComplaintDetails, pageURL_LeadDetails, pageURL_WarrantyRequestDetails } from '../pro_utils/string_routes';
+import { pageURL_ComplaintDetails, pageURL_GeneralDetails, pageURL_LeadDetails, pageURL_WarrantyRequestDetails } from '../pro_utils/string_routes';
 import useSessionRedirect from '../pro_utils/manage_session';
 import LeftPanelMenus from '../components/leftPanel';
 import moment from 'moment';
 import { RejectMSGMasterDataModel, StatusMasterDataModel } from '../datamodels/CommonDataModels';
 import { ComplaintListDataModel } from '../datamodels/ComplaintsDataModel';
 import { DealershipEnqListingDataModel } from '../datamodels/DealershipEnqDataModel';
+import { GeneralEnqListingDataModel } from '../datamodels/GenerealEnquiryDataModel';
 
 interface DataFilters {
   date: any, enquiry_id: any, city: any, state: any, status: any, customerPhone: any, page: any, limit: any
@@ -35,7 +36,7 @@ const LeadRequestListing = () => {
   // const [pageNumber, setPageNumber] = useState(1);
   // const [pageSize, setPageSize] = useState(10);
   const [statusMasterData, setStatusMasterData] = useState<StatusMasterDataModel[]>([]);
-  const [dealershipEnqList, setDealershipEnqList] = useState<DealershipEnqListingDataModel[]>([]);
+  const [dealershipEnqList, setDealershipEnqList] = useState<GeneralEnqListingDataModel[]>([]);
 
 
   const [dataFilters, setDataFilters] = useState<DataFilters>({
@@ -48,8 +49,9 @@ const LeadRequestListing = () => {
   useEffect(() => {
     sessionStorage.removeItem(COMPLAINT_FILTER_KEY);
     sessionStorage.removeItem(WARRANTY_FILTER_KEY);
+    sessionStorage.removeItem(LEAD_FILTER_KEY);
     // fetchData(dataFilters.date, dataFilters.request_id, dataFilters.phone_no, dataFilters.name, dataFilters.status, dataFilters.page, dataFilters.limit);
-    const stored = sessionStorage.getItem(LEAD_FILTER_KEY);
+    const stored = sessionStorage.getItem(GENERAL_FILTER_KEY);
     console.log("stored filter data :----- --------",stored);
     
     try {
@@ -356,21 +358,21 @@ const LeadRequestListing = () => {
 
                     {dealershipEnqList && dealershipEnqList.length > 0 &&
                       dealershipEnqList.map((request) => (
-                        <div className="row list_listbox" style={{ alignItems: "center", cursor: "pointer" }} key={request.pk_deal_id} onClick={() => { }}>
-                          <div className="col-lg-3 text-center"><div className="label">{request.dealership_id}</div></div>
+                        <div className="row list_listbox" style={{ alignItems: "center", cursor: "pointer" }} key={request.pk_id} onClick={() => { }}>
+                          <div className="col-lg-3 text-center"><div className="label">{request.general_id}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{formatDateYYYYMMDD(request.created_at)}</div></div>
-                          <div className="col-lg-2 text-center"><div className="label">{request.raised_whatsapp_no}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{request.contact_no}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{request.city}</div></div>
-                          <div className="col-lg-2 text-center"><div className="label">{request.state_address}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{request.state}</div></div>
                           <div className="col-lg-1 text-center"><div className="label">{request.request_status}</div></div>
 
                           <div className=""><div className="label viewbtn" onClick={() => {
                             setGlobalState({
-                              selectedViewID: request.pk_deal_id + '',
+                              selectedViewID: request.pk_id + '',
                               auth_id: auth_id,
                               userName: userName
                             });
-                            router.push(pageURL_LeadDetails);
+                            router.push(pageURL_GeneralDetails);
                           }}><img src={staticIconsBaseURL + "/images/view_icon.png"} alt="Varroc Excellence" className="img-fluid" style={{ maxHeight: "18px" }} /></div>
                           </div>
                         </div>

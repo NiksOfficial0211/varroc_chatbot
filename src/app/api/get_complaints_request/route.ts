@@ -105,9 +105,21 @@ export async function  POST(request:Request){
         };
       })
     );
+    let countQuery = `SELECT COUNT(*) as total 
+    FROM user_complaint_requests ufr
+      JOIN request_status rs ON ufr.status_id = rs.status_id`;
+
+    if (conditions.length > 0) {
+      countQuery += ` WHERE ` + conditions.join(" AND ");
+    }
+    const [countResult] = await connection.execute<CountResult[]>(countQuery, values);
+    const totalCount = countResult[0]?.total || 0;
 
         connection.release();
-        return NextResponse.json({status:1,message:"All Complaints List",data:enrichedRequests,pageNumber:page
+        return NextResponse.json({status:1,message:"All Complaints List",data:enrichedRequests,pageNumber:page,
+          total:totalCount,
+          from: offset + 1,
+          to: Math.min(offset + enrichedRequests.length, totalCount)
         });
     }catch(e){
         console.log(e);

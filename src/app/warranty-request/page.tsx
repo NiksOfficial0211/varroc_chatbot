@@ -5,7 +5,7 @@ import LoadingDialog from '../components/PageLoader';
 import ShowAlertMessage from '../components/alert';
 import { WarrantyRequestDataModel } from '../datamodels/WarrantyReqestListDataModel';
 import { data } from 'jquery';
-import { COMPLAINT_FILTER_KEY, LEAD_FILTER_KEY, staticIconsBaseURL, status_Rejected, WARRANTY_FILTER_KEY } from '../pro_utils/string_constants'
+import { COMPLAINT_FILTER_KEY, GENERAL_FILTER_KEY, LEAD_FILTER_KEY, staticIconsBaseURL, status_Rejected, WARRANTY_FILTER_KEY } from '../pro_utils/string_constants'
 import { useGlobalContext } from '../contextProviders/globalContext';
 import { useRouter } from 'next/navigation';
 import { pageURL_WarrantyRequestDetails } from '../pro_utils/string_routes';
@@ -45,7 +45,9 @@ const WarrantyRequestListing = () => {
 
   useEffect(() => {
     sessionStorage.removeItem(COMPLAINT_FILTER_KEY);
-     sessionStorage.removeItem(LEAD_FILTER_KEY);
+    sessionStorage.removeItem(LEAD_FILTER_KEY);
+    sessionStorage.removeItem(GENERAL_FILTER_KEY);
+     
     const stored = sessionStorage.getItem(WARRANTY_FILTER_KEY);
     console.log("stored filter data :----- --------",stored);
     

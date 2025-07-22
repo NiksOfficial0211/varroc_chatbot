@@ -17,6 +17,7 @@ import { FileViewer } from '@/app/components/DocViewer';
 import DialogImagePop from '@/app/components/dialog_DocViewer';
 import { ComplaintDetailDataModel, ComplaintListDataModel } from '@/app/datamodels/ComplaintsDataModel';
 import { DealershipEnqDetailDataModel } from '@/app/datamodels/DealershipEnqDataModel';
+import { GeneralEnqDetailDataModel } from '@/app/datamodels/GenerealEnquiryDataModel';
 
 
 interface formValues {
@@ -43,7 +44,7 @@ const WarrantyRequestDetails = () => {
   const [cityError, setCityError] = useState('');
   // const [pageNumber, setPageNumber] = useState(1);
   // const [pageSize, setPageSize] = useState(10);
-  const [leadDetailsResponse, setLeadDetailsRes] = useState<DealershipEnqDetailDataModel>();
+  const [leadDetailsResponse, setLeadDetailsRes] = useState<GeneralEnqDetailDataModel>();
   const [statusMasterData, setStatusMasterData] = useState<StatusMasterDataModel[]>([]);
   const [rejectionMasterData, setRejectionMasterData] = useState<RejectMSGMasterDataModel[]>([]);
   const [formVal, setFormVal] = useState<formValues>({
@@ -62,7 +63,7 @@ const WarrantyRequestDetails = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/get_delearship_requests_details", {
+      const res = await fetch("/api/get_general_requests_details", {
         method: "POST",
         headers: {
           "Content-Type": "application/json", // 🔥 Important for raw JSON

@@ -53,8 +53,8 @@ export async function POST(request: NextRequest) {
             "auth_id":validRows.length>0?validRows[0].auth_id:"",
             "valid_upload_start_serial_no":validRows.length>0?validRows[0].battery_serial_number:"",
             "invalid_upload_start_serial_no":errorRows.length>0?errorRows[0].battery_serial_number:"",
-            "valid_upload_end_serial_no":validRows.length>0?validRows[validRows.length].battery_serial_number:"",
-            "invalid_upload_end_serial_no":errorRows.length>0?errorRows[errorRows.length].battery_serial_number:"",
+            "valid_upload_end_serial_no":validRows.length>0?validRows[validRows.length-1].battery_serial_number:"",
+            "invalid_upload_end_serial_no":errorRows.length>0?errorRows[errorRows.length-1].battery_serial_number:"",
             
           }
         const insertLog = await db.query(

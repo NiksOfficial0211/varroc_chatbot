@@ -43,13 +43,21 @@ const BulkUploadForm = ({ onClose }: { onClose: () => void }) => {
                 isCsv=true;
                 const resPonseUplod = await uploadCSVFile(uploadFile,auth_id);
             
-
+                if(resPonseUplod==1){
                 setLoading(false);
 
                 setShowAlert(true);
                 setAlertTitle("Result");
-                setAlertStartContent(resPonseUplod+"");
+                setAlertStartContent("Data added successfully");
                 setAlertForSuccess(1);
+                }else{
+                    setLoading(false);
+
+                setShowAlert(true);
+                setAlertTitle("Result");
+                setAlertStartContent("Failed to upload data successfully");
+                setAlertForSuccess(2);
+                }
                 // formData.append("valid_data",  JSON.stringify(validRows));
                 // formData.append("invalid_data",  JSON.stringify(errorRows));
 
@@ -65,11 +73,17 @@ const BulkUploadForm = ({ onClose }: { onClose: () => void }) => {
                 const resPonseUplod = await uploadThroughXLSX(uploadFile,auth_id);
                 console.log("98bhjbdnmasab snd dajksdna sdjadas---------------",resPonseUplod);
                 setLoading(false);
-
+                if(resPonseUplod==1){
                 setShowAlert(true);
                 setAlertTitle("Result");
-                setAlertStartContent(resPonseUplod+"");
+                setAlertStartContent("Data added successfully");
                 setAlertForSuccess(1);
+                }else{
+                    setShowAlert(true);
+                setAlertTitle("Result");
+                setAlertStartContent("Failed to upload data");
+                setAlertForSuccess(2);
+                }
                 
         
             }
@@ -332,10 +346,10 @@ async function uploadCSVFile(uploadFile: File,auth_id:any) {
             return_message="Data Uploaded Successfully";
             
         }else{
-            return_message="Failed To upload Data Successfully"
+            return_message="Failed To upload Data"
              
         }
-        return return_message;
+        return res.status;
     } catch (error) {
         console.error("Database error:", error);
         return "Some exception occured while adding data";
@@ -345,7 +359,7 @@ async function uploadCSVFile(uploadFile: File,auth_id:any) {
 
 export async function uploadThroughXLSX(uploadFile: File,auth_id:any) {
   console.log("uploadHolidaysThroughXLSX is called");
-  let return_message="";
+  let return_message=0;
   const reader = new FileReader();
   reader.readAsArrayBuffer(uploadFile);
   const insertValid: (string | null)[][] = [];
@@ -481,16 +495,16 @@ export async function uploadThroughXLSX(uploadFile: File,auth_id:any) {
     const res=await responce.json();
 
     if (res.status==1) {
-        return_message="Data Uploaded Successfully";
+        return_message=1;
         
     }else{
-        return_message="Failed To upload Data"
+        return_message=0
          
     }
       
     } catch (err) {
       console.error("DB Insertion Error:", err);
-      return_message="Some exception occured while adding data";
+      return_message=3;
       
     }
   };

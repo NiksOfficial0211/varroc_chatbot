@@ -17,7 +17,7 @@ export async function  POST(request:Request){
     return NextResponse.json({ error: 'Unauthorized',message:"You are unauthorized" }, { status: 403 });
   }
     const body = await request.json();
-    const { date,request_id,phone_no,status,city,state_address,page=1,limit=10  } = body;
+    const { date,enquiry_id,phone_no,status,city,state_address,page=1,limit=10  } = body;
     
     
     const parsedPage = Number(page);
@@ -44,9 +44,9 @@ export async function  POST(request:Request){
       values.push(date); // should be in 'YYYY-MM-DD' format
     }
 
-    if (request_id) {
+    if (enquiry_id) {
       conditions.push(`udr.dealership_id = ?`);
-      values.push(request_id);
+      values.push(enquiry_id);
     }
 
     if (phone_no) {
@@ -110,9 +110,20 @@ export async function  POST(request:Request){
         };
       })
     );
+let countQuery = `SELECT COUNT(*) as total 
+    FROM user_freechat_requests ufr
+      JOIN request_status rs ON ufr.status_id = rs.status_id`;
 
+    if (conditions.length > 0) {
+      countQuery += ` WHERE ` + conditions.join(" AND ");
+    }
+    const [countResult] = await connection.execute<CountResult[]>(countQuery, values);
+    const totalCount = countResult[0]?.total || 0;
         
-        return NextResponse.json({status:1,message:"All Dealership Enquiries List",data:enrichedRequests,pageNumber:page
+        return NextResponse.json({status:1,message:"All Dealership Enquiries List",data:enrichedRequests,pageNumber:page,
+          total:totalCount,
+          from: offset + 1,
+          to: Math.min(offset + enrichedRequests.length, totalCount),
         });
     }catch(e){
         console.log(e);

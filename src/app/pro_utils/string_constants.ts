@@ -51,3 +51,4 @@ export const lead_status_disqualified=13;
 export  const LEAD_FILTER_KEY = 'lead_list_filter';
 export  const COMPLAINT_FILTER_KEY = 'complaint_list_filter';
 export  const WARRANTY_FILTER_KEY = 'warranty_list_filter';
+export  const GENERAL_FILTER_KEY = 'general_list_filter';

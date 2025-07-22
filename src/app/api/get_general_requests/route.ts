@@ -17,7 +17,7 @@ export async function  POST(request:Request){
     return NextResponse.json({ error: 'Unauthorized',message:"You are unauthorized" }, { status: 403 });
   }
     const body = await request.json();
-    const { date,request_id,phone_no,status,city,state_address,page=1,limit=10  } = body;
+    const { date,enquiry_id,phone_no,status,city,state_address,page=1,limit=10  } = body;
     
     
     const parsedPage = Number(page);
@@ -29,10 +29,10 @@ export async function  POST(request:Request){
    
         let query = `
       SELECT 
-        udr.*,
+        ufr.*,
         rs.status AS request_status
-      FROM user_freechat_requests udr
-      JOIN request_status rs ON udr.status_id = rs.status_id
+      FROM user_freechat_requests ufr
+      JOIN request_status rs ON ufr.status_id = rs.status_id
     `;
 
     // Dynamic WHERE conditions
@@ -40,31 +40,31 @@ export async function  POST(request:Request){
     const values: any[] = [];
 
     if (date) {
-      conditions.push(`DATE(udr.created_at) = ?`);
+      conditions.push(`DATE(ufr.created_at) = ?`);
       values.push(date); // should be in 'YYYY-MM-DD' format
     }
 
-    if (request_id) {
-      conditions.push(`udr.general_id = ?`);
-      values.push(request_id);
+    if (enquiry_id) {
+      conditions.push(`ufr.general_id = ?`);
+      values.push(enquiry_id);
     }
 
     if (phone_no) {
-      conditions.push(`udr.whatsapp_no like ?`);
+      conditions.push(`ufr.whatsapp_no like ?`);
       values.push(`%${phone_no}%`);
     }
 
     if (state_address) {
-      conditions.push(`udr.state = ?`);
+      conditions.push(`ufr.state = ?`);
       values.push(state_address);
     }
     if (city) {
-      conditions.push(`udr.city = ?`);
+      conditions.push(`ufr.city = ?`);
       values.push(city);
     }
 
     if (status) {
-      conditions.push(`udr.status_id = ?`);
+      conditions.push(`ufr.status_id = ?`);
       values.push(status);
     }
    
@@ -73,7 +73,7 @@ export async function  POST(request:Request){
       query += ` WHERE ` + conditions.join(" AND ");
     }
 
-    query += ` ORDER BY udr.created_at DESC LIMIT ${parsedLimit} OFFSET ${offset}`;
+    query += ` ORDER BY ufr.created_at DESC LIMIT ${parsedLimit} OFFSET ${offset}`;
     // values.push(limit, offset);
     console.log(query);
     
@@ -110,9 +110,9 @@ export async function  POST(request:Request){
         };
       })
     );
-let countQuery = `SELECT COUNT(*) as total FROM user_freechat_requests ua 
-    FROM user_freechat_requests udr
-      JOIN request_status rs ON udr.status_id = rs.status_id`;
+let countQuery = `SELECT COUNT(*) as total 
+    FROM user_freechat_requests ufr
+      JOIN request_status rs ON ufr.status_id = rs.status_id`;
 
     if (conditions.length > 0) {
       countQuery += ` WHERE ` + conditions.join(" AND ");

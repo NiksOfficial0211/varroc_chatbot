@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
                 (hash_key,created_at) VALUES (?,?)
                 `,[hash,new Date()]); 
 
-  const { whatsapp_number,full_name,contact_number,pincode,state_address,description } = body;
+  const { whatsapp_number,full_name,contact_number,pincode,state_address,enquiry_description } = body;
     
   try {
 
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       const cleanedState =
       state_address?.trim() !== '' ? state_address.trim() : null;
       const cleanedDescription =
-      description?.trim() !== '' ? description.trim() : null;
+      enquiry_description?.trim() !== '' ? enquiry_description.trim() : null;
       
 
     // const cleanedDate = convertDDMMYYYYtoYYYYMMDD(product_purchase_date.trim());
@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
     
         const aisensyPayload = {
           "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-          "campaignName": "Dealership_enquiry_id",
+          "campaignName": "general_enquiry_id",
           "destination": `${cleanedWhatsAppNumber}`,
           "userName": "Varroc Aftermarket",
           "templateParams": [
@@ -184,9 +184,14 @@ export async function POST(request: NextRequest) {
     if (connection) {
       await connection.rollback();
     }
+    const [hashPresent] = await connection.execute<any[]>(`SELECT hash_key FROM all_request_hash
+                WHERE hash_key = ?
+                `,[hash]);
+  if(hashPresent.length == 0){ 
     const [addHash] = await connection.execute<any[]>(`INSERT INTO all_request_hash
                 (hash_key,created_at) VALUES (?,?)
                 `,[hash,new Date()]);
+    }
     console.error('DB Error:', err);
     const cleanedWhatsAppNumber =
       whatsapp_number?.trim() !== '' ? whatsapp_number.trim() : null;

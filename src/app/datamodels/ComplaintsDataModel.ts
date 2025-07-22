@@ -57,6 +57,8 @@ export interface WarrantyRequestDetails {
   retailer_city_name: string
   product_serial_no: string
   product_purchase_date: string
+  warranty_start_date:any
+  warranty_end_date:any
   request_type_id: number
   status_id: number
   fk_reject_id: any

@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       SELECT 
         udr.*,
         rs.status AS request_status
-        FROM user_dealership_request udr
+        FROM user_freechat_requests udr
         JOIN request_status rs ON udr.status_id = rs.status_id 
     `;
 
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
 
     if (pk_id) {
-      conditions.push(`udr.pk_deal_id = ?`);
+      conditions.push(`udr.pk_id = ?`);
       values.push(pk_id);
     }
 
@@ -45,18 +45,18 @@ export async function POST(request: Request) {
     }
 
     // values.push(limit, offset);
-    console.log(query);
+    
 
     const [userRequests] = await connection.execute<RowDataPacket[]>(query, values);
-    
+    console.log(userRequests);
     const [duplicateDataRows] = await connection.execute(`
       SELECT 
         udr.*,
         rs.status AS request_status
-        FROM user_dealership_request udr
+        FROM user_freechat_requests udr
         JOIN request_status rs ON udr.status_id = rs.status_id
-        WHERE raised_whatsapp_no = ? AND pk_deal_id != ?
-    `, [userRequests[0].raised_whatsapp_no,pk_id]);
+        WHERE whatsapp_no = ? AND pk_id != ?
+    `, [userRequests[0].whatsapp_no,pk_id]);
 
 
     const [addressedData] = await connection.execute(
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
           JOIN auth aut ON ura.auth_user_id = aut.auth_id 
           JOIN request_types rt ON ura.request_type = rt.request_type_id 
           LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
-          JOIN request_status rs ON ura.request_status = rs.status_id WHERE fk_request_id = ? AND request_type=3`,
+          JOIN request_status rs ON ura.request_status = rs.status_id WHERE ura.fk_request_id = ? AND ura.request_type=4`,
       [pk_id]
     );
  
