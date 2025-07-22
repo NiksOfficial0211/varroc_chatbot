@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { baseUrl, pageURL_BatteryListingPage, pageURL_ComplaintList, pageURL_dashboard, pageURL_ErrorLogsPage, pageURL_LeadRequstList, pageURL_WarrantyRequestList } from '../pro_utils/string_routes'
+import { baseUrl, pageURL_BatteryListingPage, pageURL_ComplaintList, pageURL_dashboard, pageURL_ErrorLogsPage, pageURL_GeneralRequstList, pageURL_LeadRequstList, pageURL_WarrantyRequestList } from '../pro_utils/string_routes'
 import { staticIconsBaseURL } from '../pro_utils/string_constants';
 import HeaderComponent from './header';
 import BulkUploadForm from './bulkUpload';
@@ -74,6 +74,7 @@ const LeftPanelMenus = ({ selectedMenu,headertitle, rightBoxUI }: LeftPanelProps
                                                 </div>
                                             </a>
                                         </li>
+                                        
                                 <li className={menuIndex == 4 ? "selected" : ""}>
                                     <a href={pageURL_BatteryListingPage} onClick={() => {setMenuIndex(4),setHeaderTitle("Battery Master")}}>
                                         <div className="iconbox">
@@ -92,6 +93,17 @@ const LeftPanelMenus = ({ selectedMenu,headertitle, rightBoxUI }: LeftPanelProps
                                                 </div>
                                                 <div className="leftmenutext">                                        
                                                     Dealership 
+                                                    <span>Enquiries</span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li className={menuIndex == 8 ? "selected" : ""}>
+                                            <a href={pageURL_GeneralRequstList} onClick={()=>{setMenuIndex(8),setHeaderTitle("General Enquiries")}}>
+                                                <div className="iconbox">
+                                                    <img src={staticIconsBaseURL + "/images/ic_general_enq.png"} alt="icon" className="img-fluid"/>
+                                                </div>
+                                                <div className="leftmenutext">                                        
+                                                    General
                                                     <span>Enquiries</span>
                                                 </div>
                                             </a>

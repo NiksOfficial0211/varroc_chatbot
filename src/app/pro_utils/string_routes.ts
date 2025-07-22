@@ -12,3 +12,6 @@ export const pageURL_ComplaintDetails=baseUrl+"/complaint-request/complaint-deta
 export const pageURL_LeadRequstList=baseUrl+"/lead-request";
 export const pageURL_LeadDetails=baseUrl+"/lead-request/lead-request-detail";
 
+export const pageURL_GeneralRequstList=baseUrl+"/general-request";
+export const pageURL_GeneralDetails=baseUrl+"/general-request/general-request-detail";
+

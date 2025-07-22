@@ -17,6 +17,7 @@ import { ComplaintListDataModel } from '../datamodels/ComplaintsDataModel';
 
 interface DataFilters {
   date: any, request_id: any, phone_no: any, name: any, status: any, page: any, limit: any
+  ,datafrom:number,dataTo:number,total:number
 }
 
 const WarrantyRequestListing = () => {
@@ -35,7 +36,7 @@ const WarrantyRequestListing = () => {
   const [statusMasterData, setStatusMasterData] = useState<StatusMasterDataModel[]>([]);
 
   const [dataFilters, setDataFilters] = useState<DataFilters>({
-    date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
+    date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
 
   });
   const [hasMoreData, setHasMoreData] = useState(true);
@@ -64,20 +65,20 @@ const WarrantyRequestListing = () => {
           
         } else {
           setDataFilters({
-            date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
+            date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
 
           }); // fallback if invalid
           fetchData(dataFilters);
         }
       }else{
        setDataFilters({
-            date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
+            date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
           }); // fallback
         fetchData(dataFilters);
       }
     } catch (error) {
       setDataFilters({
-        date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
+        date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
 
       }); // fallback
       fetchData(dataFilters);
@@ -171,13 +172,13 @@ const WarrantyRequestListing = () => {
     if (hasMoreData) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-      date: '', request_id: '', phone_no: '', name: '', status: '', page: dataFilters.page + page, limit: 10
+      date: '', request_id: '', phone_no: '', name: '', status: '', page: dataFilters.page + page, limit: 10,datafrom:dataFilters.datafrom,dataTo:dataFilters.dataTo,total:dataFilters.total
     });
     }
     else if (!hasMoreData && dataFilters.page > 1) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-      date: '', request_id: '', phone_no: '', name: '', status: '', page: dataFilters.page + page, limit: 10
+      date: '', request_id: '', phone_no: '', name: '', status: '', page: dataFilters.page + page, limit: 10,datafrom:dataFilters.datafrom,dataTo:dataFilters.dataTo,total:dataFilters.total
     });
     }
 
@@ -194,12 +195,12 @@ const WarrantyRequestListing = () => {
     window.location.reload();
     setDataFilters({
 
-      date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
+      date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
     });
     sessionStorage.removeItem(COMPLAINT_FILTER_KEY);
 
     fetchData({
-      date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10
+      date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
     });
   }
 
@@ -364,6 +365,8 @@ const WarrantyRequestListing = () => {
               </div>
               <div className="row">
                 <div className="col-lg-12">
+                  <p style={{float:"left"}}>Showing {dataFilters.datafrom} to {dataFilters.dataTo} out of {dataFilters.total}</p>
+
                   <div className="pagination_box mb-3">
                     <div className={dataFilters.page > 1 ? " pagi_btn" : "pagi_btn btn_no"} onClick={() => { dataFilters.page > 1 && changePage(-1); }}>Prev</div>
                     <div className="btn_count">{dataFilters.page}</div>

@@ -15,7 +15,7 @@ import moment from 'moment';
 import { RejectMSGMasterDataModel, StatusMasterDataModel } from '../datamodels/CommonDataModels';
 
 interface DataFilters {
-  date: any, request_id: any, phone_no: any, name: any, status: any, reject_id: any, page: any, limit: any
+  date: any, request_id: any, phone_no: any, name: any, status: any, reject_id: any, page: any, limit: any,datafrom:number,dataTo:number,total:number
 }
 
 const WarrantyRequestListing = () => {
@@ -35,9 +35,10 @@ const WarrantyRequestListing = () => {
   const [rejectionMasterData, setRejectionMasterData] = useState<RejectMSGMasterDataModel[]>([]);
 
   const [dataFilters, setDataFilters] = useState<DataFilters>({
-    date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
+    date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
 
   });
+
   const [hasMoreData, setHasMoreData] = useState(true);
   const router = useRouter();
 
@@ -66,20 +67,20 @@ const WarrantyRequestListing = () => {
           
         } else {
           setDataFilters({
-            date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
+            date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
 
           }); // fallback if invalid
           fetchData(dataFilters);
         }
       }else{
         setDataFilters({
-            date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
+            date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
           }); // fallback
       fetchData(dataFilters);
       }
     } catch (error) {
       setDataFilters({
-          date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
+          date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
         }); // fallback
       fetchData(dataFilters);
     }
@@ -146,9 +147,14 @@ const WarrantyRequestListing = () => {
 
       if (response.status == 1 && response.data.length > 0) {
         setLoading(false);
-
+          setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
+          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
+          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
         setWarrantyRequestData(response.data)
         if (response.data.length < dataFilters.limit) {
+          setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
+          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
+          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
           setHasMoreData(false);
 
         } else {
@@ -157,11 +163,17 @@ const WarrantyRequestListing = () => {
       } else if (response.status == 1 && response.data.length == 0) {
         setLoading(false);
         setWarrantyRequestData([])
+        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
+          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
+          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
         setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page }))
 
         setHasMoreData(false);
       }
       else {
+        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
+          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
+          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
         setDataFilters((prev) => ({ ...prev, ['pageNumber']: response.pageNumber }))
 
 
@@ -186,13 +198,15 @@ const WarrantyRequestListing = () => {
     if (hasMoreData) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-        date: dataFilters.date, request_id: dataFilters.request_id, phone_no: dataFilters.phone_no, name: dataFilters.name, status: dataFilters.status, reject_id: dataFilters.reject_id, page: dataFilters.page+page, limit: 10
+        date: dataFilters.date, request_id: dataFilters.request_id, phone_no: dataFilters.phone_no, name: dataFilters.name, status: dataFilters.status, reject_id: dataFilters.reject_id, page: dataFilters.page+page, limit: 10,
+        datafrom:dataFilters.datafrom,dataTo:dataFilters.dataTo,total:dataFilters.total
       });
     }
     else if (!hasMoreData && dataFilters.page > 1) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-        date: dataFilters.date, request_id: dataFilters.request_id, phone_no: dataFilters.phone_no, name: dataFilters.name, status: dataFilters.status, reject_id: dataFilters.reject_id, page: dataFilters.page+page, limit: 10
+        date: dataFilters.date, request_id: dataFilters.request_id, phone_no: dataFilters.phone_no, name: dataFilters.name, status: dataFilters.status, reject_id: dataFilters.reject_id, page: dataFilters.page+page, limit: 10,
+         datafrom:dataFilters.datafrom,dataTo:dataFilters.dataTo,total:dataFilters.total
       });
     }
 
@@ -210,7 +224,8 @@ const WarrantyRequestListing = () => {
     
     setDataFilters({
 
-      date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10
+      date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10,
+       datafrom:0,dataTo:0,total:0
     });
     fetchData(dataFilters.page);
   }
@@ -396,6 +411,7 @@ const WarrantyRequestListing = () => {
               </div>
               <div className="row">
                 <div className="col-lg-12">
+                  <p style={{float:"left"}}>Showing {dataFilters.datafrom} to {dataFilters.dataTo} out of {dataFilters.total}</p>
                   <div className="pagination_box mb-3">
                     <div className={dataFilters.page > 1 ? " pagi_btn" : "pagi_btn btn_no"} onClick={() => { dataFilters.page > 1 && changePage(-1); }}>Prev</div>
                     <div className="btn_count">{dataFilters.page}</div>

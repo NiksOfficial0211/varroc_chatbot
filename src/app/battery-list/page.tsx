@@ -13,7 +13,7 @@ import { ProductInfoMasterUserModel } from '../datamodels/BatteryDataModel';
 import EditProductDetail from '../components/dialog_EditProduct';
 
 interface DataFilters {
-  model: any, serial_no: any, manufacturing_date: any,page: any, limit: any
+  model: any, serial_no: any, manufacturing_date: any,page: any, limit: any,datafrom:number,dataTo:number,total:number
 }
 
 const BatteryListing = () => {
@@ -33,7 +33,7 @@ const BatteryListing = () => {
   // const [pageSize, setPageSize] = useState(10);
   const [batteryListData, setBatteryListData] = useState<ProductInfoMasterUserModel[]>([]);
   const [dataFilters, setDataFilters] = useState<DataFilters>({
-    model: '', serial_no: '', manufacturing_date: '',  page: 1, limit: 10
+    model: '', serial_no: '', manufacturing_date: '',  page: 1, limit: 10,datafrom:0,dataTo:0,total:0
 
   });
   const [hasMoreData, setHasMoreData] = useState(true);
@@ -128,7 +128,7 @@ const BatteryListing = () => {
     window.location.reload();
     setDataFilters({
 
-      model: '', serial_no: '', manufacturing_date: '',  page: 1, limit: 10
+      model: '', serial_no: '', manufacturing_date: '',  page: 1, limit: 10,datafrom:0,dataTo:0,total:0
     });
     fetchData(dataFilters.page);
   }
@@ -255,6 +255,8 @@ const BatteryListing = () => {
               </div>
               <div className="row">
                 <div className="col-lg-12">
+                  <p style={{float:"left"}}>{dataFilters.datafrom?`Showing ${dataFilters.datafrom} to ${dataFilters.dataTo} out of ${dataFilters.total}`:""}</p>
+
                   <div className="pagination_box mb-3">
                     <div className={dataFilters.page > 1 ? " pagi_btn" : "pagi_btn btn_no"} onClick={() => { dataFilters.page > 1 && changePage(-1); }}>Prev</div>
                     <div className="btn_count">{dataFilters.page}</div>

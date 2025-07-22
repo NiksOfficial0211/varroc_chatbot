@@ -232,7 +232,11 @@ import { pageURL_dashboard } from "./pro_utils/string_routes";
 import { MD5 } from 'crypto-js';
 import { useGlobalContext } from "./contextProviders/globalContext";
 
-
+interface formValues {
+  email: any,
+  password: any
+  
+}
 export default function Home() {
   const [formEmail, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -246,11 +250,28 @@ export default function Home() {
   const [alertTitle, setAlertTitle] = useState('');
   const [alertStartContent, setAlertStartContent] = useState('');
 
+    const [errors, setErrors] = useState<Partial<formValues>>({});
+
+  const validate = () => {
+    const newErrors: Partial<formValues> = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formEmail) newErrors.email = "required";
+    if (formEmail && !emailRegex.test(formEmail)) {
+        newErrors.email = "Valid email is required";
+        setErrors(newErrors);
+    }
+    if (!password) newErrors.password = "required";
+
+    setErrors(newErrors); 
+    return Object.keys(newErrors).length === 0;
+  }  
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const hashedPassword = MD5(password).toString();
 
+    if (!validate()) return;
+    
+    const hashedPassword = MD5(password).toString();
     setLoading(true);
     try {
       const res = await fetch("/api/auth/login", {
@@ -317,7 +338,9 @@ export default function Home() {
                   <form onSubmit={handleSubmit}>
                     <div className="row">
                       <div className="col-lg-12 mb-3">
-                        <input type="text" placeholder={"Email"} value={formEmail} onChange={(e) => setEmail(e.target.value)} required />
+                        <input type="text" placeholder={"Email"} value={formEmail} onChange={(e) => setEmail(e.target.value)}/>
+                        {errors.email && <span className="error" style={{color: "red"}}>{errors.email}</span>}
+
                       </div>
                     </div>
                     <div className="mb-2">
@@ -378,6 +401,7 @@ export default function Home() {
                               className="login_input ControlInput--password"
                               value={password} name="confirmPassword" onChange={(e) => setPassword(e.target.value)}
                             />
+                            {errors.password && <span className="error" style={{color: "red"}}>{errors.password}</span>}
 
                           </div>
                         </div>

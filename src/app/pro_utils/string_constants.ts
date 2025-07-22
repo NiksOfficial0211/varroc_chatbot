@@ -27,6 +27,7 @@ export const apifailedWithException="Failed with an exception";
 export const initialRequestID="VEL-AMD-BAT-";
 export const initialComplaintID="VEL-AMD-CLM-";
 export const initialDealershipID="VEL-AMD-DNQ-";
+export const initialGeneralID="VEL-AMD-GEN-";
 
 // initialRequestID----->"VEL-AMD-BAT-240530-00001"; 240530 is yymmdd and autoincrementing last part from 00001-99999
 

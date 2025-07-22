@@ -91,6 +91,8 @@ export async function  POST(request:Request){
 
       conditions.push(`ura.fk_request_id = ?`);
       values.push(request.pk_id); 
+      conditions.push(`ura.request_type = ?`);
+      values.push("2"); 
     
     if (conditions.length > 0) {
       addressedQuery += ` WHERE ` + conditions.join(" AND ");

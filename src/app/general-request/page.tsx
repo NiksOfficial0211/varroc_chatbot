@@ -18,7 +18,8 @@ import { DealershipEnqListingDataModel } from '../datamodels/DealershipEnqDataMo
 
 interface DataFilters {
   date: any, enquiry_id: any, city: any, state: any, status: any, customerPhone: any, page: any, limit: any
-  ,datafrom:number,dataTo:number,total:number
+    ,datafrom:number,dataTo:number,total:number
+
 }
 
 const LeadRequestListing = () => {
@@ -110,7 +111,7 @@ const LeadRequestListing = () => {
       if (statuses.status == 1) {
         setStatusMasterData(statuses.data)
       }
-      const res = await fetch("/api/get_delearship_requests", {
+      const res = await fetch("/api/get_general_requests", {
         method: "POST",
         headers: {
           "Content-Type": "application/json", // 🔥 Important for raw JSON
@@ -133,7 +134,7 @@ const LeadRequestListing = () => {
         setLoading(false);
         setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
         setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
-        setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
+        setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))   
         setDealershipEnqList(response.data)
         if (response.data.length < filter.limit) {
           setHasMoreData(false);
@@ -144,8 +145,8 @@ const LeadRequestListing = () => {
       } else if (response.status == 1 && response.data.length == 0) {
         setLoading(false);
         setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
-          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
-          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
+        setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
+        setDataFilters((prev) => ({ ...prev, ['total']: response.total  })) 
         setDealershipEnqList([])
         setDataFilters((prev) => ({ ...prev, ['page']: filter.page }))
 
@@ -155,7 +156,8 @@ const LeadRequestListing = () => {
         setDataFilters((prev) => ({ ...prev, ['pageNumber']: response.pageNumber }))
         setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
         setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
-        setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))       
+        setDataFilters((prev) => ({ ...prev, ['total']: response.total  })) 
+
         setHasMoreData(false)
         setLoading(false);
         setShowAlert(true);
@@ -181,7 +183,8 @@ const LeadRequestListing = () => {
     if (hasMoreData) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-        date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: dataFilters.page+page, limit: 10,datafrom:0,dataTo:0,total:0
+        date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: dataFilters.page+page, limit: 10,datafrom:dataFilters.datafrom
+        ,dataTo:dataFilters.dataTo,total:dataFilters.total
       });
     }
     else if (!hasMoreData && dataFilters.page > 1) {
@@ -380,8 +383,6 @@ const LeadRequestListing = () => {
 
               <div className="row">
                 <div className="col-lg-12">
-                  <p style={{float:"left"}}>{dataFilters.datafrom?`Showing ${dataFilters.datafrom} to ${dataFilters.dataTo} out of ${dataFilters.total}`:""}</p>
-
                   <div className="pagination_box mb-3">
                     <div className={dataFilters.page > 1 ? " pagi_btn" : "pagi_btn btn_no"} onClick={() => { dataFilters.page > 1 && changePage(-1); }}>Prev</div>
                     <div className="btn_count">{dataFilters.page}</div>

@@ -110,9 +110,24 @@ query += ` ORDER BY ua.created_at DESC LIMIT ${parsedLimit} OFFSET ${offset}`;
         };
       })
     );
+    let countQuery = `SELECT COUNT(*) as total FROM user_warranty_requests ua 
+    JOIN request_types rt ON ua.request_type_id = rt.request_type_id 
+    JOIN request_status rs ON ua.status_id = rs.status_id`;
+
+    if (conditions.length > 0) {
+      countQuery += ` WHERE ` + conditions.join(" AND ");
+    }
+    const [countResult] = await connection.execute<CountResult[]>(countQuery, values);
+    const totalCount = countResult[0]?.total || 0;
 
         connection.release();
-        return NextResponse.json({status:1,message:"Data Received",data:enrichedRequests,pageNumber:page
+        return NextResponse.json({status:1,
+          message:"Data Received",
+          data:enrichedRequests,pageNumber:page,
+          total:totalCount,
+          from: offset + 1,
+          to: Math.min(offset + enrichedRequests.length, totalCount),
+
         });
     }catch(e){
         console.log(e);

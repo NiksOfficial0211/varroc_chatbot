@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       `INSERT INTO user_request_addressed 
        (fk_request_id, auth_user_id, comments, request_type, request_status, fk_rejection_id, other_rejection, created_at) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [pk_id, auth_id, comments, 2, status, rejection_id, rejection_other, new Date()]
+      [pk_id, auth_id, comments, 3, status, rejection_id, rejection_other, new Date()]
     );
 
     // Step 2: Update user_warranty_requests

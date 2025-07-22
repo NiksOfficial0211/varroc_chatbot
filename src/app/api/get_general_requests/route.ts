@@ -31,7 +31,7 @@ export async function  POST(request:Request){
       SELECT 
         udr.*,
         rs.status AS request_status
-      FROM user_dealership_request udr
+      FROM user_freechat_requests udr
       JOIN request_status rs ON udr.status_id = rs.status_id
     `;
 
@@ -45,17 +45,17 @@ export async function  POST(request:Request){
     }
 
     if (request_id) {
-      conditions.push(`udr.dealership_id = ?`);
+      conditions.push(`udr.general_id = ?`);
       values.push(request_id);
     }
 
     if (phone_no) {
-      conditions.push(`udr.raised_whatsapp_no like ?`);
+      conditions.push(`udr.whatsapp_no like ?`);
       values.push(`%${phone_no}%`);
     }
 
     if (state_address) {
-      conditions.push(`udr.state_address = ?`);
+      conditions.push(`udr.state = ?`);
       values.push(state_address);
     }
     if (city) {
@@ -96,9 +96,9 @@ export async function  POST(request:Request){
       const values: any[] = [];
 
       conditions.push(`ura.fk_request_id = ?`);
-      values.push(request.dealership_id); 
+      values.push(request.pk_id); 
       conditions.push(`ura.request_type = ?`);
-      values.push("3"); 
+      values.push("4"); 
     
     if (conditions.length > 0) {
       addressedQuery += ` WHERE ` + conditions.join(" AND ");
@@ -110,10 +110,24 @@ export async function  POST(request:Request){
         };
       })
     );
+let countQuery = `SELECT COUNT(*) as total FROM user_freechat_requests ua 
+    FROM user_freechat_requests udr
+      JOIN request_status rs ON udr.status_id = rs.status_id`;
 
+    if (conditions.length > 0) {
+      countQuery += ` WHERE ` + conditions.join(" AND ");
+    }
+    const [countResult] = await connection.execute<CountResult[]>(countQuery, values);
+    const totalCount = countResult[0]?.total || 0;
         
-        return NextResponse.json({status:1,message:"All Dealership Enquiries List",data:enrichedRequests,pageNumber:page
-        });
+return NextResponse.json({status:1,
+          message:"All general enquires",
+          data:enrichedRequests,pageNumber:page,
+          total:totalCount,
+          from: offset + 1,
+          to: Math.min(offset + enrichedRequests.length, totalCount),
+
+        });        
     }catch(e){
         console.log(e);
         
