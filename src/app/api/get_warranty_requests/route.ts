@@ -125,7 +125,7 @@ query += ` ORDER BY ua.created_at DESC LIMIT ${parsedLimit} OFFSET ${offset}`;
           message:"Data Received",
           data:enrichedRequests,pageNumber:page,
           total:totalCount,
-          from: offset + 1,
+          from: totalCount>0?offset + 1:0,
           to: Math.min(offset + enrichedRequests.length, totalCount),
 
         });

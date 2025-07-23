@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized',message:"You are unauthorized" }, { status: 403 });
   }
     const body = await req.json();
-    const { date,request_id,phone_no,name,status,reject_id  } = body;
+    const { date,request_id,phone_no,city,state,status,reject_id  } = body;
     
     try{
         const connection = await pool.getConnection();
@@ -24,20 +24,21 @@ export async function POST(req: NextRequest) {
         let query = `
               SELECT 
           ucr.pk_id,
-          ucr.complaint__id,
+          ucr.general_id,
+          ucr.contact_no,
           ucr.customer_name,
-          ucr.battery_serial_no,
-          ucr.user_phone,
-          ucr.complaint_type,
-          ucr.raised_whatsapp_no,
-          ucr.complaint_description,
+          ucr.whatsapp_no,
+          ucr.pincode,
+          ucr.city,
+          ucr.state,
+          ucr.description,
           ucr.status_id,
           ucr.addressed_by,
+          ucr.comments,
           ucr.created_at AS ucr_created_at,
           ucr.updated_at AS ucr_updated_at,
-
-            rs.status AS request_status
-          FROM user_complaint_requests ucr
+          rs.status AS request_status
+          FROM user_freechat_requests ucr
           JOIN request_status rs ON ucr.status_id = rs.status_id
       `;
 
@@ -51,13 +52,21 @@ export async function POST(req: NextRequest) {
     }
 
     if (request_id) {
-      conditions.push(`ucr.complaint__id = ?`);
+      conditions.push(`ucr.general_id = ?`);
       values.push(request_id);
     }
 
     if (phone_no) {
       conditions.push(`ucr.user_phone like ?`);
       values.push(`%${phone_no}%`);
+    }
+     if (city) {
+      conditions.push(`ucr.city = ?`);
+      values.push(city);
+    }
+     if (state) {
+      conditions.push(`ucr.state = ?`);
+      values.push(state);
     }
     if (status) {
       conditions.push(`ucr.status_id = ?`);
@@ -97,12 +106,13 @@ export async function POST(req: NextRequest) {
         const conditions: string[] = [];
       const values: any[] = [];
 
-    
+    conditions.push(`ura.request_type = ?`);
+      values.push("4"); 
       conditions.push(`ura.fk_request_id = ?`);
       values.push(request.pk_id); 
     
     if (conditions.length > 0) {
-      addressedQuery += ` WHERE ura.request_type=2 ` + conditions.join(" AND ");
+      addressedQuery += ` WHERE ` + conditions.join(" AND ");
     }
     const [addressedData]=await connection.execute(addressedQuery,values)
         return {
@@ -116,24 +126,20 @@ export async function POST(req: NextRequest) {
 
     const flatData = enrichedRequests.map((item:any,index:any) => ({
             sr_no: index,
-            complaint__id:item.complaint__id,
+            enquiry_id:item.general_id,
             request_date:item.ucr_created_at?formatDate(item.ucr_created_at):'',
             customer_name:item.customer_name,
-            customer_phone:item.user_phone,
-            serial_no:item.battery_serial_no,
-            complaint_type:item.complaint_type,
-            complaint_detscription:item.complaint_description,
+            customer_phone:item.contact_no,
+            city:item.city,
+            state:item.state,
+            description:item.description,
+            complaint_type:"General Request",
+            updated_by:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].addressedBY? item.addressedDetails[0].addressedBY:"",
+
             request_status:item.request_status,
-            whatsapp_number:item.raised_whatsapp_no,
-            request_comments:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].comments?item.addressedDetails[0].comments:"--",
+            whatsapp_number:item.whatsapp_no,
+            request_comments:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[item.addressedDetails.length-1].comments?item.addressedDetails[item.addressedDetails.length-1].comments:"--",
             requst_updated_date:item.ucr_updated_at?formatDate(item.ucr_updated_at):'',
-            updated_by:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].addressedBY? item.addressedDetails[0].addressedBY:"--",
-            master_serial_no:item.battery_serial_number,
-            master_battery_model:item.battery_model,
-            master_varroc_part_code:item.varroc_part_code,
-            manufacturing_date:formatDateDDMMYYYY(item.manufacturing_date),
-            proposed_mrp:item.proposed_mrp,
-            description:item.battery_description,
       }));
           
     //-----------------------Convert data to CSV

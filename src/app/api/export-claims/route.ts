@@ -97,7 +97,9 @@ export async function POST(req: NextRequest) {
         const conditions: string[] = [];
       const values: any[] = [];
 
-    
+    conditions.push(`ura.request_type = ?`);
+      values.push("2"); 
+      
       conditions.push(`ura.fk_request_id = ?`);
       values.push(request.pk_id); 
     

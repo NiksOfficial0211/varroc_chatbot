@@ -239,7 +239,7 @@ const LeadRequestListing = () => {
         "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
       },
       body: JSON.stringify({
-        date: dataFilters.date,
+          date: dataFilters.date,
           request_id: dataFilters.enquiry_id,
           phone_no: dataFilters.customerPhone,
           city:dataFilters.city,
@@ -252,7 +252,7 @@ const LeadRequestListing = () => {
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = "warranty_requests.csv";
+    a.download = "dealership_requests.csv";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

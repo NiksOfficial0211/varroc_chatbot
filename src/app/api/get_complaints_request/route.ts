@@ -118,7 +118,7 @@ export async function  POST(request:Request){
         connection.release();
         return NextResponse.json({status:1,message:"All Complaints List",data:enrichedRequests,pageNumber:page,
           total:totalCount,
-          from: offset + 1,
+          from: totalCount>0?offset + 1:0,
           to: Math.min(offset + enrichedRequests.length, totalCount)
         });
     }catch(e){

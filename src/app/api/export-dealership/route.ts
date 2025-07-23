@@ -83,6 +83,7 @@ export async function POST(req: NextRequest) {
     }
 
     query += ` ORDER BY ucr.created_at ASC`;
+
     const [userRequests] = await connection.execute<RowDataPacket[]>(query, values);
     console.log("all user request data",userRequests);
     
@@ -106,9 +107,10 @@ export async function POST(req: NextRequest) {
         const conditions: string[] = [];
       const values: any[] = [];
 
-      conditions.push(`ura.request_type=3`);
+      conditions.push(`ura.request_type = ?`);
+      values.push("3");
       conditions.push(`ura.fk_request_id = ?`);
-      values.push(request.pk_id); 
+      values.push(request.pk_deal_id); 
     
     if (conditions.length > 0) {
       addressedQuery += ` WHERE ` + conditions.join(" AND ");
@@ -125,24 +127,22 @@ export async function POST(req: NextRequest) {
 
     const flatData = enrichedRequests.map((item:any,index:any) => ({
             sr_no: index,
-            complaint__id:item.complaint__id,
+            enquiry_id:item.dealership_id,
             request_date:item.ucr_created_at?formatDate(item.ucr_created_at):'',
-            customer_name:item.customer_name,
-            customer_phone:item.user_phone,
-            serial_no:item.battery_serial_no,
-            complaint_type:item.complaint_type,
-            complaint_detscription:item.complaint_description,
+            customer_name:item.full_name,
+            alternaet_contact:item.alternate_contact,
+            pncode:item.pincode,
+            city:item.city,
+            state:item.state_address,
+            business_age:item.business_age,
+            shop_type:item.shop_type,
+            complaint_type:"Dealership Enquiry",
             request_status:item.request_status,
+            updated_by:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].addressedBY? item.addressedDetails[0].addressedBY:"",
             whatsapp_number:item.raised_whatsapp_no,
             request_comments:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].comments?item.addressedDetails[0].comments:"--",
             requst_updated_date:item.ucr_updated_at?formatDate(item.ucr_updated_at):'',
-            updated_by:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].addressedBY? item.addressedDetails[0].addressedBY:"--",
-            master_serial_no:item.battery_serial_number,
-            master_battery_model:item.battery_model,
-            master_varroc_part_code:item.varroc_part_code,
-            manufacturing_date:formatDateDDMMYYYY(item.manufacturing_date),
-            proposed_mrp:item.proposed_mrp,
-            description:item.battery_description,
+            
       }));
           
     //-----------------------Convert data to CSV

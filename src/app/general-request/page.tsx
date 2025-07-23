@@ -236,29 +236,30 @@ const LeadRequestListing = () => {
   const downloadExport = async () => {
 
     setLoading(true);
-    // const response = await fetch("/api/export-data", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json", // 🔥 Important for raw JSON
-    //     "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
-    //   },
-    //   body: JSON.stringify({
-    //     date: dataFilters.date,
-    //       request_id: dataFilters.request_id,
-    //       phone_no: dataFilters.phone_no,
-    //       name: dataFilters.name,
-    //       status: dataFilters.status,
-    //   }),
-    // });
-    // const blob = await response.blob();
-    // const url = window.URL.createObjectURL(blob);
+    const response = await fetch("/api/export-general", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // 🔥 Important for raw JSON
+        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
+      },
+      body: JSON.stringify({
+          date: dataFilters.date,
+          request_id: dataFilters.enquiry_id,
+          phone_no: dataFilters.customerPhone,
+          city:dataFilters.city,
+          state:dataFilters.state,
+          status: dataFilters.status,
+      }),
+    });
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
 
-    // const a = document.createElement("a");
-    // a.href = url;
-    // a.download = "warranty_requests.csv";
-    // document.body.appendChild(a);
-    // a.click();
-    // document.body.removeChild(a);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "general_requests.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     setLoading(false);
   };
 
@@ -274,7 +275,7 @@ const LeadRequestListing = () => {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
 
-      <LeftPanelMenus selectedMenu={5} showLeftPanel={false} headertitle='Dealership Enquiries' rightBoxUI={
+      <LeftPanelMenus selectedMenu={8} showLeftPanel={false} headertitle='General Enquiries' rightBoxUI={
         <div className="container warranty_mainbox">
           <div className="row mt-4">
             <div className="col-lg-12">
@@ -385,6 +386,8 @@ const LeadRequestListing = () => {
 
               <div className="row">
                 <div className="col-lg-12">
+                  <p style={{float:"left"}}>Showing {dataFilters.datafrom} to {dataFilters.dataTo} out of {dataFilters.total}</p>
+
                   <div className="pagination_box mb-3">
                     <div className={dataFilters.page > 1 ? " pagi_btn" : "pagi_btn btn_no"} onClick={() => { dataFilters.page > 1 && changePage(-1); }}>Prev</div>
                     <div className="btn_count">{dataFilters.page}</div>

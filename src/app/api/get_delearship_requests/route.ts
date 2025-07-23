@@ -122,7 +122,7 @@ let countQuery = `SELECT COUNT(*) as total
         
         return NextResponse.json({status:1,message:"All Dealership Enquiries List",data:enrichedRequests,pageNumber:page,
           total:totalCount,
-          from: offset + 1,
+          from: totalCount>0?offset + 1:0,
           to: Math.min(offset + enrichedRequests.length, totalCount),
         });
     }catch(e){

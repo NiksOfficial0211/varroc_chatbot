@@ -71,7 +71,9 @@ const BatteryListing = () => {
 
       if (response.status == 1 && response.data.length > 0 ) {
         setLoading(false);
-
+setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
+          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
+          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
         setBatteryListData(response.data)
         if (response.data.length < dataFilters.limit) {
           setHasMoreData(false);
@@ -80,6 +82,9 @@ const BatteryListing = () => {
           setHasMoreData(true);
         }
       } else if (response.status == 1 && response.data.length == 0) {
+        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
+          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
+          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
         setLoading(false);
         setBatteryListData([])
         setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page }))
@@ -87,6 +92,9 @@ const BatteryListing = () => {
       }
       else {
         setDataFilters((prev) => ({ ...prev, ['pageNumber']: response.pageNumber }))
+        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
+          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
+          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
         setHasMoreData(false)
         setLoading(false);
         setShowAlert(true);
