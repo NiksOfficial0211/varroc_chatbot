@@ -58,7 +58,7 @@ export async function POST(request: Request) {
           JOIN auth aut ON ura.auth_user_id = aut.auth_id 
           JOIN request_types rt ON ura.request_type = rt.request_type_id 
           LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
-          JOIN request_status rs ON ura.request_status = rs.status_id WHERE ura.fk_request_id = ? AND .request_type=1`,
+          JOIN request_status rs ON ura.request_status = rs.status_id WHERE ura.request_type=1 AND ura.fk_request_id = ? `,
       [request_id]
     );
 
