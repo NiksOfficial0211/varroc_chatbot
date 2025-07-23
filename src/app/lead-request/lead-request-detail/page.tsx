@@ -330,7 +330,7 @@ const WarrantyRequestDetails = () => {
                         </div>
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
-                            Alternate Contact No. :
+                            Contact No. :
                             <span>{leadDetailsResponse.enq_data[0].alternate_contact && leadDetailsResponse.enq_data[0].alternate_contact.toString().length==10? "91"+leadDetailsResponse.enq_data[0].alternate_contact || "--":"--"}</span>
 
                           </div>

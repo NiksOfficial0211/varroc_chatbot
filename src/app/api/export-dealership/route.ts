@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
             enquiry_id:item.dealership_id,
             request_date:item.ucr_created_at?formatDate(item.ucr_created_at):'',
             customer_name:item.full_name,
-            alternate_contact:item.alternate_contact,
+            contact_no:item.alternate_contact,
             pincode:item.pincode,
             city:item.city,
             state:item.state_address,
