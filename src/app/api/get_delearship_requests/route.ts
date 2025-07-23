@@ -111,8 +111,8 @@ export async function  POST(request:Request){
       })
     );
 let countQuery = `SELECT COUNT(*) as total 
-    FROM user_dealership_request ufr
-      JOIN request_status rs ON ufr.status_id = rs.status_id`;
+    FROM user_dealership_request udr
+      JOIN request_status rs ON udr.status_id = rs.status_id`;
 
     if (conditions.length > 0) {
       countQuery += ` WHERE ` + conditions.join(" AND ");
