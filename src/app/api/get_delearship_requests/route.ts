@@ -111,7 +111,7 @@ export async function  POST(request:Request){
       })
     );
 let countQuery = `SELECT COUNT(*) as total 
-    FROM user_freechat_requests ufr
+    FROM user_dealership_request ufr
       JOIN request_status rs ON ufr.status_id = rs.status_id`;
 
     if (conditions.length > 0) {

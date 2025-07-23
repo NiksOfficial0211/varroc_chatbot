@@ -7,6 +7,7 @@ import ShowAlertMessage from './alert';
 import { staticIconsBaseURL } from '../pro_utils/string_constants';
 import ExcelJS, { CellRichTextValue } from "exceljs";
 import { useGlobalContext } from '../contextProviders/globalContext';
+import moment from 'moment';
 
 
 
@@ -281,10 +282,10 @@ async function uploadCSVFile(uploadFile: File,auth_id:any) {
         let formattedDate = "";
         let dateError = false;
 
-        if (mfg_date && mfg_date) {
-            const parts = mfg_date.split("-");
-            if (parts.length === 3) {
-                formattedDate = `${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
+        if (mfg_date) {
+            const parsedDate = moment(mfg_date, ["DD/MM/YYYY", "YYYY-MM-DD", "MM/DD/YYYY"], true); // strict parsing
+            if (parsedDate.isValid()) {
+                formattedDate = parsedDate.format("YYYY-MM-DD");
             } else {
                 dateError = true;
                 missingFields.push("Invalid manufacturingDate format");
@@ -298,12 +299,15 @@ async function uploadCSVFile(uploadFile: File,auth_id:any) {
                 JSON.stringify(row),
             ]);
         } else {
+            
+            console.log(formattedDate);
+            
             validRows.push([
                 auth_id,
                 battery_model,
                 varroc_part_code,
                 battery_serial_number,
-                formatDateYYYYMMDD(mfg_date),
+                formattedDate,
                 description,
                 proposed_mrp,
                 24,0,
@@ -313,20 +317,13 @@ async function uploadCSVFile(uploadFile: File,auth_id:any) {
     });
 
     try {
-        // if (validRows.length) {
-        //     await db.query(
-        //         `INSERT INTO product_info (battery_model, varroc_part_code, battery_serial_number, manufacturing_date,warranty,is_sold,created_at) VALUES ?`,
-        //         [validRows]
-        //     );
-        // }
-
-        // if (errorRows.length) {
-        //     await db.query(
-        //         `INSERT INTO battery_upload_errors (rowNumber, message, rawData) VALUES ?`,
-        //         [errorRows]
-        //     );
-        // }
-
+     
+        console.log(JSON.stringify({
+                isCSV:false,
+                valid_data:validRows,
+                invalid_data:errorRows
+            }));
+        
         const responce=await fetch("/api/product_bulk_upload", {
             method: "POST",
             headers: {
@@ -444,18 +441,26 @@ export async function uploadThroughXLSX(uploadFile: File,auth_id:any) {
           })
         ]);
       } else {
+            let manuFact_Date = null;
 
-        insertValid.push([
+            // Convert DD/MM/YYYY → YYYY-MM-DD
+            if (mfg_date && typeof mfg_date === 'string') {
+                const [day, month, year] = mfg_date.split('/');
+                if (day && month && year) {
+                manuFact_Date = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                }
+            }        
+  insertValid.push([
             auth_id,
             battery_model,
-                varroc_part_code,
-                battery_serial_number,
-                formatDateYYYYMMDD(manuFact_Date),
-                description,
-                proposed_mrp,
-                "24","0",
-                formatDateToMySQL(new Date())
-        ]);
+            varroc_part_code,
+            battery_serial_number,
+             manuFact_Date,
+            description,
+            proposed_mrp,
+            "24", "0",
+            formatDateToMySQL(new Date())
+            ]);
       }
     });
 
@@ -513,7 +518,7 @@ export async function uploadThroughXLSX(uploadFile: File,auth_id:any) {
 }
 
 function formatDateYYYYMMDD(inputDate:string){
-    const [day, month, year] = inputDate.split('-');
+    const [day, month, year] = inputDate.split('/');
     const formattedDate = `${year}-${month}-${day}`; 
     return formattedDate;
 } 

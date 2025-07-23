@@ -136,6 +136,9 @@ const WarrantyRequestListing = () => {
         setLoading(false);
 
         setComplaintsData(response.data)
+        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
+          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
+          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
         if (response.data.length < dataFilters.limit) {
           setHasMoreData(false);
 
@@ -145,12 +148,18 @@ const WarrantyRequestListing = () => {
       } else if (response.status == 1 && response.data.length == 0) {
         setLoading(false);
         setComplaintsData([])
+        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
+          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
+          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
         setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page }))
 
         setHasMoreData(false);
       }
       else {
         setDataFilters((prev) => ({ ...prev, ['pageNumber']: response.pageNumber }))
+        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
+          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
+          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
         setHasMoreData(false)
         setLoading(false);
         setShowAlert(true);

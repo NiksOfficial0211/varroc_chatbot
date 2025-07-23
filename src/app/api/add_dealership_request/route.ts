@@ -186,9 +186,14 @@ export async function POST(request: NextRequest) {
     if (connection) {
       await connection.rollback();
     }
+    const [hashPresent] = await connection.execute<any[]>(`SELECT hash_key FROM all_request_hash
+                WHERE hash_key = ?
+                `,[hash]);
+  if(hashPresent.length == 0){
     const [addHash] = await connection.execute<any[]>(`INSERT INTO all_request_hash
                 (hash_key,created_at) VALUES (?,?)
                 `,[hash,new Date()]);
+    }
     console.error('DB Error:', err);
     const cleanedWhatsAppNumber =
       whatsapp_number?.trim() !== '' ? whatsapp_number.trim() : null;

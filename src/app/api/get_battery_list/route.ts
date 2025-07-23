@@ -61,9 +61,8 @@ query += ` ORDER BY pro.created_at DESC LIMIT ${parsedLimit} OFFSET ${offset}`;
     
     const [allBattery] = await connection.execute<RowDataPacket[]>(query, values);
     
-   let countQuery = `SELECT COUNT(*) as total 
-    FROM FROM product_info pro
-      JOIN auth AS created_by_user ON pro.created_by = created_by_user.auth_id
+   let countQuery = `SELECT COUNT(*) as total FROM product_info pro
+     JOIN auth AS created_by_user ON pro.created_by = created_by_user.auth_id
       LEFT JOIN auth AS updated_by_user ON pro.updated_by = updated_by_user.auth_id`;
 
     if (conditions.length > 0) {

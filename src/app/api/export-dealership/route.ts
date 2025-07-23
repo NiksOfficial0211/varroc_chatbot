@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized',message:"You are unauthorized" }, { status: 403 });
   }
     const body = await req.json();
-    const { date,request_id,phone_no,name,status,reject_id  } = body;
+    const { date,request_id,phone_no,city,state,status,reject_id  } = body;
     
     try{
         const connection = await pool.getConnection();
@@ -60,6 +60,14 @@ export async function POST(req: NextRequest) {
       conditions.push(`ucr.user_phone like ?`);
       values.push(`%${phone_no}%`);
     }
+    if (city) {
+      conditions.push(`ucr.city like ?`);
+      values.push(`%${city}%`);
+    }
+    if (state) {
+      conditions.push(`ucr.state_address like ?`);
+      values.push(`%${state}%`);
+    }
     if (status) {
       conditions.push(`ucr.status_id = ?`);
       values.push(status);
@@ -98,7 +106,7 @@ export async function POST(req: NextRequest) {
         const conditions: string[] = [];
       const values: any[] = [];
 
-    
+      conditions.push(`ura.request_type=3`);
       conditions.push(`ura.fk_request_id = ?`);
       values.push(request.pk_id); 
     
