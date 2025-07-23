@@ -82,29 +82,7 @@ const WarrantyRequestDetails = () => {
       if (response.status == 1) {
 
         setComplaintData(response.data)
-        if(response.data.warrantyRaised && response.data.warrantyRaised.length>0){
-        const purchaseDate = new Date(response.data.warrantyRaised[0].warranty_start_date);
-
-        // Step 1: Add 24 months
-        const expiryDate = new Date(purchaseDate);
-        expiryDate.setMonth(expiryDate.getMonth() + 24);
-
-        // Step 2: Get today's date (UTC)
-        const today = new Date();
-        const todayUTC = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
-
-        // Step 3: Calculate remaining days
-        const timeDiff = expiryDate.getTime() - todayUTC.getTime();
         
-        setWarrantyEndDate(response.data.warrantyRaised[0].warranty_end_date)
-        
-        const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 18));
-        if(daysRemaining>0){
-            setWarrantyRemainingDays(daysRemaining)
-        }else{
-          setWarrantyRemainingDays("Warranty already expired")
-        }
-      }
         
         setFormVal({
           status_id: response.data.complaint_data[0].status_id,
@@ -167,6 +145,30 @@ const WarrantyRequestDetails = () => {
     return parsedDate.format('DD-MM-YYYY');
   };
   
+
+  const setRemainingDays=(endDate:any)=>{
+      console.log("this is the end date",endDate);
+      
+     
+        const expiryDate = new Date(endDate);
+        expiryDate.setMonth(expiryDate.getMonth());
+
+        // Step 2: Get today's date (UTC)
+        const today = new Date();
+        const todayUTC = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+
+        // Step 3: Calculate remaining days
+        const timeDiff = expiryDate.getTime() - todayUTC.getTime();
+        const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        // setWarrantyRemainingDays(daysRemaining)
+        if(daysRemaining>0){
+          return daysRemaining;
+        }else{
+          return "Your warranty is expired";
+        }
+        
+      
+  }
 
   const validate = () => {
     const newErrors: Partial<formValues> = {};
@@ -503,19 +505,19 @@ const WarrantyRequestDetails = () => {
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list ">
                                   Warranty start Date:
-                                  <span>{warrantyEndDate ? formatDateDDMMYYYY(warrantyreq.warranty_start_date):"--"}</span>
+                                  <span>{warrantyreq.warranty_start_date ? formatDateDDMMYYYY(warrantyreq.warranty_start_date):"--"}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list ">
                                   Warranty End Date:
-                                  <span>{warrantyEndDate ? formatDateDDMMYYYY(warrantyreq.warranty_end_date):"--"}</span>
+                                  <span>{warrantyreq.warranty_end_date ? formatDateDDMMYYYY(warrantyreq.warranty_end_date):"--"}</span>
                                 </div>
                               </div>
                                <div className="col-lg-4 mb-3">
                                 <div className="request_list ">
                                   Warranty Remaining Days:
-                                  <span>{warrantyRemainingDays}</span>
+                                  <span>{warrantyreq.warranty_end_date?setRemainingDays(warrantyreq.warranty_end_date):"--"}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">

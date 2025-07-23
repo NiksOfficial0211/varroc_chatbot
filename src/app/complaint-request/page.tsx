@@ -121,9 +121,9 @@ const WarrantyRequestListing = () => {
         },
         body: JSON.stringify({
           date: filter.date,
-          request_id: filter.request_id,
-          phone_no: filter.phone_no,
-          name: filter.name,
+          request_id: filter.request_id.trim(),
+          phone_no: filter.phone_no.trim(),
+          name: filter.name.trim(),
           status: filter.status,
           page: dataFilters.page == filter.page ? dataFilters.page : filter.page,
           limit: filter.limit

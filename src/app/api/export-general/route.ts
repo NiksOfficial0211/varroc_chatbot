@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
     // return NextResponse.json({data:enrichedRequests})
 
     const flatData = enrichedRequests.map((item:any,index:any) => ({
-            sr_no: index,
+            sr_no: index+1,
             enquiry_id:item.general_id,
             request_date:item.ucr_created_at?formatDate(item.ucr_created_at):'',
             customer_name:item.customer_name,

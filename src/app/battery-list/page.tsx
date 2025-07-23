@@ -59,9 +59,9 @@ const BatteryListing = () => {
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
         body: JSON.stringify({
-          battery_model: dataFilters.model,
-          battery_serial_number: dataFilters.serial_no,
-          date: dataFilters.manufacturing_date,
+          battery_model: dataFilters.model.trim(),
+          battery_serial_number: dataFilters.serial_no.trim(),
+          date: dataFilters.manufacturing_date.trim(),
           page: dataFilters.page == page ? dataFilters.page : page,
           limit: dataFilters.limit
         }),
