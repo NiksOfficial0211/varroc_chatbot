@@ -48,6 +48,10 @@ export const lead_status_contacted=11;
 export const lead_status_qualified=12;
 export const lead_status_disqualified=13;
 
+export const general_status_pending=14;
+export const general_status_responded=15;
+export const general_status_closed=16;
+
 export  const LEAD_FILTER_KEY = 'lead_list_filter';
 export  const COMPLAINT_FILTER_KEY = 'complaint_list_filter';
 export  const WARRANTY_FILTER_KEY = 'warranty_list_filter';

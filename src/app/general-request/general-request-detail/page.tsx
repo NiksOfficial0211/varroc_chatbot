@@ -9,7 +9,7 @@ import { WarrantyRequestDetailResponseModel } from '@/app/datamodels/WarrantyReq
 import PageErrorCenterContent from '@/app/components/pageError';
 import useSessionRedirect from '@/app/pro_utils/manage_session';
 import LeftPanelMenus from '@/app/components/leftPanel';
-import { getImageApiURL, lead_status_contacted, lead_status_disqualified, lead_status_new, lead_status_qualified, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
+import { general_status_pending, getImageApiURL, lead_status_contacted, lead_status_disqualified, lead_status_new, lead_status_qualified, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
 import moment from 'moment';
 import { RejectMSGMasterDataModel, StatusMasterDataModel } from '@/app/datamodels/CommonDataModels';
 import { useRouter } from 'next/navigation';
@@ -44,7 +44,7 @@ const WarrantyRequestDetails = () => {
   const [cityError, setCityError] = useState('');
   // const [pageNumber, setPageNumber] = useState(1);
   // const [pageSize, setPageSize] = useState(10);
-  const [leadDetailsResponse, setLeadDetailsRes] = useState<GeneralEnqDetailDataModel>();
+  const [generalDetailResponse, setLeadDetailsRes] = useState<GeneralEnqDetailDataModel>();
   const [statusMasterData, setStatusMasterData] = useState<StatusMasterDataModel[]>([]);
   const [rejectionMasterData, setRejectionMasterData] = useState<RejectMSGMasterDataModel[]>([]);
   const [formVal, setFormVal] = useState<formValues>({
@@ -160,10 +160,10 @@ const WarrantyRequestDetails = () => {
         body: 
               JSON.stringify({
                       auth_id: auth_id,
-                      pk_id: leadDetailsResponse?.enq_data[0].pk_deal_id,
+                      pk_id: generalDetailResponse?.enq_data[0].pk_deal_id,
                       comments: formVal.comments,
                       status: formVal.status_id,
-                      request_id: leadDetailsResponse?.enq_data[0].dealership_id,
+                      request_id: generalDetailResponse?.enq_data[0].dealership_id,
                      
                          
               })
@@ -223,6 +223,50 @@ const WarrantyRequestDetails = () => {
     return `${get('day')}-${get('month')}-${get('year')} ${get('hour')}:${get('minute')} ${get('dayPeriod')}`;
   }
 
+  const UpdateCity = async (e: React.FormEvent) => {
+      if (!pinCode) { setCityError("required"); return; }else{
+      setCityError("");
+    };
+  
+      try {
+        setLoading(true);
+        const response = await fetch("/api/set_city_manually", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
+          },
+          body: JSON.stringify({ pk_id: selectedViewID, changedPinCode: pinCode,update_type:3 })
+        });
+        const resJson = await response.json();
+        if (resJson && resJson.status == 1) {
+          setPinCode("");
+          setLoading(false);
+          setShowAlert(true);
+          setAlertTitle("Success")
+          setAlertStartContent(resJson.message);
+          setAlertForSuccess(1);
+          setNavigateBack(false)
+        } else {
+          setLoading(false);
+          setShowAlert(true);
+          setAlertTitle("Error")
+          setAlertStartContent(resJson.message);
+          setAlertForSuccess(2)
+          setNavigateBack(false)
+        }
+  
+      } catch (e: any) {
+        setLoading(false);
+        setShowAlert(true);
+        setAlertTitle("Exception")
+        setAlertStartContent(e.message);
+        setAlertForSuccess(2)
+        setNavigateBack(false)
+      }
+  
+    }
+
   return (
     <div>
 
@@ -251,7 +295,7 @@ const WarrantyRequestDetails = () => {
               </div>
 
 
-              {leadDetailsResponse && leadDetailsResponse.addressed_data ?
+              {generalDetailResponse && generalDetailResponse.addressed_data ?
                 <div className="grey_box request_details_mainbox">
                   <div className='row'>
                     <div className="col-lg-12">
@@ -259,7 +303,7 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-12 mb-4">
                           
                           <div className="request_list_heading" style={{ margin: "-42px 0px 0px 20px", backgroundColor: "#e6f6ff" }}>
-                            Enquiry ID: <span>{leadDetailsResponse.enq_data[0].dealership_id}</span>
+                            Enquiry ID: <span>{generalDetailResponse.enq_data[0].dealership_id}</span>
                           </div>
                         </div>
                       </div>
@@ -274,58 +318,80 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Enquiry Date:
-                            <span>{formatDate(leadDetailsResponse.enq_data[0].created_at)}</span>
+                            <span>{formatDate(generalDetailResponse.enq_data[0].created_at)}</span>
 
                           </div>
                         </div>
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Customer Phone:
-                            <span>{leadDetailsResponse.enq_data[0].raised_whatsapp_no}</span>
+                            <span>{generalDetailResponse.enq_data[0].raised_whatsapp_no}</span>
 
                           </div>
                         </div>
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Alternate Contact No. :
-                            <span>{leadDetailsResponse.enq_data[0].alternate_contact && leadDetailsResponse.enq_data[0].alternate_contact.toString.length==10? "91"+leadDetailsResponse.enq_data[0].alternate_contact || "--":"--"}</span>
+                            <span>{generalDetailResponse.enq_data[0].alternate_contact && generalDetailResponse.enq_data[0].alternate_contact.toString.length==10? "91"+generalDetailResponse.enq_data[0].alternate_contact || "--":"--"}</span>
 
                           </div>
                         </div>
-
+                        <div className="col-lg-4 mb-3">
+                          <div className="request_list ">
+                            Pincode:
+                            <span>{generalDetailResponse.enq_data[0].pincode}</span>
+                          </div>
+                        </div>
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
                             City:
-                            <span>{leadDetailsResponse.enq_data[0].city}</span>
+                            <span>{generalDetailResponse.enq_data[0].city}</span>
                           </div>
                         </div>
+                        {generalDetailResponse.enq_data[0].status_id==general_status_pending && <div className="col-lg-12 mb-3">
+                                                
+                                                                            <div className="request_list">
+                                                                              Pin code:
+                                                                              <div className="row mt-2">
+                                                                                <div className="col-lg-4 form_box">
+                                                                                  <input type="text" id="proposed_mrp" name="proposed_mrp" value={pinCode} onChange={(e) => setPinCode(e.target.value)} style={{ padding: "8px" }} />
+                                                                                  {cityError && <span className="error" style={{ color: "red" }}>{cityError}</span>}
+                                                
+                                                                                </div>
+                                                                                <div className="col-lg-4 mt-2">
+                                                                                  <a className="blue_btn " style={{ cursor: "pointer", }} onClick={UpdateCity}>Add City</a>
+                                                                                </div>
+                                                                              </div>
+                                                
+                                                                            </div>
+                                                                          </div>}
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
                             State:
-                            <span>{leadDetailsResponse.enq_data[0].state_address}</span>
+                            <span>{generalDetailResponse.enq_data[0].state_address}</span>
                           </div>
                         </div>
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
                             Business Age:
-                            <span>{leadDetailsResponse.enq_data[0].business_age.replace("_","-")} Years</span>
+                            <span>{generalDetailResponse.enq_data[0].business_age.replace("_","-")} Years</span>
                           </div>
                         </div>
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
                             Shop Type:
-                            <span>{leadDetailsResponse.enq_data[0].shop_type}</span>
+                            <span>{generalDetailResponse.enq_data[0].shop_type}</span>
                           </div>
                         </div>
                         
-                        {leadDetailsResponse.duplicate_data && leadDetailsResponse.duplicate_data.length>0 && <div className="col-lg-12">
+                        {generalDetailResponse.duplicate_data && generalDetailResponse.duplicate_data.length>0 && <div className="col-lg-12">
                           <div className="row">
                             <div className="col-lg-12">
                               <div className='masterrecord_heading'>Previous/Duplicate Request</div>
                             </div>
                           </div>
                         </div>}
-                        {leadDetailsResponse.duplicate_data && leadDetailsResponse.duplicate_data.map((duplicates, index) => (
+                        {generalDetailResponse.duplicate_data && generalDetailResponse.duplicate_data.map((duplicates, index) => (
                           <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }} key={index}>
 
                             <div className="row">
@@ -353,33 +419,33 @@ const WarrantyRequestDetails = () => {
                             </div>
                           </div>))}
                       </div>
-                      {leadDetailsResponse.addressed_data && leadDetailsResponse.addressed_data.length>0 && leadDetailsResponse.enq_data[0].status_id != status_Pending ?
+                      {generalDetailResponse.addressed_data && generalDetailResponse.addressed_data.length>0 && generalDetailResponse.enq_data[0].status_id != status_Pending ?
                         <div>
                           <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>
                             <div className="row">
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Request Status:
-                                  <span>{leadDetailsResponse.addressed_data[0].request_status}</span>
+                                  <span>{generalDetailResponse.addressed_data[0].request_status}</span>
                                 </div>
                               </div>
                               
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated By:
-                                  <span>{leadDetailsResponse.addressed_data[0].addressedBY}</span>
+                                  <span>{generalDetailResponse.addressed_data[0].addressedBY}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated Date:
-                                  <span>{formatDate(leadDetailsResponse.addressed_data[0].updated_at)}</span>
+                                  <span>{formatDate(generalDetailResponse.addressed_data[0].updated_at)}</span>
                                 </div>
                               </div>
                               <div className="col-lg-12 mb-3">
                                 <div className="request_list">
                                   Request Comments:
-                                  <span>{leadDetailsResponse.addressed_data[0].comments}</span>
+                                  <span>{generalDetailResponse.addressed_data[0].comments}</span>
                                 </div>
                               </div>
                               
@@ -391,7 +457,7 @@ const WarrantyRequestDetails = () => {
 
                       }
 
-                      {leadDetailsResponse.enq_data[0].status_id == lead_status_new ?
+                      {generalDetailResponse.enq_data[0].status_id == lead_status_new ?
                         <div>
                           <form onSubmit={handleSubmit}>
                             <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>

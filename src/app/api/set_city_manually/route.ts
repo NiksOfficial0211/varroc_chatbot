@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const connection = await pool.getConnection();
     try{
-    const { pk_id, changedPinCode } = body;
+    const { pk_id, changedPinCode,update_type } = body;
     console.log();
     
     const cleanedPinCode =
@@ -30,16 +30,40 @@ export async function POST(request: Request) {
         return NextResponse.json({ status:0,success: false, message: "No city found for the pin code" }, { status: 200 });
 
     }
-    const [result]: any= await connection.query(
+
+    let result:any;
+    if(update_type==1){
+    const [updateResult]= await connection.query(
         `UPDATE user_warranty_requests 
        SET user_pin_code=? ,
       retailer_city_name=? 
        WHERE pk_request_id = ?`,
         [cleanedPinCode, cleanedCityName, pk_id]
     );
+    result=updateResult
+}   else if(update_type==2){
+    const [updateResult]= await connection.query(
+        `UPDATE user_dealership_request 
+       SET pincode=? ,
+      city=? 
+       WHERE pk_deal_id = ?`,
+        [cleanedPinCode, cleanedCityName, pk_id]
+    );
+    result=updateResult
+}else{
+    const [updateResult]= await connection.query(
+        `UPDATE user_freechat_requests 
+       SET pincode=? ,
+      city=? 
+       WHERE pk_id = ?`,
+        [cleanedPinCode, cleanedCityName, pk_id]
+    );
+    result=updateResult;
+
+}
     console.log(result);
     
-    if (result.affectedRows > 0) {
+    if (result.affectedRows > 0 || result.changedRows === 0) {
             return NextResponse.json({status:1, success: true, message: "Update successful" }, { status: 200 });
         } else {
             return NextResponse.json({ status:0,success: false, message: "Failed to update city" }, { status: 200 });

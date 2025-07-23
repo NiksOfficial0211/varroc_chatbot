@@ -175,7 +175,9 @@ const WarrantyRequestDetails = () => {
     return Object.keys(newErrors).length === 0;
   }
   const UpdateCity = async (e: React.FormEvent) => {
-    if (!pinCode) { setCityError("required"); return; };
+    if (!pinCode) { setCityError("required"); return; }else{
+      setCityError("");
+    };
 
     try {
       setLoading(true);
@@ -185,10 +187,11 @@ const WarrantyRequestDetails = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
-        body: JSON.stringify({ pk_id: selectedViewID, changedPinCode: pinCode })
+        body: JSON.stringify({ pk_id: selectedViewID, changedPinCode: pinCode.trim(),update_type:1 })
       });
       const resJson = await response.json();
       if (resJson && resJson.status == 1) {
+        setPinCode("");
         setLoading(false);
         setShowAlert(true);
         setAlertTitle("Success")
@@ -409,13 +412,13 @@ const WarrantyRequestDetails = () => {
                             <span>{warrantyRequestData.request[0].user_pin_code}</span>
                           </div>
                         </div>
-                        {warrantyRequestData.request[0].retailer_city_name && warrantyRequestData.request[0].retailer_city_name.length > 0 ? <div className="col-lg-4 mb-3">
+                        {warrantyRequestData.request[0].retailer_city_name && warrantyRequestData.request[0].retailer_city_name.length > 0 && <div className="col-lg-4 mb-3">
                           <div className="request_list ">
                             City:
                             <span>{warrantyRequestData.request[0].retailer_city_name}</span>
                           </div>
-                        </div> :
-                          <div className="col-lg-12 mb-3">
+                        </div> }
+                          {warrantyRequestData.request[0].status_id==status_Pending && <div className="col-lg-12 mb-3">
 
                             <div className="request_list">
                               Pin code:
@@ -431,8 +434,8 @@ const WarrantyRequestDetails = () => {
                               </div>
 
                             </div>
-                          </div>
-                        }
+                          </div>}
+                        
                         <div className="col-lg-12">
                           <div className="row">
                             <div className="col-lg-12 tooltip_box">

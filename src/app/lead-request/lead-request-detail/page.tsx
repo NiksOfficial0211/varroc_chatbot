@@ -222,6 +222,50 @@ const WarrantyRequestDetails = () => {
     return `${get('day')}-${get('month')}-${get('year')} ${get('hour')}:${get('minute')} ${get('dayPeriod')}`;
   }
 
+  const UpdateCity = async (e: React.FormEvent) => {
+      if (!pinCode) { setCityError("required"); return; }else{
+      setCityError("");
+    };
+  
+      try {
+        setLoading(true);
+        const response = await fetch("/api/set_city_manually", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
+          },
+          body: JSON.stringify({ pk_id: selectedViewID, changedPinCode: pinCode,update_type:2 })
+        });
+        const resJson = await response.json();
+        if (resJson && resJson.status == 1) {
+          setPinCode("");
+          setLoading(false);
+          setShowAlert(true);
+          setAlertTitle("Success")
+          setAlertStartContent(resJson.message);
+          setAlertForSuccess(1);
+          setNavigateBack(false)
+        } else {
+          setLoading(false);
+          setShowAlert(true);
+          setAlertTitle("Error")
+          setAlertStartContent(resJson.message);
+          setAlertForSuccess(2)
+          setNavigateBack(false)
+        }
+  
+      } catch (e: any) {
+        setLoading(false);
+        setShowAlert(true);
+        setAlertTitle("Exception")
+        setAlertStartContent(e.message);
+        setAlertForSuccess(2)
+        setNavigateBack(false)
+      }
+  
+    }
+
   return (
     <div>
 
@@ -291,13 +335,35 @@ const WarrantyRequestDetails = () => {
 
                           </div>
                         </div>
-
                         <div className="col-lg-4 mb-3">
+                          <div className="request_list ">
+                            Pincode:
+                            <span>{leadDetailsResponse.enq_data[0].pincode}</span>
+                          </div>
+                        </div>
+                        {leadDetailsResponse.enq_data[0].city &&<div className="col-lg-4 mb-3">
                           <div className="request_list ">
                             City:
                             <span>{leadDetailsResponse.enq_data[0].city}</span>
                           </div>
-                        </div>
+                        </div>}
+                        {leadDetailsResponse.enq_data[0].status_id==lead_status_new && <div className="col-lg-12 mb-3">
+                        
+                                                    <div className="request_list">
+                                                      Pin code:
+                                                      <div className="row mt-2">
+                                                        <div className="col-lg-4 form_box">
+                                                          <input type="text" id="proposed_mrp" name="proposed_mrp" value={pinCode} onChange={(e) => setPinCode(e.target.value)} style={{ padding: "8px" }} />
+                                                          {cityError && <span className="error" style={{ color: "red" }}>{cityError}</span>}
+                        
+                                                        </div>
+                                                        <div className="col-lg-4 mt-2">
+                                                          <a className="blue_btn " style={{ cursor: "pointer", }} onClick={UpdateCity}>Add City</a>
+                                                        </div>
+                                                      </div>
+                        
+                                                    </div>
+                                                  </div>}
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
                             State:
