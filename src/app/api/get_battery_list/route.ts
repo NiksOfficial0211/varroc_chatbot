@@ -73,7 +73,7 @@ query += ` ORDER BY pro.created_at DESC LIMIT ${parsedLimit} OFFSET ${offset}`;
 
         connection.release();
         return NextResponse.json({status:1,message:"Data Received",data:allBattery,pageNumber:page,total:totalCount,
-          from: offset + 1,
+          from: totalCount>0?offset + 1:0,
           to: Math.min(offset + allBattery.length, totalCount),
         });
     }catch(e){
