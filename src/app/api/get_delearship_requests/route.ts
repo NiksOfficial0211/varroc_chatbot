@@ -17,7 +17,7 @@ export async function  POST(request:Request){
     return NextResponse.json({ error: 'Unauthorized',message:"You are unauthorized" }, { status: 403 });
   }
     const body = await request.json();
-    const { date,enquiry_id,phone_no,status,city,state_address,page=1,limit=10  } = body;
+    const { date,enquiry_id,whatsapp_no,status,city,state_address,page=1,limit=10  } = body;
     
     
     const parsedPage = Number(page);
@@ -49,9 +49,9 @@ export async function  POST(request:Request){
       values.push(enquiry_id);
     }
 
-    if (phone_no) {
-      conditions.push(`udr.raised_whatsapp_no like ?`);
-      values.push(`%${phone_no}%`);
+    if (whatsapp_no) {
+      conditions.push(`udr.alternate_contact like ?`);
+      values.push(`%${whatsapp_no}%`);
     }
 
     if (state_address) {

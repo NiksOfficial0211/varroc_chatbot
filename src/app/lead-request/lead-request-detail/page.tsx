@@ -385,7 +385,7 @@ const WarrantyRequestDetails = () => {
                           </div>
                         </div>
                         
-                        {leadDetailsResponse.duplicate_data && leadDetailsResponse.duplicate_data.length>0 && <div className="col-lg-12">
+                        {/* {leadDetailsResponse.duplicate_data && leadDetailsResponse.duplicate_data.length>0 && <div className="col-lg-12">
                           <div className="row">
                             <div className="col-lg-12">
                               <div className='masterrecord_heading'>Previous/Duplicate Request</div>
@@ -418,7 +418,7 @@ const WarrantyRequestDetails = () => {
 
 
                             </div>
-                          </div>))}
+                          </div>))} */}
                       </div>
                       {leadDetailsResponse.addressed_data && leadDetailsResponse.addressed_data.length>0 && leadDetailsResponse.enq_data[0].status_id != status_Pending ?
                         <div>
