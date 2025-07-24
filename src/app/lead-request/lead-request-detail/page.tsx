@@ -368,7 +368,7 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
                             State:
-                           <span>{leadDetailsResponse.enq_data[0].state_address.charAt(0).toUpperCase() + leadDetailsResponse.enq_data[0].state_address.slice(1).toLowerCase()}</span>
+                           <span>{leadDetailsResponse.enq_data[0].state_address ? leadDetailsResponse.enq_data[0].state_address.charAt(0).toUpperCase() + leadDetailsResponse.enq_data[0].state_address.slice(1).toLowerCase():"--"}</span>
 
                           </div>
                         </div>
