@@ -79,7 +79,7 @@ const duplicateFreechatDataWithAddressed = await Promise.all(
     `, [row.pk_id]);
 
     return {
-      freechat: row,
+      dup_general: row,
       addressedData: addressed
     };
   })
