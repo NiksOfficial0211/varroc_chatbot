@@ -17,7 +17,7 @@ export async function  POST(request:Request){
     return NextResponse.json({ error: 'Unauthorized',message:"You are unauthorized" }, { status: 403 });
   }
     const body = await request.json();
-    const { date,enquiry_id,phone_no,status,city,state_address,page=1,limit=10  } = body;
+    const { date,enquiry_id,phone_no,status,city,state,page=1,limit=10  } = body;
     
     
     const parsedPage = Number(page);
@@ -54,9 +54,9 @@ export async function  POST(request:Request){
       values.push(`%${phone_no}%`);
     }
 
-    if (state_address) {
+    if (state) {
       conditions.push(`ufr.state = ?`);
-      values.push(state_address);
+      values.push(state);
     }
     if (city) {
       conditions.push(`ufr.city = ?`);

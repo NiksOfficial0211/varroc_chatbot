@@ -104,7 +104,7 @@ const LeadRequestListing = () => {
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
         body: JSON.stringify({
-          "request_type": 3
+          "request_type": 4
         })
 
       });
