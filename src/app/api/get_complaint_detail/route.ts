@@ -79,7 +79,7 @@ export async function POST(request: Request) {
         `, [row.pk_id]);
 
         return {
-          complaint: row,
+          dup_complaints: row,
           addressedData: addressed
         };
       })

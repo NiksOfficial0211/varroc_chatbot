@@ -27,7 +27,7 @@ export interface DealershipEnqDetailDataModel {
 }
 
 export interface DuplicateDaum {
-  dub_complaint: DealershipEnqDataModel
+  dealership: DealershipEnqDataModel
   addressedData: AddressedDaum[]
 }
 
