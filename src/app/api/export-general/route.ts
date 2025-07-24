@@ -23,23 +23,23 @@ export async function POST(req: NextRequest) {
    
         let query = `
               SELECT 
-          ucr.pk_id,
-          ucr.general_id,
-          ucr.contact_no,
-          ucr.customer_name,
-          ucr.whatsapp_no,
-          ucr.pincode,
-          ucr.city,
-          ucr.state,
-          ucr.description,
-          ucr.status_id,
-          ucr.addressed_by,
-          ucr.comments,
-          ucr.created_at AS ucr_created_at,
-          ucr.updated_at AS ucr_updated_at,
+          ufcr.pk_id,
+          ufcr.general_id,
+          ufcr.contact_no,
+          ufcr.customer_name,
+          ufcr.whatsapp_no,
+          ufcr.pincode,
+          ufcr.city,
+          ufcr.state,
+          ufcr.description,
+          ufcr.status_id,
+          ufcr.addressed_by,
+          ufcr.comments,
+          ufcr.created_at AS ufcr_created_at,
+          ufcr.updated_at AS ufcr_updated_at,
           rs.status AS request_status
-          FROM user_freechat_requests ucr
-          JOIN request_status rs ON ucr.status_id = rs.status_id
+          FROM user_freechat_requests ufcr
+          JOIN request_status rs ON ufcr.status_id = rs.status_id
       `;
 
     // Dynamic WHERE conditions
@@ -47,34 +47,34 @@ export async function POST(req: NextRequest) {
     const values: any[] = [];
 
     if (date) {
-      conditions.push(`DATE(ucr.created_at) = ?`);
+      conditions.push(`DATE(ufcr.created_at) = ?`);
       values.push(date); // should be in 'YYYY-MM-DD' format
     }
 
     if (request_id) {
-      conditions.push(`ucr.general_id = ?`);
+      conditions.push(`ufcr.general_id = ?`);
       values.push(request_id);
     }
 
     if (phone_no) {
-      conditions.push(`ucr.user_phone like ?`);
+      conditions.push(`ufcr.contact_no like ?`);
       values.push(`%${phone_no}%`);
     }
      if (city) {
-      conditions.push(`ucr.city = ?`);
-      values.push(city);
+      conditions.push(`ufcr.city like ?`);
+      values.push(`%${city}%`);
     }
      if (state) {
-      conditions.push(`ucr.state = ?`);
+      conditions.push(`ufcr.state = ?`);
       values.push(state);
     }
     if (status) {
-      conditions.push(`ucr.status_id = ?`);
+      conditions.push(`ufcr.status_id = ?`);
       values.push(status);
     }
 
     if (reject_id) {
-      conditions.push(`ucr.fk_reject_id = ?`);
+      conditions.push(`ufcr.fk_reject_id = ?`);
       values.push(reject_id);
     }
 
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
       query += ` WHERE ` + conditions.join(" AND ");
     }
 
-    query += ` ORDER BY ucr.created_at ASC`;
+    query += ` ORDER BY ufcr.created_at ASC`;
     const [userRequests] = await connection.execute<RowDataPacket[]>(query, values);
     console.log("all user request data",userRequests);
     
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
     const flatData = enrichedRequests.map((item:any,index:any) => ({
             sr_no: index+1,
             enquiry_id:item.general_id,
-            request_date:item.ucr_created_at?formatDate(item.ucr_created_at):'',
+            request_date:item.ufcr_created_at?formatDate(item.ufcr_created_at):'',
             customer_name:item.customer_name,
             customer_phone:item.contact_no,
             city:item.city,
@@ -139,7 +139,7 @@ export async function POST(req: NextRequest) {
             request_status:item.request_status,
             whatsapp_number:item.whatsapp_no,
             request_comments:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[item.addressedDetails.length-1].comments?item.addressedDetails[item.addressedDetails.length-1].comments:"--",
-            requst_updated_date:item.ucr_updated_at?formatDate(item.ucr_updated_at):'',
+            requst_updated_date:item.ufcr_updated_at?formatDate(item.ufcr_updated_at):'',
       }));
           
     //-----------------------Convert data to CSV

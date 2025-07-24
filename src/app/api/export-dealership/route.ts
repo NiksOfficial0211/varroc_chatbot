@@ -16,30 +16,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized',message:"You are unauthorized" }, { status: 403 });
   }
     const body = await req.json();
-    const { date,request_id,phone_no,city,state,status,reject_id  } = body;
+    const { date,enquiry_id,whatsapp_no,status,city,state_address  } = body;
     
     try{
         const connection = await pool.getConnection();
    
         let query = `
               SELECT 
-          ucr.pk_deal_id,
-          ucr.dealership_id,
-          ucr.full_name,
-          ucr.alternate_contact,
-          ucr.pincode,
-          ucr.city,
-          ucr.state_address,
-          ucr.business_age,
-          ucr.shop_type,
-          ucr.addressed_by,
-          ucr.raised_whatsapp_no,
-          ucr.created_at AS ucr_created_at,
-          ucr.updated_at AS ucr_updated_at,
+          udr.pk_deal_id,
+          udr.dealership_id,
+          udr.full_name,
+          udr.alternate_contact,
+          udr.pincode,
+          udr.city,
+          udr.state_address,
+          udr.business_age,
+          udr.shop_type,
+          udr.addressed_by,
+          udr.raised_whatsapp_no,
+          udr.created_at AS ucr_created_at,
+          udr.updated_at AS ucr_updated_at,
 
             rs.status AS request_status
-          FROM user_dealership_request ucr
-          JOIN request_status rs ON ucr.status_id = rs.status_id
+          FROM user_dealership_request udr
+          JOIN request_status rs ON udr.status_id = rs.status_id
       `;
 
     // Dynamic WHERE conditions
@@ -47,42 +47,40 @@ export async function POST(req: NextRequest) {
     const values: any[] = [];
 
     if (date) {
-      conditions.push(`DATE(ucr.created_at) = ?`);
+      conditions.push(`DATE(udr.created_at) = ?`);
       values.push(date); // should be in 'YYYY-MM-DD' format
     }
 
-    if (request_id) {
-      conditions.push(`ucr.dealership_id = ?`);
-      values.push(request_id);
+    if (enquiry_id) {
+      conditions.push(`udr.dealership_id = ?`);
+      values.push(enquiry_id);
     }
 
-    if (phone_no) {
-      conditions.push(`ucr.user_phone like ?`);
-      values.push(`%${phone_no}%`);
+    if (whatsapp_no) {
+      conditions.push(`udr.alternate_contact like ?`);
+      values.push(`%${whatsapp_no}%`);
+    }
+
+    if (state_address) {
+      conditions.push(`udr.state_address like ?`);
+      values.push(`%${state_address}%`);
     }
     if (city) {
-      conditions.push(`ucr.city like ?`);
+      conditions.push(`udr.city like ?`);
       values.push(`%${city}%`);
     }
-    if (state) {
-      conditions.push(`ucr.state_address like ?`);
-      values.push(`%${state}%`);
-    }
+
     if (status) {
-      conditions.push(`ucr.status_id = ?`);
+      conditions.push(`udr.status_id = ?`);
       values.push(status);
     }
-
-    if (reject_id) {
-      conditions.push(`ucr.fk_reject_id = ?`);
-      values.push(reject_id);
-    }
+   
 
     if (conditions.length > 0) {
       query += ` WHERE ` + conditions.join(" AND ");
     }
 
-    query += ` ORDER BY ucr.created_at ASC`;
+    query += ` ORDER BY udr.created_at ASC`;
 
     const [userRequests] = await connection.execute<RowDataPacket[]>(query, values);
     console.log("all user request data",userRequests);

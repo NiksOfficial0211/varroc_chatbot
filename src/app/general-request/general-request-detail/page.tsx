@@ -369,7 +369,7 @@ const WarrantyRequestDetails = () => {
                         {generalDetailResponse.duplicate_data && generalDetailResponse.duplicate_data.length>0 && <div className="col-lg-12">
                           <div className="row">
                             <div className="col-lg-12">
-                              <div className='masterrecord_heading'>Previous/Duplicate Request</div>
+                              <div className='masterrecord_heading'>Previous Request</div>
                             </div>
                           </div>
                         </div>}

@@ -240,10 +240,10 @@ const LeadRequestListing = () => {
       },
       body: JSON.stringify({
           date: dataFilters.date,
-          request_id: dataFilters.enquiry_id,
-          phone_no: dataFilters.customerPhone,
-          city:dataFilters.city,
-          state:dataFilters.state,
+          enquiry_id: dataFilters.enquiry_id.trim(),
+          whatsapp_no: dataFilters.customerPhone.trim(),
+          city: dataFilters.city.trim(),
+          state: dataFilters.state.trim(),
           status: dataFilters.status,
       }),
     });

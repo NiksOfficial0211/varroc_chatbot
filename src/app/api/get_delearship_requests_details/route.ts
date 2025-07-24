@@ -7,11 +7,6 @@ interface CountResult extends RowDataPacket {
   total: number;
 }
 
-interface DuplicateFreechatWithAddressed {
-  dealership: RowDataPacket;
-  addressedData: RowDataPacket[];
-}
-
 export async function POST(request: Request) {
 
   const authHeader = request.headers.get('Authorization');
@@ -74,32 +69,29 @@ const [duplicateDealershipRows] = await connection.execute<RowDataPacket[]>(`
 `, [userRequests[0].raised_whatsapp_no, pk_id]);
 
 // Step 2: For each, fetch addressed data
-const dupIds = duplicateDealershipRows.map(row => row.pk_id);
-let duplicateFreechatDataWithAddressed: DuplicateFreechatWithAddressed[] = [];
+const duplicateDealershipDataWithAddressed = await Promise.all(
+  duplicateDealershipRows.map(async (row: any) => {
+    const [addressed] = await connection.execute<RowDataPacket[]>(`
+      SELECT
+        ura.*,
+        rt.request_type AS request_type,
+        rs.status AS request_status,
+        aut.username AS addressedBY,
+        rr.rejection_msg AS rejection_msg
+      FROM user_request_addressed ura
+      JOIN auth aut ON ura.auth_user_id = aut.auth_id 
+      JOIN request_types rt ON ura.request_type = rt.request_type_id 
+      LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
+      JOIN request_status rs ON ura.request_status = rs.status_id 
+      WHERE ura.request_type = 3 AND ura.fk_request_id = ?
+    `, [row.pk_deal_id]);
 
-if (dupIds.length > 0) {
-  const [addressedRows] = await connection.query<RowDataPacket[]>(`
-    SELECT
-      ura.*,
-      rt.request_type AS request_type,
-      rs.status AS request_status,
-      aut.username AS addressedBY,
-      rr.rejection_msg AS rejection_msg,
-      ura.fk_request_id
-    FROM user_request_addressed ura
-    JOIN auth aut ON ura.auth_user_id = aut.auth_id 
-    JOIN request_types rt ON ura.request_type = rt.request_type_id 
-    LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
-    JOIN request_status rs ON ura.request_status = rs.status_id 
-    WHERE ura.request_type = 4 AND ura.fk_request_id IN (?)
-  `, [dupIds]);
-
-  // Merge addressed data with duplicate rows
-  duplicateFreechatDataWithAddressed = duplicateDealershipRows.map(row => ({
-    dealership: row,
-    addressedData: addressedRows.filter(addr => addr.fk_request_id === row.pk_id)
-  }));
-}
+    return {
+      dealership: row,
+      addressedData: addressed
+    };
+  })
+);
 
 
 
@@ -120,7 +112,7 @@ if (dupIds.length > 0) {
  
     
     return NextResponse.json({
-      status: 1, message: "Data Received", data: { enq_data: userRequests, addressed_data: addressedData, duplicate_data: duplicateFreechatDataWithAddressed}
+      status: 1, message: "Data Received", data: { enq_data: userRequests, addressed_data: addressedData, duplicate_data: duplicateDealershipDataWithAddressed}
     });
 
   } catch (e) {

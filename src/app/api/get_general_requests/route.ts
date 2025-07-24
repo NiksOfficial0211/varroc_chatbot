@@ -50,7 +50,7 @@ export async function  POST(request:Request){
     }
 
     if (phone_no) {
-      conditions.push(`ufr.whatsapp_no like ?`);
+      conditions.push(`ufr.contact_no like ?`);
       values.push(`%${phone_no}%`);
     }
 
