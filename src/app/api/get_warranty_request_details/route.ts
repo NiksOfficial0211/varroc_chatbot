@@ -5,6 +5,10 @@ import { RowDataPacket } from "mysql2";
 interface CountResult extends RowDataPacket {
   total: number;
 }
+interface DuplicateFreechatWithAddressed {
+  dup_general: RowDataPacket;
+  addressedData: RowDataPacket[];
+}
 
 export async function POST(request: Request) {
   const authHeader = request.headers.get('authorization');
@@ -74,29 +78,32 @@ export async function POST(request: Request) {
 `, [userRequests[0].product_serial_no, userRequests[0].request_id]);
 
 // Fetch addressed data for each duplicate warranty request
-const duplicateWarrantyAddressedData = await Promise.all(
-  duplicateWarrantyRows.map(async (row: any) => {
-    const [addressed] = await connection.execute<RowDataPacket[]>(`
-      SELECT
-        ura.*,
-        rt.request_type AS request_type,
-        rs.status AS request_status,
-        aut.username AS addressedBY,
-        rr.rejection_msg AS rejection_msg
-      FROM user_request_addressed ura
-      JOIN auth aut ON ura.auth_user_id = aut.auth_id 
-      JOIN request_types rt ON ura.request_type = rt.request_type_id 
-      LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
-      JOIN request_status rs ON ura.request_status = rs.status_id 
-      WHERE ura.request_type = 1 AND ura.fk_request_id = ?
-    `, [row.pk_request_id]);
+const dupIds = duplicateWarrantyRows.map(row => row.pk_id);
+let duplicateFreechatDataWithAddressed: DuplicateFreechatWithAddressed[] = [];
 
-    return {
-      warranty: row,
-      addressedData: addressed
-    };
-  })
-);
+if (dupIds.length > 0) {
+  const [addressedRows] = await connection.query<RowDataPacket[]>(`
+    SELECT
+      ura.*,
+      rt.request_type AS request_type,
+      rs.status AS request_status,
+      aut.username AS addressedBY,
+      rr.rejection_msg AS rejection_msg,
+      ura.fk_request_id
+    FROM user_request_addressed ura
+    JOIN auth aut ON ura.auth_user_id = aut.auth_id 
+    JOIN request_types rt ON ura.request_type = rt.request_type_id 
+    LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
+    JOIN request_status rs ON ura.request_status = rs.status_id 
+    WHERE ura.request_type = 4 AND ura.fk_request_id IN (?)
+  `, [dupIds]);
+
+  // Merge addressed data with duplicate rows
+  duplicateFreechatDataWithAddressed = duplicateWarrantyRows.map(row => ({
+    dup_general: row,
+    addressedData: addressedRows.filter(addr => addr.fk_request_id === row.pk_id)
+  }));
+}
 
 
     // Example: Get battery info for each request
@@ -109,7 +116,7 @@ const duplicateWarrantyAddressedData = await Promise.all(
            FROM user_request_attachements WHERE fk_request_id = ?`, [request_id]);
     connection.release();
     return NextResponse.json({
-      status: 1, message: "Data Received", data: { request: userRequests, addressedData: addressedData,battery_details:batteryData, images: images,duplicate_data:duplicateWarrantyAddressedData }
+      status: 1, message: "Data Received", data: { request: userRequests, addressedData: addressedData,battery_details:batteryData, images: images,duplicate_data:duplicateFreechatDataWithAddressed }
     });
   } catch (e) {
     console.log(e);

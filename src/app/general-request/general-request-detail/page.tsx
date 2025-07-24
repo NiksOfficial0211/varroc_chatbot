@@ -9,7 +9,7 @@ import { WarrantyRequestDetailResponseModel } from '@/app/datamodels/WarrantyReq
 import PageErrorCenterContent from '@/app/components/pageError';
 import useSessionRedirect from '@/app/pro_utils/manage_session';
 import LeftPanelMenus from '@/app/components/leftPanel';
-import { general_status_pending, getImageApiURL, lead_status_contacted, lead_status_disqualified, lead_status_new, lead_status_qualified, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
+import { general_status_pending, general_status_responded, getImageApiURL, lead_status_contacted, lead_status_disqualified, lead_status_new, lead_status_qualified, staticIconsBaseURL, status_Duplicate, status_Pending, status_Rejected } from '@/app/pro_utils/string_constants';
 import moment from 'moment';
 import { RejectMSGMasterDataModel, StatusMasterDataModel } from '@/app/datamodels/CommonDataModels';
 import { useRouter } from 'next/navigation';
@@ -101,7 +101,7 @@ const WarrantyRequestDetails = () => {
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
          body:JSON.stringify({
-            "request_type":3
+            "request_type":4
         })
 
       });
@@ -151,7 +151,7 @@ const WarrantyRequestDetails = () => {
     
     // pk_request_id
     try {
-      const response = await fetch("/api/update_dealership_request", {
+      const response = await fetch("/api/update_general_request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -281,14 +281,14 @@ const WarrantyRequestDetails = () => {
       }} onCloseClicked={function (): void {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
-      <LeftPanelMenus selectedMenu={5} showLeftPanel={false} headertitle='Dealership Details' rightBoxUI={
+      <LeftPanelMenus selectedMenu={8} showLeftPanel={false} headertitle='General Details' rightBoxUI={
         <div className="container">
           <div className="row mt-4 mb-5">
 
             <div className="col-lg-12">
               <div className="row" id="top">
                 <div className="col-lg-12 mb-5">
-                  <div className="heading25" style={{ paddingLeft: "20px" }}>Dealership Enquiry Details</div>
+                  <div className="heading25" style={{ paddingLeft: "20px" }}>General Enquiry Details</div>
                 </div>
 
               </div>
@@ -439,7 +439,7 @@ const WarrantyRequestDetails = () => {
 
                       }
 
-                      {generalDetailResponse.enq_data[0].status_id == lead_status_new ?
+                      {generalDetailResponse.enq_data[0].status_id == general_status_pending || generalDetailResponse.enq_data[0].status_id == general_status_responded ?
                         <div>
                           <form onSubmit={handleSubmit}>
                             <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>
