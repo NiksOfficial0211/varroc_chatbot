@@ -55,12 +55,12 @@ export async function  POST(request:Request){
     }
 
     if (state_address) {
-      conditions.push(`udr.state_address = ?`);
-      values.push(state_address);
+      conditions.push(`udr.state_address like ?`);
+      values.push(`%${state_address}%`);
     }
     if (city) {
-      conditions.push(`udr.city = ?`);
-      values.push(city);
+      conditions.push(`udr.city like ?`);
+      values.push(`%${city}%`);
     }
 
     if (status) {
