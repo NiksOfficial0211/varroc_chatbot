@@ -55,12 +55,12 @@ export async function  POST(request:Request){
     }
 
     if (state) {
-      conditions.push(`ufr.state = ?`);
-      values.push(state);
+      conditions.push(`ufr.state like ?`);
+      values.push(`%${state}%`);
     }
     if (city) {
-      conditions.push(`ufr.city = ?`);
-      values.push(city);
+      conditions.push(`ufr.city like ?`);
+      values.push(`%${city}%`);
     }
 
     if (status) {
