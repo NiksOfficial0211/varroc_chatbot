@@ -397,20 +397,20 @@ const WarrantyRequestDetails = () => {
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Enquiry ID
-                                  <span>{duplicates.dealership_id}</span>
+                                  <span>{duplicates.dub_complaint.dealership_id}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Request Status:
-                                  <span>{duplicates.request_status}</span>
+                                  <span>{duplicates.dub_complaint.request_status}</span>
 
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list ">
                                   Updated By:
-                                  <span>{duplicates.addressed_by || "--"}</span>
+                                  <span>{duplicates.addressedData[duplicates.addressedData.length-1].addressedBY || "--"}</span>
                                 </div>
                               </div>
 

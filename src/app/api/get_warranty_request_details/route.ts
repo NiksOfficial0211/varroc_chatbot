@@ -62,16 +62,42 @@ export async function POST(request: Request) {
       [request_id]
     );
 
-    const [duplicateDataRows]=await connection.execute(`
-      SELECT 
-        ua.*,
+    const [duplicateWarrantyRows] = await connection.execute<RowDataPacket[]>(`
+  SELECT 
+    ua.*,
+    rt.request_type AS request_type,
+    rs.status AS request_status
+    FROM user_warranty_requests ua
+    JOIN request_types rt ON ua.request_type_id = rt.request_type_id 
+    JOIN request_status rs ON ua.status_id = rs.status_id
+    WHERE product_serial_no = ? AND request_id != ?
+`, [userRequests[0].product_serial_no, userRequests[0].request_id]);
+
+// Fetch addressed data for each duplicate warranty request
+const duplicateWarrantyAddressedData = await Promise.all(
+  duplicateWarrantyRows.map(async (row: any) => {
+    const [addressed] = await connection.execute<RowDataPacket[]>(`
+      SELECT
+        ura.*,
         rt.request_type AS request_type,
-        rs.status AS request_status
-        FROM user_warranty_requests ua
-        JOIN request_types rt ON ua.request_type_id = rt.request_type_id 
-        JOIN request_status rs ON ua.status_id = rs.status_id
-        WHERE product_serial_no = ? && request_id != ?
-    `,[userRequests[0].product_serial_no,userRequests[0].request_id]);
+        rs.status AS request_status,
+        aut.username AS addressedBY,
+        rr.rejection_msg AS rejection_msg
+      FROM user_request_addressed ura
+      JOIN auth aut ON ura.auth_user_id = aut.auth_id 
+      JOIN request_types rt ON ura.request_type = rt.request_type_id 
+      LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
+      JOIN request_status rs ON ura.request_status = rs.status_id 
+      WHERE ura.request_type = 1 AND ura.fk_request_id = ?
+    `, [row.pk_request_id]);
+
+    return {
+      warranty: row,
+      addressedData: addressed
+    };
+  })
+);
+
 
     // Example: Get battery info for each request
     const [images] = await connection.execute(
@@ -83,7 +109,7 @@ export async function POST(request: Request) {
            FROM user_request_attachements WHERE fk_request_id = ?`, [request_id]);
     connection.release();
     return NextResponse.json({
-      status: 1, message: "Data Received", data: { request: userRequests, addressedData: addressedData,battery_details:batteryData, images: images,duplicate_data:duplicateDataRows }
+      status: 1, message: "Data Received", data: { request: userRequests, addressedData: addressedData,battery_details:batteryData, images: images,duplicate_data:duplicateWarrantyAddressedData }
     });
   } catch (e) {
     console.log(e);

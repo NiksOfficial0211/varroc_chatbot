@@ -22,7 +22,7 @@ export interface ComplaintDetailDataModel {
   complaint_data: ComplaintDataModel[]
   addressedData: AddressedDaum[]
   battery_details: any[]
-  duplicate_data: any[]
+  duplicate_data: DuplicateDaum[]
   images: Images[]
   warrantyRaised: WarrantyRequestDetails[]
 }
@@ -67,4 +67,9 @@ export interface WarrantyRequestDetails {
   updated_at: string
   request_type: string
   request_status: string
+}
+
+export interface DuplicateDaum {
+  dup_complaints: ComplaintDataModel
+  addressedData: AddressedDaum[]
 }

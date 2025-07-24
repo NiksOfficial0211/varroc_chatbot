@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import pool from "../../../../utils/db";
 import moment from "moment";
-import { getImageApiURL } from "@/app/pro_utils/string_constants";
+import { getImageApiURL, status_Pending } from "@/app/pro_utils/string_constants";
 
 export async function POST(request: Request) {
   const authHeader = request.headers.get("Authorization");
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
           FirstName: "user"
         }
       };
-    } else if (status == 1) {
+    } else if (status == status_Pending) {
       aisensyPayload = {
         apiKey: process.env.NEXT_PUBLIC_AISENSY_API_KEY,
         campaignName: "warranty_reg_reject_status",
@@ -131,7 +131,7 @@ export async function POST(request: Request) {
         userName: "Varroc Aftermarket",
         templateParams: [
           request_id,
-          `Approved. ${comments}`,
+          `Approved.${comments?" "+comments:""}`,
           battery_serial_no,
           date_of_purchase,
           warranty_start_date,

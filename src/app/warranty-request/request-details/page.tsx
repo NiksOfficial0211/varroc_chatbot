@@ -501,7 +501,7 @@ const WarrantyRequestDetails = () => {
                           </div>
                         </div>
 
-                        {warrantyRequestData.duplicate_data && warrantyRequestData.duplicate_data.length > 0 && <div className="col-lg-12">
+                        {warrantyRequestData.duplicate_data && <div className="col-lg-12">
                           <div className="row">
                             <div className="col-lg-12 tooltip_box">
                               <div className='masterrecord_heading'>Duplicate Record
@@ -520,20 +520,20 @@ const WarrantyRequestDetails = () => {
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Reference ID
-                                  <span>{duplicates.request_id}</span>
+                                  <span>{duplicates.warranty.request_id}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Request Status:
-                                  <span>{duplicates.request_status}</span>
+                                  <span>{duplicates.warranty.request_status}</span>
 
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list ">
                                   Updated By:
-                                  <span>{duplicates.addressed_id || "--"}</span>
+                                  <span>{duplicates.addressedData[duplicates.addressedData.length-1].addressedBY || "--"}</span>
                                 </div>
                               </div>
 
@@ -570,7 +570,7 @@ const WarrantyRequestDetails = () => {
                                     
                                     <div className="request_list">
                                       Warranty Start Date:
-                                      <span>{formatDateDDMMYYYY(warrantyRequestData.request[0].warranty_end_date)}</span>
+                                      <span>{formatDateDDMMYYYY(warrantyRequestData.request[0].warranty_start_date)}</span>
                                     </div>
                                   </div>)}
                               {warrantyRequestData.request && warrantyRequestData.request.map((req,index)=>

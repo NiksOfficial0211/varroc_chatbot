@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
       values.push(request.pk_id); 
     
     if (conditions.length > 0) {
-      addressedQuery += ` WHERE ura.request_type=2 ` + conditions.join(" AND ");
+      addressedQuery += ` WHERE ` + conditions.join(" AND ");
     }
     const [addressedData]=await connection.execute(addressedQuery,values)
         return {

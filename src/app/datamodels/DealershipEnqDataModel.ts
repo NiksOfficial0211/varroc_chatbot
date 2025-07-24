@@ -23,7 +23,12 @@ export interface DealershipEnqListingDataModel {
 export interface DealershipEnqDetailDataModel {
   enq_data: DealershipEnqDataModel[]
   addressed_data: AddressedDaum[]
-  duplicate_data: DealershipEnqDataModel[]
+  duplicate_data: DuplicateDaum[]
+}
+
+export interface DuplicateDaum {
+  dub_complaint: DealershipEnqDataModel
+  addressedData: AddressedDaum[]
 }
 
 export interface DealershipEnqDataModel {

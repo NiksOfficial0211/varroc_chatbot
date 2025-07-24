@@ -6,8 +6,13 @@ import { WarrantyRequestDataModel } from "./WarrantyReqestListDataModel"
     addressedData: AddressedDaum[]
     images: Images[]
     battery_details: ProductInfoMasterDataModel[]
-    duplicate_data: WarrantyRequestDataModel[]
+    duplicate_data: DuplicateDaum[]
   }
+  
+  export interface DuplicateDaum {
+  warranty: WarrantyRequestDataModel
+  addressedData: AddressedDaum[]
+}
 
  export interface AddressedDaum {
     pk_id: number

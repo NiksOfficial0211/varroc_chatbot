@@ -131,7 +131,7 @@ const WarrantyRequestDetails = () => {
     const newErrors: Partial<formValues> = {};
 
     if (!formVal.status_id) newErrors.status_id = "Status is required";
-    if(formVal.status_id && formVal.status_id==0 || formVal.status_id==status_Pending)newErrors.status_id="Please select other status to update"
+    // if(formVal.status_id && formVal.status_id==0 || formVal.status_id==general_status_pending)newErrors.status_id="Please select other status to update"
     if(!formVal.comments) newErrors.status_id = "Please enter comments"
     // if (formVal.status_id && formVal.status_id == status_Pending) newErrors.status_id = "Please change status";
     // if (formVal.status_id && formVal.status_id == status_Rejected && !formVal.rejection_id) newErrors.rejection_id = "Please select rejection reason";
@@ -160,12 +160,11 @@ const WarrantyRequestDetails = () => {
         body: 
               JSON.stringify({
                       auth_id: auth_id,
-                      pk_id: generalDetailResponse?.enq_data[0].pk_deal_id,
+                      pk_id: generalDetailResponse?.enq_data[0].pk_id,
                       comments: formVal.comments,
                       status: formVal.status_id,
-                      request_id: generalDetailResponse?.enq_data[0].dealership_id,
-                     
-                         
+                      request_id: generalDetailResponse?.enq_data[0].general_id,
+                      
               })
           
         
@@ -303,7 +302,7 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-12 mb-4">
                           
                           <div className="request_list_heading" style={{ margin: "-42px 0px 0px 20px", backgroundColor: "#e6f6ff" }}>
-                            Enquiry ID: <span>{generalDetailResponse.enq_data[0].dealership_id}</span>
+                            Enquiry ID: <span>{generalDetailResponse.enq_data[0].general_id}</span>
                           </div>
                         </div>
                       </div>
@@ -325,17 +324,11 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Customer Phone:
-                            <span>{generalDetailResponse.enq_data[0].raised_whatsapp_no}</span>
+                            <span>{generalDetailResponse.enq_data[0].contact_no}</span>
 
                           </div>
                         </div>
-                        <div className="col-lg-4 mb-3">
-                          <div className="request_list">
-                            Alternate Contact No. :
-                            <span>{generalDetailResponse.enq_data[0].alternate_contact && generalDetailResponse.enq_data[0].alternate_contact.toString.length==10? "91"+generalDetailResponse.enq_data[0].alternate_contact || "--":"--"}</span>
-
-                          </div>
-                        </div>
+                        
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
                             Pincode:
@@ -368,21 +361,10 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
                             State:
-                            <span>{generalDetailResponse.enq_data[0].state_address}</span>
+                            <span>{generalDetailResponse.enq_data[0].state}</span>
                           </div>
                         </div>
-                        <div className="col-lg-4 mb-3">
-                          <div className="request_list ">
-                            Business Age:
-                            <span>{generalDetailResponse.enq_data[0].business_age.replace("_","-")} Years</span>
-                          </div>
-                        </div>
-                        <div className="col-lg-4 mb-3">
-                          <div className="request_list ">
-                            Shop Type:
-                            <span>{generalDetailResponse.enq_data[0].shop_type}</span>
-                          </div>
-                        </div>
+                        
                         
                         {generalDetailResponse.duplicate_data && generalDetailResponse.duplicate_data.length>0 && <div className="col-lg-12">
                           <div className="row">
@@ -398,20 +380,20 @@ const WarrantyRequestDetails = () => {
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Enquiry ID
-                                  <span>{duplicates.dealership_id}</span>
+                                  <span>{duplicates.dup_general.general_id}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Request Status:
-                                  <span>{duplicates.request_status}</span>
+                                  <span>{duplicates.dup_general.request_status}</span>
 
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list ">
                                   Updated By:
-                                  <span>{duplicates.addressed_by || "--"}</span>
+                                  <span>{duplicates.addressedData?duplicates.addressedData[duplicates.addressedData.length-1].addressedBY || "--":"--"}</span>
                                 </div>
                               </div>
 
