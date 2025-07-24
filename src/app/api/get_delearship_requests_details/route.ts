@@ -8,7 +8,7 @@ interface CountResult extends RowDataPacket {
 }
 
 interface DuplicateFreechatWithAddressed {
-  dup_general: RowDataPacket;
+  dealership: RowDataPacket;
   addressedData: RowDataPacket[];
 }
 
@@ -96,7 +96,7 @@ if (dupIds.length > 0) {
 
   // Merge addressed data with duplicate rows
   duplicateFreechatDataWithAddressed = duplicateDealershipRows.map(row => ({
-    dup_general: row,
+    dealership: row,
     addressedData: addressedRows.filter(addr => addr.fk_request_id === row.pk_id)
   }));
 }

@@ -19,7 +19,7 @@ const pool = mysql.createPool({
   database: process.env.NEXT_PUBLIC_DB_DATABASE,
   port: process.env.NEXT_PUBLIC_DB_PORT ? parseInt(process.env.NEXT_PUBLIC_DB_PORT) : 3306,
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 50,
   queueLimit: 0,
   connectTimeout: 10000,
   enableKeepAlive: true,          // keeps the connection alive
