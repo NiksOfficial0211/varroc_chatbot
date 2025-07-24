@@ -122,7 +122,7 @@ const LeadRequestListing = () => {
         body: JSON.stringify({
           date: filter.date,
           enquiry_id: filter.enquiry_id,
-          whatsapp_no: filter.customerPhone,
+          phone_no: filter.customerPhone,
           city: filter.city,
           state: filter.state,
           status: filter.status,
