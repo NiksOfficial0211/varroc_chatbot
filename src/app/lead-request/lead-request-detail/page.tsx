@@ -412,7 +412,7 @@ const WarrantyRequestDetails = () => {
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list ">
                                   Updated By:
-                                  <span>{duplicates.addressedData[duplicates.addressedData.length-1].addressedBY || "--"}</span>
+                                  <span>{duplicates.addressedData && duplicates.addressedData.length>0 ? duplicates.addressedData[duplicates.addressedData.length-1].addressedBY:"--" }</span>
                                 </div>
                               </div>
 
