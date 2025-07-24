@@ -344,7 +344,8 @@ const WarrantyRequestDetails = () => {
                         {leadDetailsResponse.enq_data[0].city &&<div className="col-lg-4 mb-3">
                           <div className="request_list ">
                             City:
-                            <span>{leadDetailsResponse.enq_data[0].city}</span>
+                            
+                            <span>{leadDetailsResponse.enq_data[0].city.charAt(0).toUpperCase() + leadDetailsResponse.enq_data[0].city.slice(1).toLowerCase()}</span>
                           </div>
                         </div>}
                         {leadDetailsResponse.enq_data[0].status_id==lead_status_new && <div className="col-lg-12 mb-3">
@@ -367,7 +368,8 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
                             State:
-                            <span>{leadDetailsResponse.enq_data[0].state_address}</span>
+                           <span>{leadDetailsResponse.enq_data[0].state_address.charAt(0).toUpperCase() + leadDetailsResponse.enq_data[0].state_address.slice(1).toLowerCase()}</span>
+
                           </div>
                         </div>
                         <div className="col-lg-4 mb-3">
