@@ -122,7 +122,7 @@ const LeadRequestListing = () => {
           enquiry_id: filter.enquiry_id,
           whatsapp_no: filter.customerPhone,
           city: filter.city,
-          state: filter.state,
+          state_address: filter.state,
           status: filter.status,
           page: dataFilters.page == filter.page ? dataFilters.page : filter.page,
           limit: filter.limit
