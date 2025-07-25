@@ -243,7 +243,7 @@ const LeadRequestListing = () => {
           enquiry_id: dataFilters.enquiry_id.trim(),
           whatsapp_no: dataFilters.customerPhone.trim(),
           city: dataFilters.city.trim(),
-          state: dataFilters.state.trim(),
+          state_address: dataFilters.state.trim(),
           status: dataFilters.status,
       }),
     });
