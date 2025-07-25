@@ -166,7 +166,7 @@ const WarrantyRequestDetails = () => {
     const newErrors: Partial<formValues> = {};
 
     if (!formVal.status_id) newErrors.status_id = "Status is required";
-    if (formVal.status_id && formVal.status_id == status_Pending) newErrors.status_id = "Please change status";
+    // if (formVal.status_id && formVal.status_id == status_Pending) newErrors.status_id = "Please change status";
     if (formVal.status_id && formVal.status_id == status_Rejected && !formVal.rejection_id) newErrors.rejection_id = "Please select rejection reason";
     if (formVal.rejection_id && formVal.rejection_id == 1 && !formVal.comments) newErrors.comments = "Please enter rejection reason";// here 1 is for other and need to add comments also
 
