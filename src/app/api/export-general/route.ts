@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
             city:item.city,
             state:item.state,
             description:item.description,
-            complaint_type:"General Request",
+            request_type:"General Request",
             updated_by:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].addressedBY? item.addressedDetails[0].addressedBY:"",
 
             request_status:item.request_status,
