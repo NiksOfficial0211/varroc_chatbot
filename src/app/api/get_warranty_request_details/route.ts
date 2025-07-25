@@ -6,7 +6,7 @@ interface CountResult extends RowDataPacket {
   total: number;
 }
 interface DuplicateFreechatWithAddressed {
-  dup_general: RowDataPacket;
+  dup_warranty: RowDataPacket;
   addressedData: RowDataPacket[];
 }
 
@@ -100,7 +100,7 @@ if (dupIds.length > 0) {
 
   // Merge addressed data with duplicate rows
   duplicateFreechatDataWithAddressed = duplicateWarrantyRows.map(row => ({
-    dup_general: row,
+    dup_warranty: row,
     addressedData: addressedRows.filter(addr => addr.fk_request_id === row.pk_id)
   }));
 }

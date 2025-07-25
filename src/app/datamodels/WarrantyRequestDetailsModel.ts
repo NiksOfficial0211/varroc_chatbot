@@ -10,7 +10,7 @@ import { WarrantyRequestDataModel } from "./WarrantyReqestListDataModel"
   }
   
   export interface DuplicateDaum {
-  warranty: WarrantyRequestDataModel
+  dup_warranty: WarrantyRequestDataModel
   addressedData: AddressedDaum[]
 }
 

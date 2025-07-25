@@ -362,7 +362,7 @@ const LeadRequestListing = () => {
                         <div className="row list_listbox" style={{ alignItems: "center", cursor: "pointer" }} key={request.pk_id} onClick={() => { }}>
                           <div className="col-lg-3 text-center"><div className="label">{request.general_id}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{formatDateYYYYMMDD(request.created_at)}</div></div>
-                          <div className="col-lg-2 text-center"><div className="label">{request.contact_no}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{request.contact_no && request.contact_no.toString().length==10? "91"+request.contact_no:request.contact_no}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{request.city}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{request.state}</div></div>
                           <div className="col-lg-1 text-center"><div className="label">{request.request_status}</div></div>
