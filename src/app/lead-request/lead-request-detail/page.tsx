@@ -427,26 +427,26 @@ const WarrantyRequestDetails = () => {
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Request Status:
-                                  <span>{leadDetailsResponse.addressed_data[0].request_status}</span>
+                                  <span>{leadDetailsResponse.addressed_data[leadDetailsResponse.addressed_data.length-1].request_status}</span>
                                 </div>
                               </div>
                               
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated By:
-                                  <span>{leadDetailsResponse.addressed_data[0].addressedBY}</span>
+                                  <span>{leadDetailsResponse.addressed_data[leadDetailsResponse.addressed_data.length-1].addressedBY}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated Date:
-                                  <span>{formatDate(leadDetailsResponse.addressed_data[0].updated_at)}</span>
+                                  <span>{formatDate(leadDetailsResponse.addressed_data[leadDetailsResponse.addressed_data.length-1].updated_at)}</span>
                                 </div>
                               </div>
                               <div className="col-lg-12 mb-3">
                                 <div className="request_list">
                                   Request Comments:
-                                  <span>{leadDetailsResponse.addressed_data[0].comments}</span>
+                                  <span>{leadDetailsResponse.addressed_data[leadDetailsResponse.addressed_data.length-1].comments}</span>
                                 </div>
                               </div>
                               
