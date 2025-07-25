@@ -501,7 +501,7 @@ const WarrantyRequestDetails = () => {
                           </div>
                         </div>
 
-                        {warrantyRequestData.duplicate_data && <div className="col-lg-12">
+                        {warrantyRequestData.duplicate_data && warrantyRequestData.duplicate_data.length>0 && <div className="col-lg-12">
                           <div className="row">
                             <div className="col-lg-12 tooltip_box">
                               <div className='masterrecord_heading'>Duplicate Record
@@ -514,7 +514,7 @@ const WarrantyRequestDetails = () => {
                           </div>
                         </div>}
                         {warrantyRequestData.duplicate_data && warrantyRequestData.duplicate_data.map((duplicates, index) => (
-                          <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }}>
+                          <div className="col-lg-12 pt-3 mb-4" style={{ backgroundColor: "#f5fdfb", borderRadius: "10px" }} key={index}>
 
                             <div className="row">
                               <div className="col-lg-4 mb-3">
