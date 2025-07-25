@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
             state:item.state_address,
             business_age:item.business_age,
             shop_type:item.shop_type,
-            complaint_type:"Dealership Enquiry",
+            request_type:"Dealership Enquiry",
             request_status:item.request_status,
             updated_by:item.addressedDetails && item.addressedDetails.length>0 && item.addressedDetails[0].addressedBY? item.addressedDetails[0].addressedBY:"",
             whatsapp_number:item.raised_whatsapp_no,
