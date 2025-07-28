@@ -6,7 +6,7 @@ import LoadingDialog from '../components/PageLoader';
 import ShowAlertMessage from '../components/alert';
 import { COMPLAINT_FILTER_KEY, LEAD_FILTER_KEY, staticIconsBaseURL, WARRANTY_FILTER_KEY } from '../pro_utils/string_constants'
 import { useRouter } from 'next/navigation';
-import { pageURL_ComplaintDetails, pageURL_LeadDetails, pageURL_WarrantyRequestDetails, pageURL_WarrantyRequestList } from '../pro_utils/string_routes';
+import { pageURL_ComplaintDetails, pageURL_GeneralDetails, pageURL_LeadDetails, pageURL_WarrantyRequestDetails, pageURL_WarrantyRequestList } from '../pro_utils/string_routes';
 import { useScrollCounter } from '../hooks/DashboardCountHook/dashboardCountHook';
 import { useGlobalContext } from '../contextProviders/globalContext';
 import LeftPanelMenus from '../components/leftPanel';
@@ -207,8 +207,10 @@ const Dashboard = () => {
                                                       router.push(pageURL_WarrantyRequestDetails)
                                                   }else if(activity.request_type_id==2){
                                                       router.push(pageURL_ComplaintDetails)
-                                                  }else{
+                                                  }else if(activity.request_type_id==3){
                                                     router.push(pageURL_LeadDetails)
+                                                  }else if(activity.request_type_id==4){
+                                                      router.push(pageURL_GeneralDetails)
                                                   }
                                                   
                                                 }}><img src={staticIconsBaseURL + "/images/view_icon.png"} alt="Varroc Excellence" className="img-fluid" style={{ maxHeight: "18px" }} /></div></div>

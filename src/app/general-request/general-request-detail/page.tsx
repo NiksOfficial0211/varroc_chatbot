@@ -324,6 +324,13 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Customer Phone:
+                            <span>{generalDetailResponse.enq_data[0].customer_name}</span>
+
+                          </div>
+                        </div>
+                        <div className="col-lg-4 mb-3">
+                          <div className="request_list">
+                            Customer Phone:
                             <span>{generalDetailResponse.enq_data[0].contact_no}</span>
 
                           </div>

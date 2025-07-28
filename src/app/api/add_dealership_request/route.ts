@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
       const cleanedFullName =
       full_name?.trim() !== '' ? full_name.trim() : null;
       const cleanedContactNumber =
-      contact_number?.trim() !== '' ? contact_number.trim() : null;
+      contact_number && contact_number !== '' ? contact_number.trim() : null;
       const cleanedPincode =
       pincode?.trim() !== '' ? pincode.trim() : null;
       const res = await fetch(`https://api.postalpincode.in/pincode/${cleanedPincode}`);

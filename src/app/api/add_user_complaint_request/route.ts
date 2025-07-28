@@ -292,6 +292,8 @@ export async function POST(request: NextRequest) {
   }
   }
   catch (err) {
+    console.log(err);
+    
     if (connection) {
       await connection.rollback();
     }
@@ -349,7 +351,7 @@ export async function POST(request: NextRequest) {
 
 }
 }catch(e){
-  
+
 return NextResponse.json({ status: 0, error: e }, { status: 500 });
 }finally{
     if (connection) connection.release();

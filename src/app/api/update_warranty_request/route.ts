@@ -109,7 +109,7 @@ export async function POST(request: Request) {
         userName: "Varroc Aftermarket",
         templateParams: [
           request_id,
-          "Pending. Will update soon on your warranty request"
+          `Pending${comments && comments.length>0 ? "-"+comments:""}. Will update soon on your warranty request`
         ],
         source: "new-landing-page form",
         media: {},
