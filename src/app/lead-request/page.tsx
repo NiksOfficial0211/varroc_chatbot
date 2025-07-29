@@ -182,13 +182,13 @@ const LeadRequestListing = () => {
     if (hasMoreData) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-        date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: dataFilters.page+page, limit: 10,datafrom:0,dataTo:0,total:0
+        date: dataFilters.date, enquiry_id: dataFilters.enquiry_id, city: dataFilters.city, state: dataFilters.state, status: dataFilters.status, customerPhone: dataFilters.customerPhone, page: dataFilters.page+page, limit: 10,datafrom:0,dataTo:0,total:0
       });
     }
     else if (!hasMoreData && dataFilters.page > 1) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-        date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: dataFilters.page+page, limit: 10,datafrom:0,dataTo:0,total:0
+        date: dataFilters.date, enquiry_id: dataFilters.enquiry_id, city: dataFilters.city, state: dataFilters.state, status: dataFilters.status, customerPhone: dataFilters.customerPhone, page: dataFilters.page+page, limit: 10,datafrom:0,dataTo:0,total:0
       });
     }
 
