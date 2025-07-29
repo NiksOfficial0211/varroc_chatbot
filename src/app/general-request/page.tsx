@@ -19,7 +19,7 @@ import { GeneralEnqListingDataModel } from '../datamodels/GenerealEnquiryDataMod
 
 interface DataFilters {
   date: any, enquiry_id: any, city: any, state: any, status: any, customerPhone: any, page: any, limit: any
-    ,datafrom:number,dataTo:number,total:number
+  , datafrom: number, dataTo: number, total: number
 
 }
 
@@ -40,7 +40,7 @@ const LeadRequestListing = () => {
 
 
   const [dataFilters, setDataFilters] = useState<DataFilters>({
-    date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
+    date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
 
   });
   const [hasMoreData, setHasMoreData] = useState(true);
@@ -52,8 +52,8 @@ const LeadRequestListing = () => {
     sessionStorage.removeItem(LEAD_FILTER_KEY);
     // fetchData(dataFilters.date, dataFilters.request_id, dataFilters.phone_no, dataFilters.name, dataFilters.status, dataFilters.page, dataFilters.limit);
     const stored = sessionStorage.getItem(GENERAL_FILTER_KEY);
-    console.log("stored filter data :----- --------",stored);
-    
+    console.log("stored filter data :----- --------", stored);
+
     try {
       if (stored) {
         const parsed = JSON.parse(stored);
@@ -67,26 +67,26 @@ const LeadRequestListing = () => {
         ) {
           fetchData(parsed);
           setDataFilters(parsed);
-          
+
         } else {
           setDataFilters({
-    date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
+            date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
 
-  }); // fallback if invalid
+          }); // fallback if invalid
           fetchData(dataFilters);
         }
-      }else{
-       setDataFilters({
-    date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
+      } else {
+        setDataFilters({
+          date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
 
-  }); // fallback
+        }); // fallback
         fetchData(dataFilters);
       }
     } catch (error) {
       setDataFilters({
-    date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
+        date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
 
-  }); // fallback
+      }); // fallback
       fetchData(dataFilters);
     }
 
@@ -94,7 +94,7 @@ const LeadRequestListing = () => {
 
   // const fetchData = async (date: any, request_id: any, phone_no: any, name: any, status: any, page: any, limit: any) => {
   const fetchData = async (filter: DataFilters) => {
-  sessionStorage.setItem(LEAD_FILTER_KEY, JSON.stringify(filter));
+    sessionStorage.setItem(LEAD_FILTER_KEY, JSON.stringify(filter));
     setLoading(true);
     try {
       const statusRes = await fetch("/api/get_status_master", {
@@ -134,9 +134,9 @@ const LeadRequestListing = () => {
 
       if (response.status == 1 && response.data.length > 0) {
         setLoading(false);
-        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
-        setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
-        setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))   
+        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from }))
+        setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to }))
+        setDataFilters((prev) => ({ ...prev, ['total']: response.total }))
         setDealershipEnqList(response.data)
         if (response.data.length < filter.limit) {
           setHasMoreData(false);
@@ -146,9 +146,9 @@ const LeadRequestListing = () => {
         }
       } else if (response.status == 1 && response.data.length == 0) {
         setLoading(false);
-        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
-        setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
-        setDataFilters((prev) => ({ ...prev, ['total']: response.total  })) 
+        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from }))
+        setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to }))
+        setDataFilters((prev) => ({ ...prev, ['total']: response.total }))
         setDealershipEnqList([])
         setDataFilters((prev) => ({ ...prev, ['page']: filter.page }))
 
@@ -156,9 +156,9 @@ const LeadRequestListing = () => {
       }
       else {
         setDataFilters((prev) => ({ ...prev, ['pageNumber']: response.pageNumber }))
-        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
-        setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
-        setDataFilters((prev) => ({ ...prev, ['total']: response.total  })) 
+        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from }))
+        setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to }))
+        setDataFilters((prev) => ({ ...prev, ['total']: response.total }))
 
         setHasMoreData(false)
         setLoading(false);
@@ -185,14 +185,14 @@ const LeadRequestListing = () => {
     if (hasMoreData) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-        date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: dataFilters.page+page, limit: 10,datafrom:dataFilters.datafrom
-        ,dataTo:dataFilters.dataTo,total:dataFilters.total
+        date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: dataFilters.page + page, limit: 10, datafrom: dataFilters.datafrom
+        , dataTo: dataFilters.dataTo, total: dataFilters.total
       });
     }
     else if (!hasMoreData && dataFilters.page > 1) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-        date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: dataFilters.page+page, limit: 10,datafrom:0,dataTo:0,total:0
+        date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: dataFilters.page + page, limit: 10, datafrom: 0, dataTo: 0, total: 0
       });
     }
 
@@ -207,26 +207,26 @@ const LeadRequestListing = () => {
 
     window.location.reload();
     sessionStorage.removeItem(LEAD_FILTER_KEY);
-    
+
     setDataFilters({
 
-      date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
+      date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
     });
     fetchData(dataFilters.page);
   }
 
-  function formatDateYYYYMMDD(inputDate: string,timeZone = 'Asia/Kolkata') {
+  function formatDateYYYYMMDD(inputDate: string, timeZone = 'Asia/Kolkata') {
     const date = new Date(inputDate);
 
     const formatter = new Intl.DateTimeFormat('en-IN', {
-        timeZone,
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
 
     const parts = formatter.formatToParts(date);
     const get = (type: string) => parts.find(p => p.type === type)?.value;
@@ -243,12 +243,12 @@ const LeadRequestListing = () => {
         "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
       },
       body: JSON.stringify({
-          date: dataFilters.date,
-          request_id: dataFilters.enquiry_id,
-          phone_no: dataFilters.customerPhone,
-          city:dataFilters.city,
-          state:dataFilters.state,
-          status: dataFilters.status,
+        date: dataFilters.date,
+        request_id: dataFilters.enquiry_id,
+        phone_no: dataFilters.customerPhone,
+        city: dataFilters.city,
+        state: dataFilters.state,
+        status: dataFilters.status,
       }),
     });
     const blob = await response.blob();
@@ -319,7 +319,7 @@ const LeadRequestListing = () => {
                       <div className="col-lg-2">
                         <div className="form_box ">
                           <label htmlFor="formFile" className="form-label">Status: </label>
-                      <select id="status" name="status" value={dataFilters.status} onChange={handleInputChange}>
+                          <select id="status" name="status" value={dataFilters.status} onChange={handleInputChange}>
                             <option value="">Select</option>
                             {statusMasterData.map((singleStatus) => (
                               <option value={singleStatus.status_id} key={singleStatus.status_id}>{singleStatus.status}</option>
@@ -362,9 +362,9 @@ const LeadRequestListing = () => {
                         <div className="row list_listbox" style={{ alignItems: "center", cursor: "pointer" }} key={request.pk_id} onClick={() => { }}>
                           <div className="col-lg-3 text-center"><div className="label">{request.general_id}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{formatDateYYYYMMDD(request.created_at)}</div></div>
-                          <div className="col-lg-2 text-center"><div className="label">{request.contact_no && request.contact_no.toString().length==10? "91"+request.contact_no:request.contact_no}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{request.contact_no && request.contact_no.toString().length == 10 ? "91" + request.contact_no : request.contact_no}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{request.city}</div></div>
-                          <div className="col-lg-2 text-center"><div className="label">{request.state}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">{request.state ? request.state.charAt(0).toUpperCase() + request.state.replace("_", " ").slice(1).toLowerCase() : "--"}</div></div>
                           <div className="col-lg-1 text-center"><div className="label">{request.request_status}</div></div>
 
                           <div className=""><div className="label viewbtn" onClick={() => {
@@ -386,7 +386,7 @@ const LeadRequestListing = () => {
 
               <div className="row">
                 <div className="col-lg-12">
-                  <p style={{float:"left"}}>Showing {dataFilters.datafrom} to {dataFilters.dataTo} out of {dataFilters.total}</p>
+                  <p style={{ float: "left" }}>Showing {dataFilters.datafrom} to {dataFilters.dataTo} out of {dataFilters.total}</p>
 
                   <div className="pagination_box mb-3">
                     <div className={dataFilters.page > 1 ? " pagi_btn" : "pagi_btn btn_no"} onClick={() => { dataFilters.page > 1 && changePage(-1); }}>Prev</div>

@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
             complaint__id:item.complaint__id,
             request_date:item.ucr_created_at?formatDate(item.ucr_created_at):'',
             customer_name:item.customer_name,
-            customer_phone:item.user_phone,
+            customer_phone:item.user_phone.length==10?"91"+item.user_phone:item.user_phone,
             serial_no:item.battery_serial_no,
             complaint_type:item.complaint_type,
             complaint_detscription:item.complaint_description,

@@ -360,7 +360,7 @@ const LeadRequestListing = () => {
                           <div className="col-lg-2 text-center"><div className="label">{formatDateYYYYMMDD(request.created_at)}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{request.alternate_contact && request.alternate_contact.toString().length==10?"91"+ request.alternate_contact:request.alternate_contact}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">    {request.city ?  request.city.charAt(0).toUpperCase() + request.city.slice(1).toLowerCase():"--"}</div></div>
-                          <div className="col-lg-2 text-center"><div className="label">    {request.state_address ? request.state_address.charAt(0).toUpperCase() + request.state_address.slice(1).toLowerCase():"--"}</div></div>
+                          <div className="col-lg-2 text-center"><div className="label">    {request.state_address ? request.state_address.charAt(0).toUpperCase() + request.state_address.replace("_"," ").slice(1).toLowerCase():"--"}</div></div>
                           <div className="col-lg-1 text-center"><div className="label">{request.request_status}</div></div>
 
                           <div className=""><div className="label viewbtn" onClick={() => {

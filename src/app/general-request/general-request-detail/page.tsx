@@ -100,8 +100,8 @@ const WarrantyRequestDetails = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
-         body:JSON.stringify({
-            "request_type":4
+        body: JSON.stringify({
+          "request_type": 4
         })
 
       });
@@ -132,7 +132,7 @@ const WarrantyRequestDetails = () => {
 
     if (!formVal.status_id) newErrors.status_id = "Status is required";
     // if(formVal.status_id && formVal.status_id==0 || formVal.status_id==general_status_pending)newErrors.status_id="Please select other status to update"
-    if(!formVal.comments) newErrors.status_id = "Please enter comments"
+    if (!formVal.comments) newErrors.status_id = "Please enter comments"
     // if (formVal.status_id && formVal.status_id == status_Pending) newErrors.status_id = "Please change status";
     // if (formVal.status_id && formVal.status_id == status_Rejected && !formVal.rejection_id) newErrors.rejection_id = "Please select rejection reason";
     // if (formVal.rejection_id && formVal.rejection_id == 1 && !formVal.comments) newErrors.comments = "Please enter rejection reason";// here 1 is for other and need to add comments also
@@ -141,14 +141,14 @@ const WarrantyRequestDetails = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
 
     e.preventDefault()
     console.log("this is the form vals", formVal);
     if (!validate()) return;
     setLoading(true);
-    
+
     // pk_request_id
     try {
       const response = await fetch("/api/update_general_request", {
@@ -157,17 +157,17 @@ const WarrantyRequestDetails = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
-        body: 
-              JSON.stringify({
-                      auth_id: auth_id,
-                      pk_id: generalDetailResponse?.enq_data[0].pk_id,
-                      comments: formVal.comments,
-                      status: formVal.status_id,
-                      request_id: generalDetailResponse?.enq_data[0].general_id,
-                      
-              })
-          
-        
+        body:
+          JSON.stringify({
+            auth_id: auth_id,
+            pk_id: generalDetailResponse?.enq_data[0].pk_id,
+            comments: formVal.comments,
+            status: formVal.status_id,
+            request_id: generalDetailResponse?.enq_data[0].general_id,
+
+          })
+
+
       });
       const resJson = await response.json();
       if (resJson && resJson.status == 1) {
@@ -204,18 +204,18 @@ const WarrantyRequestDetails = () => {
     setFormVal((prev) => ({ ...prev, [name]: value }));
   }
 
-  function formatDate(inputDate: string,timeZone = 'Asia/Kolkata') {
+  function formatDate(inputDate: string, timeZone = 'Asia/Kolkata') {
     const date = new Date(inputDate);
 
     const formatter = new Intl.DateTimeFormat('en-IN', {
-        timeZone,
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
 
     const parts = formatter.formatToParts(date);
     const get = (type: string) => parts.find(p => p.type === type)?.value;
@@ -223,48 +223,48 @@ const WarrantyRequestDetails = () => {
   }
 
   const UpdateCity = async (e: React.FormEvent) => {
-      if (!pinCode) { setCityError("required"); return; }else{
+    if (!pinCode) { setCityError("required"); return; } else {
       setCityError("");
     };
-  
-      try {
-        setLoading(true);
-        const response = await fetch("/api/set_city_manually", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
-          },
-          body: JSON.stringify({ pk_id: selectedViewID, changedPinCode: pinCode,update_type:3 })
-        });
-        const resJson = await response.json();
-        if (resJson && resJson.status == 1) {
-          setPinCode("");
-          setLoading(false);
-          setShowAlert(true);
-          setAlertTitle("Success")
-          setAlertStartContent(resJson.message);
-          setAlertForSuccess(1);
-          setNavigateBack(false)
-        } else {
-          setLoading(false);
-          setShowAlert(true);
-          setAlertTitle("Error")
-          setAlertStartContent(resJson.message);
-          setAlertForSuccess(2)
-          setNavigateBack(false)
-        }
-  
-      } catch (e: any) {
+
+    try {
+      setLoading(true);
+      const response = await fetch("/api/set_city_manually", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
+        },
+        body: JSON.stringify({ pk_id: selectedViewID, changedPinCode: pinCode, update_type: 3 })
+      });
+      const resJson = await response.json();
+      if (resJson && resJson.status == 1) {
+        setPinCode("");
         setLoading(false);
         setShowAlert(true);
-        setAlertTitle("Exception")
-        setAlertStartContent(e.message);
+        setAlertTitle("Success")
+        setAlertStartContent(resJson.message);
+        setAlertForSuccess(1);
+        setNavigateBack(false)
+      } else {
+        setLoading(false);
+        setShowAlert(true);
+        setAlertTitle("Error")
+        setAlertStartContent(resJson.message);
         setAlertForSuccess(2)
         setNavigateBack(false)
       }
-  
+
+    } catch (e: any) {
+      setLoading(false);
+      setShowAlert(true);
+      setAlertTitle("Exception")
+      setAlertStartContent(e.message);
+      setAlertForSuccess(2)
+      setNavigateBack(false)
     }
+
+  }
 
   return (
     <div>
@@ -274,7 +274,7 @@ const WarrantyRequestDetails = () => {
         setShowAlert(false)
         if (navigateBack) {
           router.back()
-        }else{
+        } else {
           fetchData()
         }
 
@@ -300,7 +300,7 @@ const WarrantyRequestDetails = () => {
                     <div className="col-lg-12">
                       <div className="row">
                         <div className="col-lg-12 mb-4">
-                          
+
                           <div className="request_list_heading" style={{ margin: "-42px 0px 0px 20px", backgroundColor: "#e6f6ff" }}>
                             Enquiry ID: <span>{generalDetailResponse.enq_data[0].general_id}</span>
                           </div>
@@ -313,7 +313,7 @@ const WarrantyRequestDetails = () => {
                             <span>{warrantyRequestData.request[0].request_id}</span>
                           </div>
                         </div> */}
-                        
+
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Enquiry Date:
@@ -335,7 +335,7 @@ const WarrantyRequestDetails = () => {
 
                           </div>
                         </div>
-                        
+
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
                             Pincode:
@@ -348,32 +348,40 @@ const WarrantyRequestDetails = () => {
                             <span>{generalDetailResponse.enq_data[0].city}</span>
                           </div>
                         </div>
-                        {generalDetailResponse.enq_data[0].status_id==general_status_pending && <div className="col-lg-12 mb-3">
-                                                
-                                                                            <div className="request_list">
-                                                                              Pin code:
-                                                                              <div className="row mt-2">
-                                                                                <div className="col-lg-4 form_box">
-                                                                                  <input type="text" id="proposed_mrp" name="proposed_mrp" value={pinCode} onChange={(e) => setPinCode(e.target.value)} style={{ padding: "8px" }} />
-                                                                                  {cityError && <span className="error" style={{ color: "red" }}>{cityError}</span>}
-                                                
-                                                                                </div>
-                                                                                <div className="col-lg-4 mt-2">
-                                                                                  <a className="blue_btn " style={{ cursor: "pointer", }} onClick={UpdateCity}>Add City</a>
-                                                                                </div>
-                                                                              </div>
-                                                
-                                                                            </div>
-                                                                          </div>}
                         <div className="col-lg-4 mb-3">
                           <div className="request_list ">
                             State:
-                            <span>{generalDetailResponse.enq_data[0].state}</span>
+
+                            <span>{generalDetailResponse.enq_data[0].state ? generalDetailResponse.enq_data[0].state.charAt(0).toUpperCase() + generalDetailResponse.enq_data[0].state.replace("_", " ").slice(1).toLowerCase() : "--"}</span>
                           </div>
                         </div>
-                        
-                        
-                        {generalDetailResponse.duplicate_data && generalDetailResponse.duplicate_data.length>0 && <div className="col-lg-12">
+                        {generalDetailResponse.enq_data[0].status_id == general_status_pending && <div className="col-lg-8 mb-3">
+
+                          <div className="request_list">
+                            Pin code:
+                            <div className="row mt-2">
+                              <div className="col-lg-4 form_box">
+                                <input type="text" id="proposed_mrp" name="proposed_mrp" value={pinCode} onChange={(e) => setPinCode(e.target.value)} style={{ padding: "8px" }} />
+                                {cityError && <span className="error" style={{ color: "red" }}>{cityError}</span>}
+
+                              </div>
+                              <div className="col-lg-4 mt-2">
+                                <a className="blue_btn " style={{ cursor: "pointer", }} onClick={UpdateCity}>Add City</a>
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>}
+
+                        <div className="col-lg-6 mb-3">
+                          <div className="request_list ">
+                            Description:
+
+                            <span>{generalDetailResponse.enq_data[0].description ? generalDetailResponse.enq_data[0].description : "--"}</span>
+                          </div>
+                        </div>
+
+                        {generalDetailResponse.duplicate_data && generalDetailResponse.duplicate_data.length > 0 && <div className="col-lg-12">
                           <div className="row">
                             <div className="col-lg-12">
                               <div className='masterrecord_heading'>Previous Request</div>
@@ -400,7 +408,7 @@ const WarrantyRequestDetails = () => {
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list ">
                                   Updated By:
-                                  <span>{duplicates.addressedData && duplicates.addressedData.length>0?duplicates.addressedData[duplicates.addressedData.length-1].addressedBY || "--":"--"}</span>
+                                  <span>{duplicates.addressedData && duplicates.addressedData.length > 0 ? duplicates.addressedData[duplicates.addressedData.length - 1].addressedBY || "--" : "--"}</span>
                                 </div>
                               </div>
 
@@ -408,38 +416,38 @@ const WarrantyRequestDetails = () => {
                             </div>
                           </div>))}
                       </div>
-                      {generalDetailResponse.addressed_data && generalDetailResponse.addressed_data.length>0 && generalDetailResponse.enq_data[0].status_id != status_Pending ?
+                      {generalDetailResponse.addressed_data && generalDetailResponse.addressed_data.length > 0 && generalDetailResponse.enq_data[0].status_id != status_Pending ?
                         <div>
                           <div className="row" style={{ backgroundColor: "#fffaf1", padding: "12px 4px", borderRadius: "10px" }}>
                             <div className="row">
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Request Status:
-                                  <span>{generalDetailResponse.addressed_data[0].request_status}</span>
+                                  <span>{generalDetailResponse.addressed_data[generalDetailResponse.addressed_data.length-1].request_status}</span>
                                 </div>
                               </div>
-                              
+
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated By:
-                                  <span>{generalDetailResponse.addressed_data[0].addressedBY}</span>
+                                  <span>{generalDetailResponse.addressed_data[generalDetailResponse.addressed_data.length-1].addressedBY}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated Date:
-                                  <span>{formatDate(generalDetailResponse.addressed_data[0].updated_at)}</span>
+                                  <span>{formatDate(generalDetailResponse.addressed_data[generalDetailResponse.addressed_data.length-1].updated_at)}</span>
                                 </div>
                               </div>
                               <div className="col-lg-12 mb-3">
                                 <div className="request_list">
                                   Request Comments:
-                                  <span>{generalDetailResponse.addressed_data[0].comments}</span>
+                                  <span>{generalDetailResponse.addressed_data[generalDetailResponse.addressed_data.length-1].comments}</span>
                                 </div>
                               </div>
-                              
-                              
-                              
+
+
+
                             </div>
                           </div>
                         </div> : <></>
@@ -509,9 +517,9 @@ const WarrantyRequestDetails = () => {
 
 
                     </div>
-                    
+
                   </div>
-                  
+
                 </div>
 
                 : <PageErrorCenterContent content={isLoading ? "" : "Failed to load data"} />}
