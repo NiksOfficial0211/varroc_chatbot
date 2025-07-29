@@ -132,7 +132,7 @@ const WarrantyRequestDetails = () => {
 
     if (!formVal.status_id) newErrors.status_id = "Status is required";
     // if(formVal.status_id && formVal.status_id==0 || formVal.status_id==general_status_pending)newErrors.status_id="Please select other status to update"
-    if (!formVal.comments) newErrors.status_id = "Please enter comments"
+    if (!formVal.comments) newErrors.comments = "Please enter comments"
     // if (formVal.status_id && formVal.status_id == status_Pending) newErrors.status_id = "Please change status";
     // if (formVal.status_id && formVal.status_id == status_Rejected && !formVal.rejection_id) newErrors.rejection_id = "Please select rejection reason";
     // if (formVal.rejection_id && formVal.rejection_id == 1 && !formVal.comments) newErrors.comments = "Please enter rejection reason";// here 1 is for other and need to add comments also
@@ -323,7 +323,7 @@ const WarrantyRequestDetails = () => {
                         </div>
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
-                            Customer Phone:
+                            Customer Name:
                             <span>{generalDetailResponse.enq_data[0].customer_name}</span>
 
                           </div>
@@ -331,7 +331,7 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Customer Phone:
-                            <span>{generalDetailResponse.enq_data[0].contact_no}</span>
+                            <span>{generalDetailResponse.enq_data[0].contact_no && generalDetailResponse.enq_data[0].contact_no.toString().length==10 ?"91"+generalDetailResponse.enq_data[0].contact_no:generalDetailResponse.enq_data[0].contact_no}</span>
 
                           </div>
                         </div>
