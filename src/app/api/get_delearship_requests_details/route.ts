@@ -6,6 +6,10 @@ import { PoolConnection } from "mysql2/promise";
 interface CountResult extends RowDataPacket {
   total: number;
 }
+interface DuplicateFreechatWithAddressed {
+  dealership: RowDataPacket;
+  addressedData: RowDataPacket[];
+}
 
 export async function POST(request: Request) {
 
@@ -69,29 +73,86 @@ const [duplicateDealershipRows] = await connection.execute<RowDataPacket[]>(`
 `, [userRequests[0].raised_whatsapp_no, pk_id]);
 
 // Step 2: For each, fetch addressed data
-const duplicateDealershipDataWithAddressed = await Promise.all(
-  duplicateDealershipRows.map(async (row: any) => {
-    const [addressed] = await connection.execute<RowDataPacket[]>(`
-      SELECT
-        ura.*,
-        rt.request_type AS request_type,
-        rs.status AS request_status,
-        aut.username AS addressedBY,
-        rr.rejection_msg AS rejection_msg
-      FROM user_request_addressed ura
-      JOIN auth aut ON ura.auth_user_id = aut.auth_id 
-      JOIN request_types rt ON ura.request_type = rt.request_type_id 
-      LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
-      JOIN request_status rs ON ura.request_status = rs.status_id 
-      WHERE ura.request_type = 3 AND ura.fk_request_id = ?
-    `, [row.pk_deal_id]);
 
-    return {
-      dealership: row,
-      addressedData: addressed
-    };
-  })
-);
+
+ const dupIds = duplicateDealershipRows.map(row => row.pk_deal_id);
+    console.log('-------dupids--------',dupIds);
+    
+    let duplicateDealershipDataWithAddressed: DuplicateFreechatWithAddressed[] = [];
+    
+    if (dupIds && dupIds.length > 0 && dupIds.length > 1  ) {
+      const placeholders = dupIds.map(() => '?').join(', ');
+          console.log(placeholders);
+
+      const [addressedRows] = await connection.query<RowDataPacket[]>(`
+        SELECT
+          ura.*,
+          rt.request_type AS request_type,
+          rs.status AS request_status,
+          aut.username AS addressedBY,
+          rr.rejection_msg AS rejection_msg,
+          ura.fk_request_id
+        FROM user_request_addressed ura
+        JOIN auth aut ON ura.auth_user_id = aut.auth_id 
+        JOIN request_types rt ON ura.request_type = rt.request_type_id 
+        LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
+        JOIN request_status rs ON ura.request_status = rs.status_id 
+        WHERE ura.request_type = 3 AND ura.fk_request_id IN (${placeholders})
+      `, dupIds);
+
+    console.log(addressedRows);
+    
+      // Merge addressed data with duplicate rows
+      duplicateDealershipDataWithAddressed = duplicateDealershipRows.map(row => ({
+        dealership: row,
+        addressedData: addressedRows
+      }));
+    }else{
+      const [addressedRows] = await connection.query<RowDataPacket[]>(`
+        SELECT
+          ura.*,
+          rt.request_type AS request_type,
+          rs.status AS request_status,
+          aut.username AS addressedBY,
+          rr.rejection_msg AS rejection_msg,
+          ura.fk_request_id
+        FROM user_request_addressed ura
+        JOIN auth aut ON ura.auth_user_id = aut.auth_id 
+        JOIN request_types rt ON ura.request_type = rt.request_type_id 
+        LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
+        JOIN request_status rs ON ura.request_status = rs.status_id 
+        WHERE ura.request_type = 3 AND ura.fk_request_id = ?
+      `, [dupIds[0]]);
+    
+      // Merge addressed data with duplicate rows
+      duplicateDealershipDataWithAddressed = duplicateDealershipRows.map(row => ({
+        dealership: row,
+        addressedData: addressedRows
+      }));
+    }
+// const duplicateDealershipDataWithAddressed = await Promise.all(
+//   duplicateDealershipRows.map(async (row: any) => {
+//     const [addressed] = await connection.execute<RowDataPacket[]>(`
+//       SELECT
+//         ura.*,
+//         rt.request_type AS request_type,
+//         rs.status AS request_status,
+//         aut.username AS addressedBY,
+//         rr.rejection_msg AS rejection_msg
+//       FROM user_request_addressed ura
+//       JOIN auth aut ON ura.auth_user_id = aut.auth_id 
+//       JOIN request_types rt ON ura.request_type = rt.request_type_id 
+//       LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
+//       JOIN request_status rs ON ura.request_status = rs.status_id 
+//       WHERE ura.request_type = 3 AND ura.fk_request_id = ?
+//     `, [row.pk_deal_id]);
+
+//     return {
+//       dealership: row,
+//       addressedData: addressed
+//     };
+//   })
+// );
 
 
 

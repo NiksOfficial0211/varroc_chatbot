@@ -93,29 +93,61 @@ const [duplicateFreechatRows] = await connection.execute<RowDataPacket[]>(`
 //   }));
 // }
 
-const duplicateDealershipDataWithAddressed = await Promise.all(
-  duplicateFreechatRows.map(async (row: any) => {
-    const [addressed] = await connection.execute<RowDataPacket[]>(`
-      SELECT
-        ura.*,
-        rt.request_type AS request_type,
-        rs.status AS request_status,
-        aut.username AS addressedBY,
-        rr.rejection_msg AS rejection_msg
-      FROM user_request_addressed ura
-      JOIN auth aut ON ura.auth_user_id = aut.auth_id 
-      JOIN request_types rt ON ura.request_type = rt.request_type_id 
-      LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
-      JOIN request_status rs ON ura.request_status = rs.status_id 
-      WHERE ura.request_type = 4 AND ura.fk_request_id = ?
-    `, [row.pk_id]);
+ const dupIds = duplicateFreechatRows.map(row => row.pk_id);
+    console.log('-------dupids--------',dupIds);
+    
+    let duplicateGeneralDataWithAddressed: DuplicateFreechatWithAddressed[] = [];
+    
+    if (dupIds && dupIds.length > 0 && dupIds.length > 1  ) {
+      const placeholders = dupIds.map(() => '?').join(', ');
+          console.log(placeholders);
 
-    return {
-      dup_general: row,
-      addressedData: addressed
-    };
-  })
-);
+      const [addressedRows] = await connection.query<RowDataPacket[]>(`
+        SELECT
+          ura.*,
+          rt.request_type AS request_type,
+          rs.status AS request_status,
+          aut.username AS addressedBY,
+          rr.rejection_msg AS rejection_msg,
+          ura.fk_request_id
+        FROM user_request_addressed ura
+        JOIN auth aut ON ura.auth_user_id = aut.auth_id 
+        JOIN request_types rt ON ura.request_type = rt.request_type_id 
+        LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
+        JOIN request_status rs ON ura.request_status = rs.status_id 
+        WHERE ura.request_type = 3 AND ura.fk_request_id IN (${placeholders})
+      `, dupIds);
+
+    console.log(addressedRows);
+    
+      // Merge addressed data with duplicate rows
+      duplicateGeneralDataWithAddressed = duplicateFreechatRows.map(row => ({
+        dup_general: row,
+        addressedData: addressedRows
+      }));
+    }else{
+      const [addressedRows] = await connection.query<RowDataPacket[]>(`
+        SELECT
+          ura.*,
+          rt.request_type AS request_type,
+          rs.status AS request_status,
+          aut.username AS addressedBY,
+          rr.rejection_msg AS rejection_msg,
+          ura.fk_request_id
+        FROM user_request_addressed ura
+        JOIN auth aut ON ura.auth_user_id = aut.auth_id 
+        JOIN request_types rt ON ura.request_type = rt.request_type_id 
+        LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
+        JOIN request_status rs ON ura.request_status = rs.status_id 
+        WHERE ura.request_type = 3 AND ura.fk_request_id = ?
+      `, [dupIds[0]]);
+    
+      // Merge addressed data with duplicate rows
+      duplicateGeneralDataWithAddressed = duplicateFreechatRows.map(row => ({
+        dup_general: row,
+        addressedData: addressedRows
+      }));
+    }
 
 
 
@@ -136,7 +168,7 @@ const duplicateDealershipDataWithAddressed = await Promise.all(
  
     
     return NextResponse.json({
-      status: 1, message: "Data Received", data: { enq_data: userRequests, addressed_data: addressedData, duplicate_data: duplicateDealershipDataWithAddressed}
+      status: 1, message: "Data Received", data: { enq_data: userRequests, addressed_data: addressedData, duplicate_data: duplicateGeneralDataWithAddressed}
     });
 
   } catch (e) {

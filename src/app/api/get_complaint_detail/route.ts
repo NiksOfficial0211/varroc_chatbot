@@ -67,9 +67,14 @@ export async function POST(request: Request) {
 
     // Fetch addressed data for each duplicate request
     const dupIds = duplicateDataRows.map(row => row.pk_id);
+    console.log('-------dupids--------',dupIds);
+    
     let duplicateFreechatDataWithAddressed: DuplicateFreechatWithAddressed[] = [];
     
     if (dupIds && dupIds.length > 0 && dupIds.length > 1  ) {
+      const placeholders = dupIds.map(() => '?').join(', ');
+          console.log(placeholders);
+
       const [addressedRows] = await connection.query<RowDataPacket[]>(`
         SELECT
           ura.*,
@@ -83,8 +88,10 @@ export async function POST(request: Request) {
         JOIN request_types rt ON ura.request_type = rt.request_type_id 
         LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
         JOIN request_status rs ON ura.request_status = rs.status_id 
-        WHERE ura.request_type = 4 AND ura.fk_request_id IN (?)
-      `, [dupIds]);
+        WHERE ura.request_type = 2 AND ura.fk_request_id IN (${placeholders})
+      `, dupIds);
+
+    console.log(addressedRows);
     
       // Merge addressed data with duplicate rows
       duplicateFreechatDataWithAddressed = duplicateDataRows.map(row => ({
@@ -105,7 +112,7 @@ export async function POST(request: Request) {
         JOIN request_types rt ON ura.request_type = rt.request_type_id 
         LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
         JOIN request_status rs ON ura.request_status = rs.status_id 
-        WHERE ura.request_type = 4 AND ura.fk_request_id = ?
+        WHERE ura.request_type = 2 AND ura.fk_request_id = ?
       `, [dupIds[0]]);
     
       // Merge addressed data with duplicate rows
