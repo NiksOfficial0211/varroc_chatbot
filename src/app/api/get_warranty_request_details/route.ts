@@ -118,7 +118,7 @@ if (dupIds && dupIds.length > 0 && dupIds.length>1) {
     LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
     JOIN request_status rs ON ura.request_status = rs.status_id 
     WHERE ura.request_type = 4 AND ura.fk_request_id = ?
-  `, dupIds);
+  `, [dupIds]);
 
   // Merge addressed data with duplicate rows
   duplicateFreechatDataWithAddressed = duplicateWarrantyRows.map(row => ({
