@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
             request_id:item.request_id,
             request_date:formatDate(item.ua_created_at),
             customer_name:item.user_name,
-            customer_phone:item.user_phone.length==10?"91"+item.user_phone:item.user_phone,
+            customer_phone:item.user_phone.length()==10?"91"+item.user_phone:item.user_phone,
             serial_no:item.product_serial_no,
             purchase_date:formatDateDDMMYYYY(item.product_purchase_date),
             request_type:item.request_type,

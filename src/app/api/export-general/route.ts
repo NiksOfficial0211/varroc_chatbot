@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
             enquiry_id:item.general_id,
             request_date:item.ufcr_created_at?formatDate(item.ufcr_created_at):'',
             customer_name:item.customer_name,
-            customer_phone:item.contact_no.length==10?"91"+item.contact_no:item.contact_no,
+            customer_phone:item.contact_no.length()==10?"91"+item.contact_no:item.contact_no,
             city:item.city,
             state:item.state?item.state.charAt(0).toUpperCase()+ item.state.replace("_"," ").slice(1).toLowerCase():"--",
             description:item.description,
