@@ -209,6 +209,58 @@ export async function POST(request: NextRequest) {
       }
 
     }
+
+
+    /// uncomment this below while pushing code on varroc server
+    // if (documents) {
+
+    //   for (let i = 0; i < documents.length; i++) {
+    //     const mediaRes = await fetch("https://apis.aisensy.com/project-apis/v1/project/6835984c7ce8780c0854abb2/get-media",
+    //       {
+    //         method: "POST",
+    //         headers: {
+    //           "Content-Type": "application/json",
+    //           "X-AiSensy-Project-API-Pwd": "85b4ec6a26590dbbbc7ee"
+    //         },
+    //         body: JSON.stringify(
+    //           {
+    //             "id": documents[i].id,//"1344347393330195",
+    //             "response_type": "document"
+    //           }
+    //         ),
+    //       }
+    //     );
+
+    //     if (mediaRes && mediaRes.ok) {
+    //       const buffer = await mediaRes.arrayBuffer();
+
+    //       const fileBuffer = Buffer.from(buffer);
+
+    //       // Optional: detect MIME type if needed
+    //       const mime = mediaRes.headers.get("Content-Type"); // e.g. 'image/jpeg', 'application/pdf'
+    //       const filename = `${documents[i].id}_${Date.now()}.${mime?.includes("pdf") ? "pdf" : "jpg"}`;
+
+    //       const currentMonthShort = new Date().toLocaleString('default', { month: 'short' });
+    //       const currentDate = getCurrentDateFormatted();
+    //       const dirPath = path.join(process.cwd(), "/uploads/warranty", currentMonthShort, currentDate);
+    //       await fs.mkdir(dirPath, { recursive: true });
+    //       const filePath = path.join(dirPath, filename);
+          
+          
+    //       await writeFile(filePath, fileBuffer);
+
+    //       const [insertImagesURL] = await connection.execute(
+    //         `INSERT INTO user_claim_attachements (
+    //             fk_request_id,aisensy_image_id,image_url,is_invoice,created_at
+    //             ) VALUES (?,?, ?, ?, ?)`, [result.insertId, documents[i].id, filePath, false, new Date()]
+    //       );
+          
+    //     } else {
+    //       mediaUploadFialed=true;
+    //     }
+    //   }
+
+    // }
       if(mediaUploadFialed){
           await connection.rollback();
           

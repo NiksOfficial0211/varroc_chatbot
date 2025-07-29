@@ -52,7 +52,7 @@ export async function POST(request: Request) {
 
     await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Update Claim Request",pk_id,1, JSON.stringify(createdJson), new Date()]
+      ["Update claim Request",pk_id,1, JSON.stringify(createdJson), new Date()]
     );
 
     // ✅ COMMIT after all DB operations are successful
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
     }{
       await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Update Warranty Request Send Message Failed",pk_id,1, JSON.stringify({...aisensyPayload,error:result}), new Date()]
+      ["Update claim Request Send Message Failed",pk_id,1, JSON.stringify({...aisensyPayload,error:result}), new Date()]
     );
       return NextResponse.json({ status: 1, message: "Request updated but message delivery failed to customer"});
     }
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
       await connection.rollback();
        await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Update Warranty Request Exception",pk_id,1, JSON.stringify(e), new Date()]
+      ["Update claim Request Exception",pk_id,1, JSON.stringify(e), new Date()]
     );
       connection.release();
     }

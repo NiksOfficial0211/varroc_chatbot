@@ -52,7 +52,7 @@ export async function POST(request: Request) {
 
     await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Update DealerShip Request",pk_id,4, JSON.stringify(createdJson), new Date()]
+      ["Update General Request",pk_id,4, JSON.stringify(createdJson), new Date()]
     );
 
     // ✅ COMMIT after all DB operations are successful
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       await connection.rollback();
        await connection.query(
       `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-      ["Update DealerShip Request Exception",pk_id,1, JSON.stringify(e), new Date()]
+      ["Update General Request Exception",pk_id,1, JSON.stringify(e), new Date()]
     );
       
     }
