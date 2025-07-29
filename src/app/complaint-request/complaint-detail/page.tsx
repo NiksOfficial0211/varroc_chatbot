@@ -210,8 +210,8 @@ const WarrantyRequestDetails = () => {
             formVal.status_id == complaint_status_rejected ? JSON.stringify({
                       auth_id: auth_id,
                       pk_id: complaintData?.complaint_data[0].pk_id,
-                      comments: formVal.comments && formVal.comments.length>0?formVal.comments : "",
-                      selectedRejection:formVal.comments && formVal.comments.length>0 && rejectionSelectedMsg!=formVal.comments?rejectionSelectedMsg:"",
+                      comments: formVal.comments,
+                      selectedRejection:rejectionSelectedMsg,
 
                       status: formVal.status_id,
                       request_id: complaintData?.complaint_data[0].complaint__id,

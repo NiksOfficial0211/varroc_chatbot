@@ -240,8 +240,8 @@ const WarrantyRequestDetails = () => {
         body: formVal.status_id == status_Rejected ? JSON.stringify({
           auth_id: auth_id,
           pk_id: warrantyRequestData?.request[0].pk_request_id,
-          comments: formVal.comments && formVal.comments.length > 0 ? formVal.comments : rejectionSelectedMsg,
-          selectedRejection: formVal.comments && formVal.comments.length > 0 && rejectionSelectedMsg != formVal.comments ? rejectionSelectedMsg : "",
+          comments: formVal.comments,
+          selectedRejection: rejectionSelectedMsg ,
           status: formVal.status_id,
           request_id: warrantyRequestData?.request[0].request_id,
           request_type: warrantyRequestData?.request[0].request_type_id,

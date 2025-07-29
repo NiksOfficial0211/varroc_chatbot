@@ -89,7 +89,7 @@ export async function POST(request: Request) {
         userName: "Varroc Aftermarket",
         templateParams: [
           request_id,
-          isRejected ? comments && comments.length > 0 ? `Rejected ${selectedRejection}-${comments} Please fill the form again` : "Rejected- please fill the form again" : isDuplicate ? `Duplicate Request -${comments}` : "",
+          isRejected ? comments && comments.length > 0 ? `Rejected ${selectedRejection}-${comments} Please fill the form again` : "Rejected- please fill the form again" : isDuplicate ? `Duplicate Request${comments && comments.length>0?"-"+comments:""}` : "",
         ],
         source: "new-landing-page form",
         media: {},
