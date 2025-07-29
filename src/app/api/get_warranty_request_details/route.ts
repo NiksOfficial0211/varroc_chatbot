@@ -66,6 +66,7 @@ export async function POST(request: Request) {
       [request_id]
     );
 
+    
     const [duplicateWarrantyRows] = await connection.execute<RowDataPacket[]>(`
   SELECT 
     ua.*,
@@ -74,11 +75,13 @@ export async function POST(request: Request) {
     FROM user_warranty_requests ua
     JOIN request_types rt ON ua.request_type_id = rt.request_type_id 
     JOIN request_status rs ON ua.status_id = rs.status_id
-    WHERE product_serial_no = ? AND request_id != ?
-`, [userRequests[0].product_serial_no, userRequests[0].request_id]);
+    WHERE product_serial_no = ? AND pk_request_id != ?
+`, [userRequests[0].product_serial_no, request_id]);
 
 // Fetch addressed data for each duplicate warranty request
-const dupIds = duplicateWarrantyRows.map(row => row.pk_id);
+const dupIds = duplicateWarrantyRows.map(row => row.pk_request_id);
+console.log(dupIds[0]);
+
 let duplicateFreechatDataWithAddressed: DuplicateFreechatWithAddressed[] = [];
 let addressedRows: any[] | null ;
 if (dupIds && dupIds.length > 0 && dupIds.length>1) {
@@ -101,7 +104,7 @@ if (dupIds && dupIds.length > 0 && dupIds.length>1) {
   // Merge addressed data with duplicate rows
   duplicateFreechatDataWithAddressed = duplicateWarrantyRows.map(row => ({
     dup_warranty: row,
-    addressedData: addressedRows!.filter(addr => addr.fk_request_id === row.pk_id)
+    addressedData: addressedRows!
   }));
 }else{
 [addressedRows] = await connection.query<RowDataPacket[]>(`
@@ -117,13 +120,14 @@ if (dupIds && dupIds.length > 0 && dupIds.length>1) {
     JOIN request_types rt ON ura.request_type = rt.request_type_id 
     LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
     JOIN request_status rs ON ura.request_status = rs.status_id 
-    WHERE ura.request_type = 4 AND ura.fk_request_id = ?
-  `, [dupIds]);
-
+    WHERE ura.request_type = 1 AND ura.fk_request_id = ?
+  `, [dupIds[0]]);
+  
+  
   // Merge addressed data with duplicate rows
   duplicateFreechatDataWithAddressed = duplicateWarrantyRows.map(row => ({
     dup_warranty: row,
-    addressedData: addressedRows!.filter(addr => addr.fk_request_id === row.pk_id)
+    addressedData: addressedRows!
   }));
 }
 

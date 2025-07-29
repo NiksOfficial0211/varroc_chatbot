@@ -62,14 +62,14 @@ export async function POST(request: Request) {
         rs.status AS request_status
         FROM user_complaint_requests ucr
         JOIN request_status rs ON ucr.status_id = rs.status_id
-        WHERE battery_serial_no = ? && complaint__id != ?
-    `, [userRequests[0].battery_serial_no, userRequests[0].complaint__id]);
+        WHERE battery_serial_no = ? && pk_id != ?
+    `, [userRequests[0].battery_serial_no, pk_id]);
 
     // Fetch addressed data for each duplicate request
     const dupIds = duplicateDataRows.map(row => row.pk_id);
     let duplicateFreechatDataWithAddressed: DuplicateFreechatWithAddressed[] = [];
     
-    if (dupIds.length > 0) {
+    if (dupIds && dupIds.length > 0 && dupIds.length > 1  ) {
       const [addressedRows] = await connection.query<RowDataPacket[]>(`
         SELECT
           ura.*,
@@ -89,7 +89,29 @@ export async function POST(request: Request) {
       // Merge addressed data with duplicate rows
       duplicateFreechatDataWithAddressed = duplicateDataRows.map(row => ({
         dup_complaints: row,
-        addressedData: addressedRows.filter(addr => addr.fk_request_id === row.pk_id)
+        addressedData: addressedRows
+      }));
+    }else{
+      const [addressedRows] = await connection.query<RowDataPacket[]>(`
+        SELECT
+          ura.*,
+          rt.request_type AS request_type,
+          rs.status AS request_status,
+          aut.username AS addressedBY,
+          rr.rejection_msg AS rejection_msg,
+          ura.fk_request_id
+        FROM user_request_addressed ura
+        JOIN auth aut ON ura.auth_user_id = aut.auth_id 
+        JOIN request_types rt ON ura.request_type = rt.request_type_id 
+        LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
+        JOIN request_status rs ON ura.request_status = rs.status_id 
+        WHERE ura.request_type = 4 AND ura.fk_request_id = ?
+      `, [dupIds[0]]);
+    
+      // Merge addressed data with duplicate rows
+      duplicateFreechatDataWithAddressed = duplicateDataRows.map(row => ({
+        dup_complaints: row,
+        addressedData: addressedRows
       }));
     }
 
