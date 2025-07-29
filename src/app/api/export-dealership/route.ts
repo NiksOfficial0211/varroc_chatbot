@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
             enquiry_id:item.dealership_id,
             request_date:item.ucr_created_at?formatDate(item.ucr_created_at):'',
             customer_name:item.full_name,
-            contact_no:item.alternate_contact.length()==10?"91"+item.alternate_contact:item.alternate_contact,
+            contact_no:item.alternate_contact.toString().length === 10?"91"+item.alternate_contact:item.alternate_contact,
             pincode:item.pincode,
             city:item.city,
             state:item.state_address?item.state_address.charAt(0).toUpperCase()+ item.state_address.replace("_"," ").slice(1).toLowerCase():"--",
