@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   const token = authHeader?.split(' ')[1]; // 'Bearer your-token'
 
   if (!token || token !== process.env.NEXT_PUBLIC_API_SECRET_TOKEN) {
-    return NextResponse.json({ error: 'Unauthorized',message:"You are unauthorized" }, { status: 403 });
+    return NextResponse.json({ error: 'Unauthorized', message: "You are unauthorized" }, { status: 403 });
   }
   const body = await request.json();
   const { request_id } = body;
@@ -48,8 +48,8 @@ export async function POST(request: Request) {
 
     const [userRequests] = await connection.execute<RowDataPacket[]>(query, values);
 
-    const [batteryData]=await connection.execute(
-      `SELECT *,DATE_FORMAT(manufacturing_date, '%Y-%m-%d') as manufacturing_date FROM product_info WHERE battery_serial_number=?`,[userRequests[0].product_serial_no])
+    const [batteryData] = await connection.execute(
+      `SELECT *,DATE_FORMAT(manufacturing_date, '%Y-%m-%d') as manufacturing_date FROM product_info WHERE battery_serial_number=?`, [userRequests[0].product_serial_no])
 
     const [addressedData] = await connection.execute(
       `SELECT
@@ -66,26 +66,26 @@ export async function POST(request: Request) {
       [request_id]
     );
 
-    
+
     const [duplicateWarrantyRows] = await connection.execute<RowDataPacket[]>(`
-  SELECT 
-    ua.*,
-    rt.request_type AS request_type,
-    rs.status AS request_status
-    FROM user_warranty_requests ua
-    JOIN request_types rt ON ua.request_type_id = rt.request_type_id 
-    JOIN request_status rs ON ua.status_id = rs.status_id
-    WHERE product_serial_no = ? AND pk_request_id != ?
-`, [userRequests[0].product_serial_no, request_id]);
+          SELECT 
+            ua.*,
+            rt.request_type AS request_type,
+            rs.status AS request_status
+            FROM user_warranty_requests ua
+            JOIN request_types rt ON ua.request_type_id = rt.request_type_id 
+            JOIN request_status rs ON ua.status_id = rs.status_id
+            WHERE product_serial_no = ? AND pk_request_id != ?
+        `, [userRequests[0].product_serial_no, request_id]);
 
-// Fetch addressed data for each duplicate warranty request
-const dupIds = duplicateWarrantyRows.map(row => row.pk_request_id);
-console.log(dupIds[0]);
+    // Fetch addressed data for each duplicate warranty request
+    const dupIds = duplicateWarrantyRows.map(row => row.pk_request_id);
+    console.log(dupIds[0]);
 
-let duplicateFreechatDataWithAddressed: DuplicateFreechatWithAddressed[] = [];
-let addressedRows: any[] | null ;
-if (dupIds && dupIds.length > 0 && dupIds.length>1) {
-   [addressedRows] = await connection.query<RowDataPacket[]>(`
+    let duplicateFreechatDataWithAddressed: DuplicateFreechatWithAddressed[] = [];
+    let addressedRows: any[] | null;
+    if (dupIds && dupIds.length > 0 && dupIds.length > 1) {
+      [addressedRows] = await connection.query<RowDataPacket[]>(`
     SELECT
       ura.*,
       rt.request_type AS request_type,
@@ -101,13 +101,13 @@ if (dupIds && dupIds.length > 0 && dupIds.length>1) {
     WHERE ura.request_type = 4 AND ura.fk_request_id IN (?)
   `, [dupIds]);
 
-  // Merge addressed data with duplicate rows
-  duplicateFreechatDataWithAddressed = duplicateWarrantyRows.map(row => ({
-    dup_warranty: row,
-    addressedData: addressedRows!
-  }));
-}else{
-[addressedRows] = await connection.query<RowDataPacket[]>(`
+      // Merge addressed data with duplicate rows
+      duplicateFreechatDataWithAddressed = duplicateWarrantyRows.map(row => ({
+        dup_warranty: row,
+        addressedData: addressedRows!
+      }));
+    } else {
+      [addressedRows] = await connection.query<RowDataPacket[]>(`
     SELECT
       ura.*,
       rt.request_type AS request_type,
@@ -122,14 +122,14 @@ if (dupIds && dupIds.length > 0 && dupIds.length>1) {
     JOIN request_status rs ON ura.request_status = rs.status_id 
     WHERE ura.request_type = 1 AND ura.fk_request_id = ?
   `, [dupIds[0]]);
-  
-  
-  // Merge addressed data with duplicate rows
-  duplicateFreechatDataWithAddressed = duplicateWarrantyRows.map(row => ({
-    dup_warranty: row,
-    addressedData: addressedRows!
-  }));
-}
+
+
+      // Merge addressed data with duplicate rows
+      duplicateFreechatDataWithAddressed = duplicateWarrantyRows.map(row => ({
+        dup_warranty: row,
+        addressedData: addressedRows!
+      }));
+    }
 
 
     // Example: Get battery info for each request
@@ -142,7 +142,7 @@ if (dupIds && dupIds.length > 0 && dupIds.length>1) {
            FROM user_request_attachements WHERE fk_request_id = ?`, [request_id]);
     connection.release();
     return NextResponse.json({
-      status: 1, message: "Data Received", data: { request: userRequests, addressedData: addressedData,battery_details:batteryData, images: images,duplicate_data:duplicateFreechatDataWithAddressed }
+      status: 1, message: "Data Received", data: { request: userRequests, addressedData: addressedData, battery_details: batteryData, images: images, duplicate_data: duplicateFreechatDataWithAddressed }
     });
   } catch (e) {
     console.log(e);

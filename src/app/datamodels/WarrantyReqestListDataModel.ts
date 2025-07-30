@@ -20,6 +20,7 @@ export interface WarrantyRequestDataModel {
   updated_at: string
   request_type: string
   request_status: string
+  certificate_url:string
     addressedDetails: AddressedByDetail[]
   }
 

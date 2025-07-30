@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import pool from "../../../../utils/db";
 import moment from "moment";
-import { getImageApiURL, status_Pending } from "@/app/pro_utils/string_constants";
+import { getImageApiURL, staticIconsBaseURL, status_Pending } from "@/app/pro_utils/string_constants";
+import { RowDataPacket } from "mysql2";
 
 export async function POST(request: Request) {
   const authHeader = request.headers.get("Authorization");
@@ -14,7 +15,10 @@ export async function POST(request: Request) {
   const body = await request.json();
 
 
-  const { auth_id, pk_id, comments, status, request_id, request_type, rejection_id, selectedRejection, rejection_other, isRejected, isDuplicate, customer_phone, warranty_start_date, warranty_end_date, battery_serial_no, date_of_purchase } = body;
+  const { auth_id, pk_id, comments, status, request_id, request_type, 
+    rejection_id, selectedRejection, rejection_other, isRejected, 
+    isDuplicate, customer_phone, warranty_start_date, warranty_end_date, 
+    battery_serial_no, date_of_purchase } = body;
 
   let connection;
 
@@ -38,15 +42,7 @@ export async function POST(request: Request) {
       [status, pk_id]
     );
     console.log("this is the body", body);
-    await connection.query(
-      `UPDATE user_warranty_requests 
-       SET status_id = ?, addressed_id = ?, fk_reject_id = ?,warranty_start_date=?,warranty_end_date=?
-       WHERE pk_request_id = ?`,
-      [status, auth_id, rejection_id,
-        warranty_start_date ? moment(warranty_start_date, "DD/MM/YYYY").format("YYYY-MM-DD") : null,
-        warranty_end_date ? moment(warranty_end_date, "DD/MM/YYYY").format("YYYY-MM-DD") : null, pk_id
-      ]
-    );
+    
 
     // Step 3: Insert into logs
     const createdJson = {
@@ -123,19 +119,105 @@ export async function POST(request: Request) {
       };
     } else {
 
+      let query = `
+      SELECT 
+        ua.*,
+        rt.request_type AS request_type,
+        rs.status AS request_status
+        FROM user_warranty_requests ua
+        JOIN request_types rt ON ua.request_type_id = rt.request_type_id 
+        JOIN request_status rs ON ua.status_id = rs.status_id
+    `;
+
+    // Dynamic WHERE conditions
+    const conditions: string[] = [];
+    const values: any[] = [];
+
+    if (pk_id) {
+      conditions.push(`ua.pk_request_id = ?`);
+      values.push(pk_id);
+    }
+    if (conditions.length > 0) {
+      query += ` WHERE ` + conditions.join(" AND ");
+    }
+
+
+    const [userRequests] = await connection.execute<RowDataPacket[]>(query, values);
+        console.log(userRequests[0]);
+
+    const [batteryData]=await connection.execute<RowDataPacket[]>(
+      `SELECT *,DATE_FORMAT(manufacturing_date, '%d-%m-%y') as manufacturing_date FROM product_info WHERE battery_serial_number=?`,[userRequests[0].product_serial_no])
+    console.log(batteryData);
+      
+
+      const certResponse=await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/generate-pdf`,{
+        method: "POST",
+        
+        body:JSON.stringify({
+          base_url:staticIconsBaseURL,
+          reference_id:userRequests[0].request_id, 
+          customer_name:userRequests[0].user_name, 
+          phone_no:userRequests[0].user_phone? userRequests[0].user_phone:"--", 
+          battery_serial_no:userRequests[0].product_serial_no,
+          pin_code:userRequests[0].user_pin_code,
+          city:userRequests[0].retailer_city_name?userRequests[0].retailer_city_name: "--",
+          purchase_date:formatDateDDMMYYYY(userRequests[0].product_purchase_date),
+          retailer_shop_name:userRequests[0].retailer_shop_name,
+          warranty_start_date:warranty_start_date,
+          warranty_end_date:warranty_end_date,
+          request_date:formatDateDDMMYYYY(userRequests[0].created_at),
+          varroc_part_code:batteryData && batteryData.length>0 && batteryData[0].varroc_part_code? batteryData[0].varroc_part_code: "--",
+          manufacturing_date:batteryData && batteryData.length>0 && batteryData[0].manufacturing_date?batteryData[0].manufacturing_date: "--",
+          description:batteryData && batteryData.length>0 && batteryData[0].battery_description?batteryData[0].battery_description: "--"
+        })
+      })
+      const certificateURL=await certResponse.json();
+      console.log("after geting the url in update route------",certificateURL);
+
+      
+      await connection.query(
+      `UPDATE user_warranty_requests 
+       SET status_id = ?, addressed_id = ?, fk_reject_id = ?,warranty_start_date=?,warranty_end_date=?,certificate_url=?
+       WHERE pk_request_id = ?`,
+      [status, auth_id, rejection_id,
+        warranty_start_date ? moment(warranty_start_date, "DD/MM/YYYY").format("YYYY-MM-DD") : null,
+        warranty_end_date ? moment(warranty_end_date, "DD/MM/YYYY").format("YYYY-MM-DD") : null,certificateURL.url, pk_id
+      ]
+    );
+
+      // aisensyPayload = {
+      //   apiKey: process.env.NEXT_PUBLIC_AISENSY_API_KEY,
+      //   campaignName: "approved_status_warranty_reg",
+      //   destination: `${customer_phone}`,
+      //   userName: "Varroc Aftermarket",
+      //   templateParams: [
+      //     request_id,
+      //     `Approved.${comments?" "+comments:""}`,
+      //     battery_serial_no,
+      //     date_of_purchase,
+      //     warranty_start_date,
+      //     warranty_end_date
+      //   ],
+      //   source: "new-landing-page form",
+      //   media: {},
+      //   buttons: [],
+      //   carouselCards: [],
+      //   location: {},
+      //   attributes: {},
+      //   paramsFallbackValue: {
+      //     FirstName: "user"
+      //   }
+      // };
 
       aisensyPayload = {
         apiKey: process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-        campaignName: "approved_status_warranty_reg",
+        campaignName: "WARRANTY_APPROVED",
         destination: `${customer_phone}`,
         userName: "Varroc Aftermarket",
         templateParams: [
           request_id,
           `Approved.${comments?" "+comments:""}`,
-          battery_serial_no,
-          date_of_purchase,
-          warranty_start_date,
-          warranty_end_date
+          
         ],
         source: "new-landing-page form",
         media: {},
@@ -146,21 +228,18 @@ export async function POST(request: Request) {
         paramsFallbackValue: {
           FirstName: "user"
         }
-
-
-
       };
       console.log(aisensyPayload);
 
       pdfPayload = {
         "apiKey": process.env.NEXT_PUBLIC_AISENSY_API_KEY,
-        "campaignName": "pdf_warranty_approves",
+        "campaignName": "pdf_warranty_verified",
         "destination": `${customer_phone}`,
         "userName": "Varroc Aftermarket",
         "templateParams": [],
         "source": "new-landing-page form",
         "media": {
-          "url": `${getImageApiURL}/uploads/sample_warranty_certificate.pdf`,
+          "url": `${certificateURL.url}`,
           "filename": "Certificate"
         },
         "buttons": [],
@@ -203,7 +282,7 @@ export async function POST(request: Request) {
       } else {
         await connection.query(
           `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-          ["Update Warranty Request Send PDF Failed", pk_id, 1, JSON.stringify({ ...pdfPayload, message: "Failed to send pdf to customer", response: result }), new Date()]
+          ["Update Warranty Request Send PDF Failed", pk_id, 1, JSON.stringify({ ...pdfPayload, message: "Failed to send pdf to customer", response: pdfResult }), new Date()]
         );
       }
 
@@ -236,4 +315,8 @@ export async function POST(request: Request) {
 
 
 
-
+ const formatDateDDMMYYYY = (date: any, isTime = false) => {
+      if (!date) return '';
+      const parsedDate = moment(date);
+      return parsedDate.format('DD-MM-YYYY');
+    };

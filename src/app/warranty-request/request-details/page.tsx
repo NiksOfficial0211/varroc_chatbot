@@ -723,6 +723,13 @@ const WarrantyRequestDetails = () => {
 
                           </div>
                         )}
+                        {warrantyRequestData.request && warrantyRequestData.request.length>0 && warrantyRequestData.request[0].certificate_url.length>0 && 
+                        <div className="invoice_attach_box">
+                            <FileViewer fileUrl={warrantyRequestData.request[0].certificate_url} isDialogView={false} set_height={150}  /><br></br>
+                            <button className="blue_btn" onClick={() => { setShowImagePop(true); setImagePopURL(warrantyRequestData.request[0].certificate_url) }}>View</button>
+
+                          </div>
+                        }
                     </div>
                   </div>
                   {showImagePop && <DialogImagePop
