@@ -1,8 +1,8 @@
 import path from 'path';
 import fs from 'fs/promises';
 import { NextResponse } from 'next/server';
-import puppeteer from 'puppeteer';
-import handlebars from 'handlebars';
+import chromium from '@sparticuz/chromium';
+import puppeteer from 'puppeteer-core';import handlebars from 'handlebars';
 import { writeFileSync } from 'fs';
 import { supabase } from '../../../../utils/supabaseClient';
 
@@ -20,9 +20,11 @@ export async function POST(req: Request) {
     const finalHtml = compiledTemplate(data);
 
     const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+  args: chromium.args,
+  defaultViewport: { width: 1280, height: 800 }, // ✅ set it here
+  executablePath: await chromium.executablePath(),
+  headless: true,
+});
 
     const page = await browser.newPage();
     await page.setContent(finalHtml, { waitUntil: 'domcontentloaded' });
