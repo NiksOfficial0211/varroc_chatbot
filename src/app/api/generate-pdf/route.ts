@@ -12,6 +12,9 @@ export async function POST(req: Request) {
   const { reference_id, customer_name, phone_no, battery_serial_no,pin_code,city,
         purchase_dat,retailer_shop_name,warranty_start_date,warranty_end_date,request_date,
     varroc_part_code,manufacturing_date,description } = data;
+    data.logo_base64 = await fetchImageAsBase64('https://varroc-chatbot-final.vercel.app/images/varroc.png');
+    data.hiker_logo_base64 = await fetchImageAsBase64('https://varroc-chatbot-final.vercel.app/images/hiker.png');
+
   console.log("whole path got in process.cwd()",process.cwd());
         
   const templatePath = path.join(process.cwd(), 'htmltemplates', 'warrantycertificate.html');
@@ -79,4 +82,13 @@ function getCurrentDateFormatted(): string {
   const yyyy = today.getFullYear();
 
   return `${dd}-${mm}-${yyyy}`;
+}
+
+
+async function fetchImageAsBase64(url: string) {
+  const response = await fetch(url);
+  const buffer = await response.arrayBuffer();
+  const base64 = Buffer.from(buffer).toString('base64');
+  const contentType = response.headers.get('content-type') || 'image/png';
+  return `data:${contentType};base64,${base64}`;
 }

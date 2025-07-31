@@ -683,7 +683,7 @@ const WarrantyRequestDetails = () => {
                                   <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Warranty End Date:</div>
                                   <div className="col-lg-12 mb-3">
                                     <div className='form_box'>
-                                      <input type="date" id="warranty_end_date" name="warranty_end_date" value={formVal.warranty_end_date} max={formVal.warranty_end_date} onChange={handleInputChange} />
+                                      <input type="date" id="warranty_end_date" name="warranty_end_date" value={formVal.warranty_end_date} min={formVal.warranty_start_date} max={formVal.warranty_end_date} onChange={handleInputChange} />
                                     </div>
                                   </div>
                                 </div>
