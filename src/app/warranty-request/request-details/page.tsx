@@ -23,6 +23,8 @@ interface formValues {
   rejection_id: any,
   warranty_start_date: any,
   warranty_end_date: any,
+  minstartDate:any,
+  minEndDate:any
 }
 
 
@@ -47,7 +49,7 @@ const WarrantyRequestDetails = () => {
   const [statusMasterData, setStatusMasterData] = useState<StatusMasterDataModel[]>([]);
   const [rejectionMasterData, setRejectionMasterData] = useState<RejectMSGMasterDataModel[]>([]);
   const [formVal, setFormVal] = useState<formValues>({
-    status_id: 0, comments: "", rejection_id: 0, warranty_start_date: "", warranty_end_date: ""
+    status_id: 0, comments: "", rejection_id: 0, warranty_start_date: "", warranty_end_date: "",minstartDate:'',minEndDate:''
   });
   const { selectedViewID } = useGlobalContext()
   const [errors, setErrors] = useState<Partial<formValues>>({});
@@ -88,6 +90,8 @@ const WarrantyRequestDetails = () => {
           rejection_id: 0,
           warranty_start_date: formatDateYYYYMMDD(response.data.request[0].product_purchase_date),
           warranty_end_date: formatDateYYYYMMDD(addMonths(new Date(response.data.request[0].product_purchase_date)))
+          ,minstartDate:formatDateYYYYMMDD(response.data.request[0].product_purchase_date),
+          minEndDate:formatDateYYYYMMDD(addMonths(new Date(response.data.request[0].product_purchase_date)))
         });
       } else {
         setLoading(false);
@@ -300,6 +304,7 @@ const WarrantyRequestDetails = () => {
     const { name, value } = e.target;
     if (name == "warranty_start_date") {
       setFormVal((prev) => ({ ...prev, ["warranty_end_date"]: formatDateYYYYMMDD(addMonths(new Date(value))) }));
+      setFormVal((prev) => ({ ...prev, ["minEndDate"]: formatDateYYYYMMDD(addMonths(new Date(value))) }));
     }
 
     setFormVal((prev) => ({ ...prev, [name]: value }));
@@ -673,7 +678,7 @@ const WarrantyRequestDetails = () => {
                                   <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Warranty Start Date:</div>
                                   <div className="col-lg-12 mb-3">
                                     <div className='form_box'>
-                                      <input type="date" id="warranty_start_date" name="warranty_start_date" value={formVal.warranty_start_date} min={formVal.warranty_start_date} onChange={handleInputChange} />
+                                      <input type="date" id="warranty_start_date" name="warranty_start_date" value={formVal.warranty_start_date} min={formVal.minstartDate} onChange={handleInputChange} />
                                     </div>
                                   </div>
                                 </div>
@@ -683,7 +688,7 @@ const WarrantyRequestDetails = () => {
                                   <div className="col-lg-12 mb-1" style={{ fontFamily: "GothamMedium" }}>Warranty End Date:</div>
                                   <div className="col-lg-12 mb-3">
                                     <div className='form_box'>
-                                      <input type="date" id="warranty_end_date" name="warranty_end_date" value={formVal.warranty_end_date} min={formVal.warranty_start_date} max={formVal.warranty_end_date} onChange={handleInputChange} />
+                                      <input type="date" id="warranty_end_date" name="warranty_end_date" value={formVal.warranty_end_date} min={formVal.warranty_start_date} max={formVal.minEndDate} onChange={handleInputChange} />
                                     </div>
                                   </div>
                                 </div>
