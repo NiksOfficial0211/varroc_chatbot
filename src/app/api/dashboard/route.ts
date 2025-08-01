@@ -60,7 +60,7 @@ export async function  POST(request:Request){
             `);
             
         return NextResponse.json({status:1,message:"Data Received",data:{
-            total_Request:totalWarrantyRequestRows[0].total + totalComplaintRequests[0].total+totalDealershipRequest[0].total,
+            total_Request:totalWarrantyRequestRows[0].total + totalComplaintRequests[0].total+totalDealershipRequest[0].total+generalPendingRequests[0].total,
             total_Warranty_Request:totalWarrantyRequestRows[0].total,
             addressed_count:totalAddressedCount[0].total,
             warranty_pending_request:warrantyPendingRequests[0].total,

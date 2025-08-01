@@ -113,7 +113,7 @@ const Dashboard = () => {
                 </div>
               </div>
               {/* onClick={() => router.push(pageURL_WarrantyRequestList)} */}
-              <div className="req_whitebox" style={{ backgroundColor: "#ffeceb" }} onClick={() => {
+              <div className="req_whitebox" style={{ backgroundColor: "#ffeceb", cursor:'pointer' }} onClick={() => {
                 setGlobalState({
                   selectedViewID: '',
                   auth_id: auth_id,
@@ -127,7 +127,7 @@ const Dashboard = () => {
                   <div className="col-lg-12 request_text">Pending <br></br>Warranty Requests</div>
                 </div>
               </div>
-              <div className="req_whitebox" style={{ backgroundColor: "#ffeceb" }} onClick={() => {
+              <div className="req_whitebox" style={{ backgroundColor: "#ffeceb", cursor:'pointer' }} onClick={() => {
                 setGlobalState({
                   selectedViewID: '',
                   auth_id: auth_id,
@@ -141,7 +141,7 @@ const Dashboard = () => {
                   <div className="col-lg-12 request_text">Pending<br></br>Complaints</div>
                 </div>
               </div>
-              <div className="req_whitebox" style={{ backgroundColor: "#ffeceb" }} onClick={() => {
+              <div className="req_whitebox" style={{ backgroundColor: "#ffeceb", cursor:'pointer' }} onClick={() => {
                 setGlobalState({
                   selectedViewID: '',
                   auth_id: auth_id,
@@ -156,7 +156,7 @@ const Dashboard = () => {
                 </div>
 
               </div>
-              <div className="req_whitebox" style={{ backgroundColor: "#ffeceb" }} onClick={() => {
+              <div className="req_whitebox" style={{ backgroundColor: "#ffeceb", cursor:'pointer' }} onClick={() => {
                 setGlobalState({
                   selectedViewID: '',
                   auth_id: auth_id,
