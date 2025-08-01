@@ -240,6 +240,12 @@ fetchData(dataFilters);
 
     window.location.reload();
     sessionStorage.removeItem(LEAD_FILTER_KEY);
+    setGlobalState({
+                  selectedViewID: '',
+                  auth_id: auth_id,
+                  userName: userName,
+                  fromDashboardCount: 0
+                })
 
     setDataFilters({
 

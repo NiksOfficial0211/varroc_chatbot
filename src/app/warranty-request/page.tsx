@@ -264,7 +264,12 @@ const WarrantyRequestListing = () => {
 
     window.location.reload();
     sessionStorage.removeItem(WARRANTY_FILTER_KEY);
-
+setGlobalState({
+                  selectedViewID: '',
+                  auth_id: auth_id,
+                  userName: userName,
+                  fromDashboardCount: 1
+                })
     setDataFilters({
 
       date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10,

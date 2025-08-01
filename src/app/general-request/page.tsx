@@ -242,7 +242,12 @@ const LeadRequestListing = () => {
 
     window.location.reload();
     sessionStorage.removeItem(LEAD_FILTER_KEY);
-
+setGlobalState({
+                  selectedViewID: '',
+                  auth_id: auth_id,
+                  userName: userName,
+                  fromDashboardCount: 1
+                })
     setDataFilters({
 
       date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0

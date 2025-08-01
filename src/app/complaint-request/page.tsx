@@ -239,6 +239,12 @@ fetchData({
   const resetFilter = async () => {
 
     window.location.reload();
+    setGlobalState({
+                  selectedViewID: '',
+                  auth_id: auth_id,
+                  userName: userName,
+                  fromDashboardCount: 1
+                })
     setDataFilters({
 
       date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
