@@ -294,7 +294,8 @@ export default function Home() {
         setGlobalState({
           selectedViewID:'',
           auth_id:response.user.auth_id,
-          userName:response.user.username
+          userName:response.user.username,
+          fromDashboardCount:0,
         })
         router.push(pageURL_dashboard)
 

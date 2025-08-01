@@ -5,6 +5,7 @@ interface DashboardResponseData {
   addressed_count: number
   complaints_pending_request:number
   business_pending_requests:number
+  general_pending_requests:number
   activities: ActivityDataModel[]
 }
 

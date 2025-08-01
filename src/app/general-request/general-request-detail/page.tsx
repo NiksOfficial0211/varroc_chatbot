@@ -331,7 +331,7 @@ const WarrantyRequestDetails = () => {
                         <div className="col-lg-4 mb-3">
                           <div className="request_list">
                             Customer Phone:
-                            <span>{generalDetailResponse.enq_data[0].contact_no && generalDetailResponse.enq_data[0].contact_no.toString().length==10 ?"91"+generalDetailResponse.enq_data[0].contact_no:generalDetailResponse.enq_data[0].contact_no}</span>
+                            <span>{generalDetailResponse.enq_data[0].contact_no && generalDetailResponse.enq_data[0].contact_no.toString().length == 10 ? "91" + generalDetailResponse.enq_data[0].contact_no : generalDetailResponse.enq_data[0].contact_no}</span>
 
                           </div>
                         </div>
@@ -385,6 +385,12 @@ const WarrantyRequestDetails = () => {
                           <div className="row">
                             <div className="col-lg-12">
                               <div className='masterrecord_heading'>Previous Request</div>
+                              <div className='tooltip_box2'>
+                                <img src={staticIconsBaseURL + "/images/ic_info_i.png"} alt="icon" className="img-fluid" style={{ width: "18px", marginLeft: "15px" }} />
+                                <div className="tooltip_inner">
+                                  These records represent previous requests made by the user using the same battery serial number.
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>}
@@ -423,26 +429,26 @@ const WarrantyRequestDetails = () => {
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Request Status:
-                                  <span>{generalDetailResponse.addressed_data[generalDetailResponse.addressed_data.length-1].request_status}</span>
+                                  <span>{generalDetailResponse.addressed_data[generalDetailResponse.addressed_data.length - 1].request_status}</span>
                                 </div>
                               </div>
 
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated By:
-                                  <span>{generalDetailResponse.addressed_data[generalDetailResponse.addressed_data.length-1].addressedBY}</span>
+                                  <span>{generalDetailResponse.addressed_data[generalDetailResponse.addressed_data.length - 1].addressedBY}</span>
                                 </div>
                               </div>
                               <div className="col-lg-4 mb-3">
                                 <div className="request_list">
                                   Updated Date:
-                                  <span>{formatDate(generalDetailResponse.addressed_data[generalDetailResponse.addressed_data.length-1].updated_at)}</span>
+                                  <span>{formatDate(generalDetailResponse.addressed_data[generalDetailResponse.addressed_data.length - 1].updated_at)}</span>
                                 </div>
                               </div>
                               <div className="col-lg-12 mb-3">
                                 <div className="request_list">
                                   Request Comments:
-                                  <span>{generalDetailResponse.addressed_data[generalDetailResponse.addressed_data.length-1].comments}</span>
+                                  <span>{generalDetailResponse.addressed_data[generalDetailResponse.addressed_data.length - 1].comments}</span>
                                 </div>
                               </div>
 

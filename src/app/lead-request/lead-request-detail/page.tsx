@@ -396,6 +396,12 @@ const WarrantyRequestDetails = () => {
                           <div className="row">
                             <div className="col-lg-12">
                               <div className='masterrecord_heading'>Previous Request</div>
+                              <div className='tooltip_box2'>
+                                                                <img src={staticIconsBaseURL+"/images/ic_info_i.png"} alt="icon" className="img-fluid" style={{width:"18px",marginLeft:"15px"}}/>
+                                                                <div className="tooltip_inner">
+                                                                These records represent previous requests made by the user using the same battery serial number.
+                                                              </div>
+                                                              </div>
                             </div>
                           </div>
                         </div>}

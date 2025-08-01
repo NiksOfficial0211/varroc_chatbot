@@ -1005,6 +1005,9 @@
 .tooltip_box{
   position: relative;
 }
+.tooltip_box2{
+  float: right;
+}
 .tooltip_inner{
     display: none;
     position: absolute;
@@ -1020,7 +1023,7 @@
     box-shadow: 0 0 20px #0000002e;
     margin: -40px 0 0 140px;
 }
-.tooltip_box:hover .tooltip_inner{
+.tooltip_box2:hover .tooltip_inner{
   display: block;
 }
 /* -------------------------- Nikhil Css End------------------------------ */

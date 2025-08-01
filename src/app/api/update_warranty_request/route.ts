@@ -173,7 +173,14 @@ export async function POST(request: Request) {
       })
       const certificateURL=await certResponse.json();
       console.log("after geting the url in update route------",certificateURL);
-
+      if(!certificateURL && certificateURL.length==0){
+        connection.rollback();
+        connection.release();
+         return NextResponse.json(
+          { status: 0, error: "Failed to generate PDF" },
+          { status: 200 }
+        );
+      }
       
       await connection.query(
       `UPDATE user_warranty_requests 
@@ -302,7 +309,7 @@ export async function POST(request: Request) {
         `INSERT INTO logs (activity_type,fk_request_id,request_type_id, change_json, created_at) VALUES (?, ?, ?, ?, ?)`,
         ["Update Warranty Request Exception", pk_id, 1, JSON.stringify(e), new Date()]
       );
-      connection.release();
+      
     }
 
     console.error("Transaction failed:", e);
@@ -310,6 +317,10 @@ export async function POST(request: Request) {
       { status: 0, error: e.message || "Internal Server Error", code: e.code || null },
       { status: 500 }
     );
+  }finally{
+    if (connection) {
+    connection.release();
+    }
   }
 }
 

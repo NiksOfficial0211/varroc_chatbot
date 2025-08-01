@@ -12,8 +12,8 @@ import React, {
 
 // 2. Create the context with a default value
 const GlobalContext = createContext({
-  selectedViewID: '',auth_id:0,userName:'',
-  setGlobalState: (state: { selectedViewID: string;auth_id:number,userName:string }) => {},
+  selectedViewID: '',auth_id:0,userName:'',fromDashboardCount:0,
+  setGlobalState: (state: { selectedViewID: string;auth_id:number,userName:string,fromDashboardCount:number }) => {},
 });
 
 // 3. Define the provider
@@ -23,9 +23,9 @@ export const GlobalContextProvider = ({ children }: { children: ReactNode }) => 
       const storedState = localStorage.getItem('globalState');
       return storedState
         ? JSON.parse(storedState)
-        : { selectedViewID: '',auth_id:0,userName:'' };
+        : { selectedViewID: '',auth_id:0,userName:'',fromDashboardCount:0 };
     }
-    return { selectedViewID: '',auth_id:0,userName:'' };
+    return { selectedViewID: '',auth_id:0,userName:'',fromDashboardCount:0 };
   });
 
   useEffect(() => {

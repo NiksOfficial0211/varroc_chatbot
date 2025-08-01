@@ -27,7 +27,7 @@ const LeadRequestListing = () => {
   useSessionRedirect();
 
   const [isLoading, setLoading] = useState(false);
-  const { auth_id, userName, setGlobalState } = useGlobalContext();
+  const { auth_id, userName, fromDashboardCount, setGlobalState } = useGlobalContext();
   const [isChecked, setIsChecked] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [alertForSuccess, setAlertForSuccess] = useState(0);
@@ -69,25 +69,60 @@ const LeadRequestListing = () => {
           setDataFilters(parsed);
 
         } else {
+          if (fromDashboardCount == 4) {
+            setDataFilters({
+              date: '', enquiry_id: '', city: '', state: '', status: 14, customerPhone: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+
+            });
+            fetchData({
+              date: '', enquiry_id: '', city: '', state: '', status: 14, customerPhone: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+
+            });
+          } else {
+            setDataFilters({
+              date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+
+            }); // fallback if invalid
+            fetchData(dataFilters);
+          }
+          
+        }
+      } else {
+        if (fromDashboardCount == 4) {
+          setDataFilters({
+            date: '', enquiry_id: '', city: '', state: '', status: 14, customerPhone: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+
+          });
+          fetchData({
+              date: '', enquiry_id: '', city: '', state: '', status: 14, customerPhone: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+
+            });
+        } else {
           setDataFilters({
             date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
 
           }); // fallback if invalid
           fetchData(dataFilters);
         }
+        
+      }
+    } catch (error) {
+      if (fromDashboardCount == 4) {
+        setDataFilters({
+          date: '', enquiry_id: '', city: '', state: '', status: 14, customerPhone: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+
+        });
+        fetchData({
+              date: '', enquiry_id: '', city: '', state: '', status: 14, customerPhone: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+
+            });
       } else {
         setDataFilters({
           date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
 
-        }); // fallback
+        }); // fallback if invalid
         fetchData(dataFilters);
       }
-    } catch (error) {
-      setDataFilters({
-        date: '', enquiry_id: '', city: '', state: '', status: '', customerPhone: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
-
-      }); // fallback
-      fetchData(dataFilters);
     }
 
   }, [])
@@ -371,7 +406,8 @@ const LeadRequestListing = () => {
                             setGlobalState({
                               selectedViewID: request.pk_id + '',
                               auth_id: auth_id,
-                              userName: userName
+                              userName: userName,
+                              fromDashboardCount: fromDashboardCount,
                             });
                             router.push(pageURL_GeneralDetails);
                           }}><img src={staticIconsBaseURL + "/images/view_icon.png"} alt="Varroc Excellence" className="img-fluid" style={{ maxHeight: "18px" }} /></div>

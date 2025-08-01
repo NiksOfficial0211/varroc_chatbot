@@ -36,11 +36,14 @@ export async function  POST(request:Request){
             'SELECT COUNT(*) AS total FROM user_warranty_requests where status_id=1'//1=pending
           );  
           const [complaintPendingRequests] = await connection.execute<CountResult[]>(
-            'SELECT COUNT(*) AS total FROM user_complaint_requests where status_id=6'//6=new
+            'SELECT COUNT(*) AS total FROM user_complaint_requests where status_id=6'//6=pending
           ); 
           const [dealershipPendingRequests] = await connection.execute<CountResult[]>(
-            'SELECT COUNT(*) AS total FROM user_dealership_request where status_id=10'//6=new
-          );  
+            'SELECT COUNT(*) AS total FROM user_dealership_request where status_id=10'//10=pending
+          ); 
+           const [generalPendingRequests] = await connection.execute<CountResult[]>(
+            'SELECT COUNT(*) AS total FROM user_freechat_requests where status_id=14'//14=new
+          );   
         const [userActivities] = await connection.execute(`SELECT 
                 ua.pk_activity_id,ua.name,
                 ua.phone,ua.request_type_id,
@@ -63,6 +66,7 @@ export async function  POST(request:Request){
             warranty_pending_request:warrantyPendingRequests[0].total,
             complaints_pending_request:complaintPendingRequests[0].total,
             business_pending_requests:dealershipPendingRequests[0].total,
+            general_pending_requests:generalPendingRequests[0].total,
             activities:userActivities
         }});
     }catch(e){

@@ -15,14 +15,14 @@ import moment from 'moment';
 import { RejectMSGMasterDataModel, StatusMasterDataModel } from '../datamodels/CommonDataModels';
 
 interface DataFilters {
-  date: any, request_id: any, phone_no: any, name: any, status: any, reject_id: any, page: any, limit: any,datafrom:number,dataTo:number,total:number
+  date: any, request_id: any, phone_no: any, name: any, status: any, reject_id: any, page: any, limit: any, datafrom: number, dataTo: number, total: number
 }
 
 const WarrantyRequestListing = () => {
   useSessionRedirect();
 
   const [isLoading, setLoading] = useState(false);
-  const { auth_id, userName, setGlobalState } = useGlobalContext();
+  const { auth_id, userName, fromDashboardCount, setGlobalState } = useGlobalContext();
   const [isChecked, setIsChecked] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [alertForSuccess, setAlertForSuccess] = useState(0);
@@ -35,7 +35,7 @@ const WarrantyRequestListing = () => {
   const [rejectionMasterData, setRejectionMasterData] = useState<RejectMSGMasterDataModel[]>([]);
 
   const [dataFilters, setDataFilters] = useState<DataFilters>({
-    date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
+    date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
 
   });
 
@@ -47,10 +47,10 @@ const WarrantyRequestListing = () => {
     sessionStorage.removeItem(COMPLAINT_FILTER_KEY);
     sessionStorage.removeItem(LEAD_FILTER_KEY);
     sessionStorage.removeItem(GENERAL_FILTER_KEY);
-     
+
     const stored = sessionStorage.getItem(WARRANTY_FILTER_KEY);
-    console.log("stored filter data :----- --------",stored);
-    
+    console.log("stored filter data :----- --------", stored);
+
     try {
       if (stored) {
         const parsed = JSON.parse(stored);
@@ -63,35 +63,76 @@ const WarrantyRequestListing = () => {
           'limit' in parsed
         ) {
           console.log(parsed);
-          
+
           fetchData(parsed);
           setDataFilters(parsed);
-          
+
         } else {
+          console.log("nikhil else condition after parsed");
+          
+          if (fromDashboardCount == 1) {
+            setDataFilters({
+              date: '', request_id: '', phone_no: '', name: '', status: 1, reject_id: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+
+            }); // fallback if invalid
+            fetchData({
+              date: '', request_id: '', phone_no: '', name: '', status: 1, reject_id: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+
+            });
+          } else {
+            console.log("nikhil else condition after count");
+            setDataFilters({
+              date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+
+            }); // fallback if invalid
+            fetchData(dataFilters);
+          }
+
+          
+        }
+      } else {
+        
+        
+        if (fromDashboardCount == 1) {
+          console.log("this is the stored else condition called--------");
           setDataFilters({
-            date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
+            date: '', request_id: '', phone_no: '', name: '', status: "1", reject_id: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+
+          }); // fallback if invalid
+          fetchData({
+            date: '', request_id: '', phone_no: '', name: '', status: "1", reject_id: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+
+          });
+        } else {
+          
+          setDataFilters({
+            date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
 
           }); // fallback if invalid
           fetchData(dataFilters);
         }
-      }else{
-        setDataFilters({
-            date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
-          }); // fallback
-      fetchData(dataFilters);
+        
       }
     } catch (error) {
-      setDataFilters({
-          date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
-        }); // fallback
+      if (fromDashboardCount == 1) {
+        setDataFilters({
+          date: '', request_id: '', phone_no: '', name: '', status: 1, reject_id: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+
+        }); // fallback if invalid
+      } else {
+        setDataFilters({
+          date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+
+        }); // fallback if invalid
+      }
       fetchData(dataFilters);
     }
 
   }, [])
 
   // const fetchData = async (date: any, request_id: any, phone_no: any, name: any, status: any, page: any, limit: any) => {
-  const fetchData = async (filters:DataFilters) => {
-        sessionStorage.setItem(WARRANTY_FILTER_KEY, JSON.stringify(filters));
+  const fetchData = async (filters: DataFilters) => {
+    sessionStorage.setItem(WARRANTY_FILTER_KEY, JSON.stringify(filters));
 
     setLoading(true);
     try {
@@ -101,8 +142,8 @@ const WarrantyRequestListing = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
-         body:JSON.stringify({
-            "request_type":1
+        body: JSON.stringify({
+          "request_type": 1
         })
 
       });
@@ -117,8 +158,8 @@ const WarrantyRequestListing = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_SECRET_TOKEN}`
         },
-        body:JSON.stringify({
-            "request_type":1
+        body: JSON.stringify({
+          "request_type": 1
         })
 
       });
@@ -149,14 +190,14 @@ const WarrantyRequestListing = () => {
 
       if (response.status == 1 && response.data.length > 0) {
         setLoading(false);
-          setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
-          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
-          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
+        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from }))
+        setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to }))
+        setDataFilters((prev) => ({ ...prev, ['total']: response.total }))
         setWarrantyRequestData(response.data)
         if (response.data.length < dataFilters.limit) {
-          setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
-          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
-          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
+          setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from }))
+          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to }))
+          setDataFilters((prev) => ({ ...prev, ['total']: response.total }))
           setHasMoreData(false);
 
         } else {
@@ -165,17 +206,17 @@ const WarrantyRequestListing = () => {
       } else if (response.status == 1 && response.data.length == 0) {
         setLoading(false);
         setWarrantyRequestData([])
-        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
-          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
-          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
+        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from }))
+        setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to }))
+        setDataFilters((prev) => ({ ...prev, ['total']: response.total }))
         setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page }))
 
         setHasMoreData(false);
       }
       else {
-        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
-          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
-          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
+        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from }))
+        setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to }))
+        setDataFilters((prev) => ({ ...prev, ['total']: response.total }))
         setDataFilters((prev) => ({ ...prev, ['pageNumber']: response.pageNumber }))
 
 
@@ -200,15 +241,15 @@ const WarrantyRequestListing = () => {
     if (hasMoreData) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-        date: dataFilters.date, request_id: dataFilters.request_id, phone_no: dataFilters.phone_no, name: dataFilters.name, status: dataFilters.status, reject_id: dataFilters.reject_id, page: dataFilters.page+page, limit: 10,
-        datafrom:dataFilters.datafrom,dataTo:dataFilters.dataTo,total:dataFilters.total
+        date: dataFilters.date, request_id: dataFilters.request_id, phone_no: dataFilters.phone_no, name: dataFilters.name, status: dataFilters.status, reject_id: dataFilters.reject_id, page: dataFilters.page + page, limit: 10,
+        datafrom: dataFilters.datafrom, dataTo: dataFilters.dataTo, total: dataFilters.total
       });
     }
     else if (!hasMoreData && dataFilters.page > 1) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-        date: dataFilters.date, request_id: dataFilters.request_id, phone_no: dataFilters.phone_no, name: dataFilters.name, status: dataFilters.status, reject_id: dataFilters.reject_id, page: dataFilters.page+page, limit: 10,
-         datafrom:dataFilters.datafrom,dataTo:dataFilters.dataTo,total:dataFilters.total
+        date: dataFilters.date, request_id: dataFilters.request_id, phone_no: dataFilters.phone_no, name: dataFilters.name, status: dataFilters.status, reject_id: dataFilters.reject_id, page: dataFilters.page + page, limit: 10,
+        datafrom: dataFilters.datafrom, dataTo: dataFilters.dataTo, total: dataFilters.total
       });
     }
 
@@ -222,28 +263,28 @@ const WarrantyRequestListing = () => {
   const resetFilter = async () => {
 
     window.location.reload();
-        sessionStorage.removeItem(WARRANTY_FILTER_KEY);
-    
+    sessionStorage.removeItem(WARRANTY_FILTER_KEY);
+
     setDataFilters({
 
       date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10,
-       datafrom:0,dataTo:0,total:0
+      datafrom: 0, dataTo: 0, total: 0
     });
     fetchData(dataFilters.page);
   }
 
-  function formatDateYYYYMMDD(inputDate: string,timeZone = 'Asia/Kolkata') {
+  function formatDateYYYYMMDD(inputDate: string, timeZone = 'Asia/Kolkata') {
     const date = new Date(inputDate);
 
     const formatter = new Intl.DateTimeFormat('en-IN', {
-        timeZone,
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
 
     const parts = formatter.formatToParts(date);
     const get = (type: string) => parts.find(p => p.type === type)?.value;
@@ -261,11 +302,11 @@ const WarrantyRequestListing = () => {
       },
       body: JSON.stringify({
         date: dataFilters.date,
-          request_id: dataFilters.request_id,
-          phone_no: dataFilters.phone_no,
-          name: dataFilters.name,
-          status: dataFilters.status,
-          reject_id: dataFilters.reject_id,
+        request_id: dataFilters.request_id,
+        phone_no: dataFilters.phone_no,
+        name: dataFilters.name,
+        status: dataFilters.status,
+        reject_id: dataFilters.reject_id,
       }),
     });
     const blob = await response.blob();
@@ -298,12 +339,12 @@ const WarrantyRequestListing = () => {
             <div className="col-lg-12">
 
               <div className="row" id="top">
-                
-                  <div className="col-lg-12 mb-3">
-                    <div className="heading25">
-                      Requests
-                      <button className="blue_btn" style={{ float: "right" }} onClick={downloadExport}>Export Data</button>
-                    </div>
+
+                <div className="col-lg-12 mb-3">
+                  <div className="heading25">
+                    Requests
+                    <button className="blue_btn" style={{ float: "right" }} onClick={downloadExport}>Export Data</button>
+                  </div>
                 </div>
 
                 <div className="col-lg-12 mb-4 ">
@@ -342,7 +383,7 @@ const WarrantyRequestListing = () => {
                           {/* <input type="text" id="status" name="status" value={dataFilters.status} onChange={handleInputChange} /> */}
                         </div>
                       </div>
-                      {dataFilters.status && dataFilters.status==status_Rejected && <div className="col-lg-2">
+                      {dataFilters.status && dataFilters.status == status_Rejected && <div className="col-lg-2">
                         <div className="form_box ">
                           <label htmlFor="formFile" className="form-label"> Rejection Reason: </label>
                           <select id="reject_id" name="reject_id" onChange={handleInputChange}>
@@ -362,7 +403,7 @@ const WarrantyRequestListing = () => {
                       </div>
 
                       <div className="col-lg-12 pt-4">
-                        <div style={{float:"right", margin:"0 0 -30px 0"}}>
+                        <div style={{ float: "right", margin: "0 0 -30px 0" }}>
                           <a className="blue_btn" onClick={() => { fetchData(dataFilters); }}>Submit</a> <a className="blue_btn" onClick={() => resetFilter()}>Reset</a>
                         </div>
                       </div>
@@ -374,7 +415,7 @@ const WarrantyRequestListing = () => {
               </div>
               <div className="row mb-3">
                 <div className="col-lg-12">
-                  <div className="grey_box" style={{ backgroundColor: "#fff", position:"relative", padding:"20px 60px 20px 30px" }}>
+                  <div className="grey_box" style={{ backgroundColor: "#fff", position: "relative", padding: "20px 60px 20px 30px" }}>
                     <div className="row list_label mb-4">
                       <div className="col-lg-3 text-center"><div className="label">Reference <br></br>ID</div></div>
                       <div className="col-lg-2 text-center"><div className="label">Reference <br></br>Date</div></div>
@@ -401,7 +442,8 @@ const WarrantyRequestListing = () => {
                             setGlobalState({
                               selectedViewID: request.pk_request_id + '',
                               auth_id: auth_id,
-                              userName: userName
+                              userName: userName,
+                              fromDashboardCount: 0,
                             });
                             router.push(pageURL_WarrantyRequestDetails);
                           }}><img src={staticIconsBaseURL + "/images/view_icon.png"} alt="Varroc Excellence" className="img-fluid" style={{ maxHeight: "18px" }} /></div>
@@ -413,7 +455,7 @@ const WarrantyRequestListing = () => {
               </div>
               <div className="row">
                 <div className="col-lg-12">
-                  <p style={{float:"left"}}>Showing {dataFilters.datafrom} to {dataFilters.dataTo} out of {dataFilters.total}</p>
+                  <p style={{ float: "left" }}>Showing {dataFilters.datafrom} to {dataFilters.dataTo} out of {dataFilters.total}</p>
                   <div className="pagination_box mb-3">
                     <div className={dataFilters.page > 1 ? " pagi_btn" : "pagi_btn btn_no"} onClick={() => { dataFilters.page > 1 && changePage(-1); }}>Prev</div>
                     <div className="btn_count">{dataFilters.page}</div>

@@ -17,14 +17,14 @@ import { ComplaintListDataModel } from '../datamodels/ComplaintsDataModel';
 
 interface DataFilters {
   date: any, request_id: any, phone_no: any, name: any, status: any, page: any, limit: any
-  ,datafrom:number,dataTo:number,total:number
+  , datafrom: number, dataTo: number, total: number
 }
 
 const WarrantyRequestListing = () => {
   useSessionRedirect();
 
   const [isLoading, setLoading] = useState(false);
-  const { auth_id, userName, setGlobalState } = useGlobalContext();
+  const { auth_id, userName, fromDashboardCount, setGlobalState } = useGlobalContext();
   const [isChecked, setIsChecked] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [alertForSuccess, setAlertForSuccess] = useState(0);
@@ -36,21 +36,21 @@ const WarrantyRequestListing = () => {
   const [statusMasterData, setStatusMasterData] = useState<StatusMasterDataModel[]>([]);
 
   const [dataFilters, setDataFilters] = useState<DataFilters>({
-    date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
+    date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
 
   });
   const [hasMoreData, setHasMoreData] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    
-      sessionStorage.removeItem(WARRANTY_FILTER_KEY);
-          sessionStorage.removeItem(LEAD_FILTER_KEY);
-              sessionStorage.removeItem(GENERAL_FILTER_KEY);
-          
+
+    sessionStorage.removeItem(WARRANTY_FILTER_KEY);
+    sessionStorage.removeItem(LEAD_FILTER_KEY);
+    sessionStorage.removeItem(GENERAL_FILTER_KEY);
+
     const stored = sessionStorage.getItem(COMPLAINT_FILTER_KEY);
-    console.log("stored filter data :----- --------",stored);
-    
+    console.log("stored filter data :----- --------", stored);
+
     try {
       if (stored) {
         const parsed = JSON.parse(stored);
@@ -64,29 +64,64 @@ const WarrantyRequestListing = () => {
         ) {
           fetchData(parsed);
           setDataFilters(parsed);
-          
-        } else {
-          setDataFilters({
-            date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
 
-          }); // fallback if invalid
-          fetchData(dataFilters);
+        } else {
+          if (fromDashboardCount == 2) {
+            setDataFilters({
+              date: '', request_id: '', phone_no: '', name: '', status: 6, page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+            })
+fetchData({
+              date: '', request_id: '', phone_no: '', name: '', status: 6, page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+            });
+          }
+          else {
+            setDataFilters({
+              date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+
+            }); // fallback if invalid
+            fetchData(dataFilters);
+          }
+          
         }
-      }else{
-       setDataFilters({
-            date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
-          }); // fallback
-        fetchData(dataFilters);
+      } else {
+        if (fromDashboardCount == 2) {
+          setDataFilters({
+            date: '', request_id: '', phone_no: '', name: '', status: 6, page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+          });
+          fetchData({
+              date: '', request_id: '', phone_no: '', name: '', status: 6, page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+            });
+        }
+        else {
+          setDataFilters({
+            date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+
+          });  // fallback
+          fetchData(dataFilters);
+          
+        }
+        
       }
     } catch (error) {
-      setDataFilters({
-        date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
+      if (fromDashboardCount == 2) {
+        setDataFilters({
+          date: '', request_id: '', phone_no: '', name: '', status: 6, page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+        })
+        fetchData({
+              date: '', request_id: '', phone_no: '', name: '', status: 6, page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
+            });
+      }
+      else {
+        setDataFilters({
+          date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
 
-      }); // fallback
-      fetchData(dataFilters);
+        });  // fallback
+        fetchData(dataFilters);
+      }
+      
     }
     // fetchData(dataFilters.date, dataFilters.request_id, dataFilters.phone_no, dataFilters.name, dataFilters.status, dataFilters.page, dataFilters.limit);
-    
+
 
   }, [])
 
@@ -136,9 +171,9 @@ const WarrantyRequestListing = () => {
         setLoading(false);
 
         setComplaintsData(response.data)
-        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
-          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
-          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
+        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from }))
+        setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to }))
+        setDataFilters((prev) => ({ ...prev, ['total']: response.total }))
         if (response.data.length < dataFilters.limit) {
           setHasMoreData(false);
 
@@ -148,18 +183,18 @@ const WarrantyRequestListing = () => {
       } else if (response.status == 1 && response.data.length == 0) {
         setLoading(false);
         setComplaintsData([])
-        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
-          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
-          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
+        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from }))
+        setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to }))
+        setDataFilters((prev) => ({ ...prev, ['total']: response.total }))
         setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page }))
 
         setHasMoreData(false);
       }
       else {
         setDataFilters((prev) => ({ ...prev, ['pageNumber']: response.pageNumber }))
-        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from  }))
-          setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to  }))
-          setDataFilters((prev) => ({ ...prev, ['total']: response.total  }))
+        setDataFilters((prev) => ({ ...prev, ['datafrom']: response.from }))
+        setDataFilters((prev) => ({ ...prev, ['dataTo']: response.to }))
+        setDataFilters((prev) => ({ ...prev, ['total']: response.total }))
         setHasMoreData(false)
         setLoading(false);
         setShowAlert(true);
@@ -183,14 +218,14 @@ const WarrantyRequestListing = () => {
     if (hasMoreData) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-      date: dataFilters.date, request_id: dataFilters.request_id, phone_no: dataFilters.phone_no, name: dataFilters.name, status: dataFilters.status, page: dataFilters.page + page, limit: 10,datafrom:dataFilters.datafrom,dataTo:dataFilters.dataTo,total:dataFilters.total
-    });
+        date: dataFilters.date, request_id: dataFilters.request_id, phone_no: dataFilters.phone_no, name: dataFilters.name, status: dataFilters.status, page: dataFilters.page + page, limit: 10, datafrom: dataFilters.datafrom, dataTo: dataFilters.dataTo, total: dataFilters.total
+      });
     }
     else if (!hasMoreData && dataFilters.page > 1) {
       setDataFilters((prev) => ({ ...prev, ['page']: dataFilters.page + page }))
       fetchData({
-      date: dataFilters.date, request_id: dataFilters.request_id, phone_no: dataFilters.phone_no, name: dataFilters.name, status: dataFilters.status, page: dataFilters.page + page, limit: 10,datafrom:dataFilters.datafrom,dataTo:dataFilters.dataTo,total:dataFilters.total
-    });
+        date: dataFilters.date, request_id: dataFilters.request_id, phone_no: dataFilters.phone_no, name: dataFilters.name, status: dataFilters.status, page: dataFilters.page + page, limit: 10, datafrom: dataFilters.datafrom, dataTo: dataFilters.dataTo, total: dataFilters.total
+      });
     }
 
   }
@@ -200,18 +235,18 @@ const WarrantyRequestListing = () => {
     // console.log("Form values updated:", formValues);
     setDataFilters((prev) => ({ ...prev, [name]: value }));
   }
-  
+
   const resetFilter = async () => {
 
     window.location.reload();
     setDataFilters({
 
-      date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
+      date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
     });
     sessionStorage.removeItem(COMPLAINT_FILTER_KEY);
 
     fetchData({
-      date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10,datafrom:0,dataTo:0,total:0
+      date: '', request_id: '', phone_no: '', name: '', status: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
     });
   }
 
@@ -364,7 +399,8 @@ const WarrantyRequestListing = () => {
                             setGlobalState({
                               selectedViewID: complaints.pk_id + '',
                               auth_id: auth_id,
-                              userName: userName
+                              userName: userName,
+                              fromDashboardCount: fromDashboardCount,
                             });
                             router.push(pageURL_ComplaintDetails);
                           }}><img src={staticIconsBaseURL + "/images/view_icon.png"} alt="Varroc Excellence" className="img-fluid" style={{ maxHeight: "18px" }} /></div>
@@ -376,7 +412,7 @@ const WarrantyRequestListing = () => {
               </div>
               <div className="row">
                 <div className="col-lg-12">
-                  <p style={{float:"left"}}>Showing {dataFilters.datafrom} to {dataFilters.dataTo} out of {dataFilters.total}</p>
+                  <p style={{ float: "left" }}>Showing {dataFilters.datafrom} to {dataFilters.dataTo} out of {dataFilters.total}</p>
 
                   <div className="pagination_box mb-3">
                     <div className={dataFilters.page > 1 ? " pagi_btn" : "pagi_btn btn_no"} onClick={() => { dataFilters.page > 1 && changePage(-1); }}>Prev</div>

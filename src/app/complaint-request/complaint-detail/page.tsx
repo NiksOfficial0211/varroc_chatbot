@@ -448,6 +448,12 @@ const WarrantyRequestDetails = () => {
                           <div className="row">
                             <div className="col-lg-12">
                               <div className='masterrecord_heading'>Previous/Duplicate Request</div>
+                              <div className='tooltip_box2'>
+                                                                <img src={staticIconsBaseURL+"/images/ic_info_i.png"} alt="icon" className="img-fluid" style={{width:"18px",marginLeft:"15px"}}/>
+                                                                <div className="tooltip_inner">
+                                                                These records represent multiple requests made by the user using the same battery serial number.
+                                                              </div>
+                                                              </div>
                             </div>
                           </div>
                         </div>}
@@ -483,6 +489,12 @@ const WarrantyRequestDetails = () => {
                           <div className="row">
                             <div className="col-lg-12">
                               <div className='masterrecord_heading'>Warranty Request</div>
+                              <div className='tooltip_box2'>
+                                                                <img src={staticIconsBaseURL+"/images/ic_info_i.png"} alt="icon" className="img-fluid" style={{width:"18px",marginLeft:"15px"}}/>
+                                                                <div className="tooltip_inner">
+                                                                These records represent warranty requests made by the user using the same battery serial number.
+                                                              </div>
+                                                              </div>
                             </div>
                           </div>
                         </div>}
@@ -539,7 +551,14 @@ const WarrantyRequestDetails = () => {
                             </div>
                           </div>))}
                         {complaintData.battery_details.length == 0 && <div className="request_list_heading mb-4 ml-3" style={{ width: "auto", margin: "0" }}>
-                          <span style={{ color: "#D93731" }}>Serial Number does not match</span>
+                          <span style={{ color: "#D93731" }}>Serial Number does not match
+                            <div className='tooltip_box2'>
+                                                              <img src={staticIconsBaseURL+"/images/ic_info_i.png"} alt="icon" className="img-fluid" style={{width:"18px",marginLeft:"15px"}}/>
+                                                              <div className="tooltip_inner">
+                                  This message appears when the serial number entered by the user does not match any record in our battery master database.   
+                                                            </div>
+                                                            </div>
+                          </span>
                         </div>}
 
                       </div>

@@ -6,7 +6,7 @@ import LoadingDialog from '../components/PageLoader';
 import ShowAlertMessage from '../components/alert';
 import { COMPLAINT_FILTER_KEY, LEAD_FILTER_KEY, staticIconsBaseURL, WARRANTY_FILTER_KEY } from '../pro_utils/string_constants'
 import { useRouter } from 'next/navigation';
-import { pageURL_ComplaintDetails, pageURL_GeneralDetails, pageURL_LeadDetails, pageURL_WarrantyRequestDetails, pageURL_WarrantyRequestList } from '../pro_utils/string_routes';
+import { pageURL_ComplaintDetails, pageURL_ComplaintList, pageURL_GeneralDetails, pageURL_LeadDetails, pageURL_LeadRequstList, pageURL_WarrantyRequestDetails, pageURL_WarrantyRequestList } from '../pro_utils/string_routes';
 import { useScrollCounter } from '../hooks/DashboardCountHook/dashboardCountHook';
 import { useGlobalContext } from '../contextProviders/globalContext';
 import LeftPanelMenus from '../components/leftPanel';
@@ -14,8 +14,8 @@ import LeftPanelMenus from '../components/leftPanel';
 const Dashboard = () => {
   useSessionRedirect();
   useScrollCounter();
-  const { auth_id,userName,setGlobalState } = useGlobalContext();
-  
+  const { auth_id, userName, setGlobalState } = useGlobalContext();
+
   const [isLoading, setLoading] = useState(false);
 
   const [isChecked, setIsChecked] = useState(true);
@@ -30,16 +30,16 @@ const Dashboard = () => {
   useEffect(() => {
     sessionStorage.removeItem(WARRANTY_FILTER_KEY);
     sessionStorage.removeItem(COMPLAINT_FILTER_KEY);
-              sessionStorage.removeItem(LEAD_FILTER_KEY);
+    sessionStorage.removeItem(LEAD_FILTER_KEY);
     fetchData();
     // fetchData();
-        const intervalId = setInterval(() => {
-            // fetchActivities();
-            fetchData();
-        }, 5000); 
-        return () => {
-            clearInterval(intervalId);
-          };
+    const intervalId = setInterval(() => {
+      // fetchActivities();
+      fetchData();
+    }, 5000);
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []);
 
   const fetchData = async () => {
@@ -77,12 +77,12 @@ const Dashboard = () => {
       setAlertForSuccess(2)
     }
   }
-  
+
 
 
   return (
     <div>
-      
+
       <LoadingDialog isLoading={false} />
       {showAlert && <ShowAlertMessage title={alertTitle} startContent={alertStartContent} onOkClicked={function (): void {
         setShowAlert(false)
@@ -90,48 +90,87 @@ const Dashboard = () => {
       }} onCloseClicked={function (): void {
         setShowAlert(false)
       }} showCloseButton={false} successFailure={alertForSuccess} />}
-        <LeftPanelMenus selectedMenu={1} showLeftPanel={false} headertitle='Battery Dashboard' rightBoxUI={
+      <LeftPanelMenus selectedMenu={1} showLeftPanel={false} headertitle='Battery Dashboard' rightBoxUI={
         <div className="container">
           <div className="row mb-5">
             <div className="col-lg-12">
-              <div className="req_whitebox" style={{ backgroundColor:"#f0faff"}}>
+              <div className="req_whitebox" style={{ backgroundColor: "#f0faff" }}>
                 <div className="row text-center">
                   <div className="col-lg-12 mb-2"><span data-max="08" className="ms-animated">{dashboardData?.activities.length || 0}</span></div>
                   <div className="col-lg-12 request_text">Today's <br></br>Requests</div>
                 </div>
               </div>
-              <div className="req_whitebox" style={{ backgroundColor:"#fff9ee"}}>
+              <div className="req_whitebox" style={{ backgroundColor: "#fff9ee" }}>
                 <div className="row text-center">
                   <div className="col-lg-12 mb-2"><span data-max="08" className="ms-animated">{dashboardData?.total_Request || 0}</span></div>
                   <div className="col-lg-12 request_text">Total <br></br>Requests</div>
                 </div>
               </div>
-              <div className="req_whitebox" style={{ backgroundColor:"#def9e1"}}>
+              <div className="req_whitebox" style={{ backgroundColor: "#def9e1" }}>
                 <div className="row text-center">
                   <div className="col-lg-12 mb-2"><span data-max="10000" className="ms-animated">{dashboardData?.addressed_count || 0}</span></div>
                   <div className="col-lg-12 request_text">Request <br></br>Addressed</div>
                 </div>
               </div>
               {/* onClick={() => router.push(pageURL_WarrantyRequestList)} */}
-              <div className="req_whitebox" style={{ backgroundColor:"#ffeceb"}} >
+              <div className="req_whitebox" style={{ backgroundColor: "#ffeceb" }} onClick={() => {
+                setGlobalState({
+                  selectedViewID: '',
+                  auth_id: auth_id,
+                  userName: userName,
+                  fromDashboardCount: 1
+                })
+                router.push(pageURL_WarrantyRequestList)
+              }}>
                 <div className="row text-center">
                   <div className="col-lg-12 mb-2"><span data-max="39" className="ms-animated">{dashboardData?.warranty_pending_request || 0}</span></div>
                   <div className="col-lg-12 request_text">Pending <br></br>Warranty Requests</div>
                 </div>
               </div>
-              <div className="req_whitebox" style={{ backgroundColor:"#ffeceb"}}>
+              <div className="req_whitebox" style={{ backgroundColor: "#ffeceb" }} onClick={() => {
+                setGlobalState({
+                  selectedViewID: '',
+                  auth_id: auth_id,
+                  userName: userName,
+                  fromDashboardCount: 2
+                })
+                router.push(pageURL_ComplaintList)
+              }}>
                 <div className="row text-center">
                   <div className="col-lg-12 mb-2"><span data-max="39" className="ms-animated">{dashboardData?.complaints_pending_request || 0}</span></div>
                   <div className="col-lg-12 request_text">Pending<br></br>Complaints</div>
                 </div>
               </div>
-              <div className="req_whitebox" style={{ backgroundColor:"#ffeceb"}}>
-                <div className="row text-center">
+              <div className="req_whitebox" style={{ backgroundColor: "#ffeceb" }} onClick={() => {
+                setGlobalState({
+                  selectedViewID: '',
+                  auth_id: auth_id,
+                  userName: userName,
+                  fromDashboardCount: 3
+                })
+                router.push(pageURL_ComplaintList)
+              }}>
+                <div className="row text-center" >
                   <div className="col-lg-12 mb-2"><span data-max="39" className="ms-animated">{dashboardData?.business_pending_requests || 0}</span></div>
                   <div className="col-lg-12 request_text">Pending <br></br>Dealership Enquiries</div>
                 </div>
+
               </div>
-              
+              <div className="req_whitebox" style={{ backgroundColor: "#ffeceb" }} onClick={() => {
+                setGlobalState({
+                  selectedViewID: '',
+                  auth_id: auth_id,
+                  userName: userName,
+                  fromDashboardCount: 4
+                })
+                router.push(pageURL_LeadRequstList)
+              }}>
+                <div className="row text-center" >
+                  <div className="col-lg-12 mb-2"><span data-max="39" className="ms-animated">{dashboardData?.general_pending_requests || 0}</span></div>
+                  <div className="col-lg-12 request_text">Pending <br></br>General Enquiries</div>
+                </div>
+              </div>
+
             </div>
           </div>
           {/* <div className="row mb-4">
@@ -198,34 +237,35 @@ const Dashboard = () => {
                           <div className="col-lg-2 text-center"><div className="label">{activity.request_type}</div></div>
                           <div className="col-lg-2 text-center"><div className="label">{activity.request_status == "1" ? "New" : activity.request_status}</div></div>
                           <div className="col-lg-1 text-center"><div className="label" onClick={() => {
-                                                  setGlobalState({
-                                                    selectedViewID: activity.go_activity_id + '',
-                                                    auth_id:auth_id,
-                                                    userName:userName
-                                                  })
-                                                  if(activity.request_type_id==1){
-                                                      router.push(pageURL_WarrantyRequestDetails)
-                                                  }else if(activity.request_type_id==2){
-                                                      router.push(pageURL_ComplaintDetails)
-                                                  }else if(activity.request_type_id==3){
-                                                    router.push(pageURL_LeadDetails)
-                                                  }else if(activity.request_type_id==4){
-                                                      router.push(pageURL_GeneralDetails)
-                                                  }
-                                                  
-                                                }}><img src={staticIconsBaseURL + "/images/view_icon.png"} alt="Varroc Excellence" className="img-fluid" style={{ maxHeight: "18px" }} /></div></div>
+                            setGlobalState({
+                              selectedViewID: activity.go_activity_id + '',
+                              auth_id: auth_id,
+                              userName: userName,
+                              fromDashboardCount: 0
+                            })
+                            if (activity.request_type_id == 1) {
+                              router.push(pageURL_WarrantyRequestDetails)
+                            } else if (activity.request_type_id == 2) {
+                              router.push(pageURL_ComplaintDetails)
+                            } else if (activity.request_type_id == 3) {
+                              router.push(pageURL_LeadDetails)
+                            } else if (activity.request_type_id == 4) {
+                              router.push(pageURL_GeneralDetails)
+                            }
+
+                          }}><img src={staticIconsBaseURL + "/images/view_icon.png"} alt="Varroc Excellence" className="img-fluid" style={{ maxHeight: "18px" }} /></div></div>
                         </div>))}
-                    
+
 
                   </div>
                 </div>
               </div>
-              
+
             </div>
 
           </div>
         </div>
-        }/>
+      } />
     </div>
   )
 }
