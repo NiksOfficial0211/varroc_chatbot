@@ -246,7 +246,7 @@ setGlobalState({
                   selectedViewID: '',
                   auth_id: auth_id,
                   userName: userName,
-                  fromDashboardCount: 1
+                  fromDashboardCount: 0
                 })
     setDataFilters({
 

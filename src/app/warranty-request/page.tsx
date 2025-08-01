@@ -69,7 +69,7 @@ const WarrantyRequestListing = () => {
 
         } else {
           console.log("nikhil else condition after parsed");
-          
+
           if (fromDashboardCount == 1) {
             setDataFilters({
               date: '', request_id: '', phone_no: '', name: '', status: 1, reject_id: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
@@ -88,11 +88,11 @@ const WarrantyRequestListing = () => {
             fetchData(dataFilters);
           }
 
-          
+
         }
       } else {
-        
-        
+
+
         if (fromDashboardCount == 1) {
           console.log("this is the stored else condition called--------");
           setDataFilters({
@@ -104,14 +104,14 @@ const WarrantyRequestListing = () => {
 
           });
         } else {
-          
+
           setDataFilters({
             date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10, datafrom: 0, dataTo: 0, total: 0
 
           }); // fallback if invalid
           fetchData(dataFilters);
         }
-        
+
       }
     } catch (error) {
       if (fromDashboardCount == 1) {
@@ -264,12 +264,12 @@ const WarrantyRequestListing = () => {
 
     window.location.reload();
     sessionStorage.removeItem(WARRANTY_FILTER_KEY);
-setGlobalState({
-                  selectedViewID: '',
-                  auth_id: auth_id,
-                  userName: userName,
-                  fromDashboardCount: 1
-                })
+    setGlobalState({
+      selectedViewID: '',
+      auth_id: auth_id,
+      userName: userName,
+      fromDashboardCount: 0
+    })
     setDataFilters({
 
       date: '', request_id: '', phone_no: '', name: '', status: '', reject_id: '', page: 1, limit: 10,
