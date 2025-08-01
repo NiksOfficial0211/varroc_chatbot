@@ -352,12 +352,13 @@ fetchData(dataFilters);
                       <div className="col-lg-2">
                         <div className="form_box ">
                           <label htmlFor="formFile" className="form-label">Status: </label>
-                          <select id="status" name="status" value={dataFilters.status} onChange={handleInputChange}>
-                            <option value="">Select</option>
-                            {statusMasterData.map((singleStatus) => (
-                              <option value={singleStatus.status_id} key={singleStatus.status_id}>{singleStatus.status}</option>
-                            ))}
-                          </select>                        </div>
+                            <select id="status" name="status" value={dataFilters.status} onChange={handleInputChange}>
+                              <option value="">Select</option>
+                              {statusMasterData.map((singleStatus) => (
+                                <option value={singleStatus.status_id} key={singleStatus.status_id}>{singleStatus.status}</option>
+                              ))}
+                            </select>                        
+                          </div>
                       </div>
                       <div className="col-lg-2">
                         <div className="form_box ">

@@ -6,7 +6,7 @@ import LoadingDialog from '../components/PageLoader';
 import ShowAlertMessage from '../components/alert';
 import { COMPLAINT_FILTER_KEY, LEAD_FILTER_KEY, staticIconsBaseURL, WARRANTY_FILTER_KEY } from '../pro_utils/string_constants'
 import { useRouter } from 'next/navigation';
-import { pageURL_ComplaintDetails, pageURL_ComplaintList, pageURL_GeneralDetails, pageURL_LeadDetails, pageURL_LeadRequstList, pageURL_WarrantyRequestDetails, pageURL_WarrantyRequestList } from '../pro_utils/string_routes';
+import { pageURL_ComplaintDetails, pageURL_ComplaintList, pageURL_GeneralDetails, pageURL_GeneralRequstList, pageURL_LeadDetails, pageURL_LeadRequstList, pageURL_WarrantyRequestDetails, pageURL_WarrantyRequestList } from '../pro_utils/string_routes';
 import { useScrollCounter } from '../hooks/DashboardCountHook/dashboardCountHook';
 import { useGlobalContext } from '../contextProviders/globalContext';
 import LeftPanelMenus from '../components/leftPanel';
@@ -148,7 +148,7 @@ const Dashboard = () => {
                   userName: userName,
                   fromDashboardCount: 3
                 })
-                router.push(pageURL_ComplaintList)
+                router.push(pageURL_LeadRequstList)
               }}>
                 <div className="row text-center" >
                   <div className="col-lg-12 mb-2"><span data-max="39" className="ms-animated">{dashboardData?.business_pending_requests || 0}</span></div>
@@ -163,7 +163,7 @@ const Dashboard = () => {
                   userName: userName,
                   fromDashboardCount: 4
                 })
-                router.push(pageURL_LeadRequstList)
+                router.push(pageURL_GeneralRequstList)
               }}>
                 <div className="row text-center" >
                   <div className="col-lg-12 mb-2"><span data-max="39" className="ms-animated">{dashboardData?.general_pending_requests || 0}</span></div>
