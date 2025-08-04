@@ -139,7 +139,7 @@ const [duplicateFreechatRows] = await connection.execute<RowDataPacket[]>(`
         JOIN request_types rt ON ura.request_type = rt.request_type_id 
         LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
         JOIN request_status rs ON ura.request_status = rs.status_id 
-        WHERE ura.request_type = 3 AND ura.fk_request_id = ?
+        WHERE ura.request_type = 4 AND ura.fk_request_id = ?
       `, [dupIds[0]]);
     
       // Merge addressed data with duplicate rows
@@ -162,7 +162,7 @@ const [duplicateFreechatRows] = await connection.execute<RowDataPacket[]>(`
           JOIN auth aut ON ura.auth_user_id = aut.auth_id 
           JOIN request_types rt ON ura.request_type = rt.request_type_id 
           LEFT JOIN request_rejections rr ON ura.fk_rejection_id = rr.pk_reject_id 
-          JOIN request_status rs ON ura.request_status = rs.status_id WHERE ura.fk_request_id = ? AND ura.request_type=4`,
+          JOIN request_status rs ON ura.request_status = rs.status_id WHERE ura.request_type=4 AND ura.fk_request_id = ?`,
       [pk_id]
     );
  
