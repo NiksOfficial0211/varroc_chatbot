@@ -383,8 +383,15 @@ const WarrantyRequestDetails = () => {
 
                         <div className="col-lg-12">
                           <div className="row">
-                            <div className="col-lg-12">
-                              <div className='masterrecord_heading'>Master Record</div>
+                            <div className="col-lg-12 tooltip_box">
+                              <div className='masterrecord_heading'>Master Record
+                                <div className='tooltip_box2'>
+                                  <img src={staticIconsBaseURL+"/images/ic_info_i.png"} alt="icon" className="img-fluid" style={{width:"18px",marginLeft:"15px"}}/>
+                                  <div className="tooltip_inner">
+                                      The battery data will be displayed only when the serial number entered by the user matches an existing record in our battery database.                                  
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
