@@ -447,13 +447,14 @@ const WarrantyRequestDetails = () => {
                        {complaintData.duplicate_data && complaintData.duplicate_data.length>0 && <div className="col-lg-12">
                           <div className="row">
                             <div className="col-lg-12">
-                              <div className='masterrecord_heading'>Previous/Duplicate Request</div>
+                              <div className='masterrecord_heading'>Previous/Duplicate Request
                               <div className='tooltip_box2'>
                                                                 <img src={staticIconsBaseURL+"/images/ic_info_i.png"} alt="icon" className="img-fluid" style={{width:"18px",marginLeft:"15px"}}/>
                                                                 <div className="tooltip_inner">
                                                                 These records represent multiple requests made by the user using the same battery serial number.
                                                               </div>
                                                               </div>
+                            </div>
                             </div>
                           </div>
                         </div>}
