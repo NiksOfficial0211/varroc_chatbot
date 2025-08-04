@@ -383,8 +383,8 @@ const WarrantyRequestDetails = () => {
 
                         {generalDetailResponse.duplicate_data && generalDetailResponse.duplicate_data.length > 0 && <div className="col-lg-12">
                           <div className="row">
-                            <div className="col-lg-12">
-                              <div className='masterrecord_heading'>Previous Request</div>
+                            <div className="col-lg-12 tooltip_box">
+                              <div className='masterrecord_heading'>Previous Request
                               <div className='tooltip_box2'>
                                 <img src={staticIconsBaseURL + "/images/ic_info_i.png"} alt="icon" className="img-fluid" style={{ width: "18px", marginLeft: "15px" }} />
                                 <div className="tooltip_inner">
@@ -392,6 +392,7 @@ const WarrantyRequestDetails = () => {
                                 </div>
                               </div>
                             </div>
+                          </div>
                           </div>
                         </div>}
                         {generalDetailResponse.duplicate_data && generalDetailResponse.duplicate_data.map((duplicates, index) => (

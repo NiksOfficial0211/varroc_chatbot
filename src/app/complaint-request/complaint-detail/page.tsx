@@ -446,7 +446,7 @@ const WarrantyRequestDetails = () => {
 
                        {complaintData.duplicate_data && complaintData.duplicate_data.length>0 && <div className="col-lg-12">
                           <div className="row">
-                            <div className="col-lg-12">
+                            <div className="col-lg-12 tooltip_box">
                               <div className='masterrecord_heading'>Previous/Duplicate Request
                               <div className='tooltip_box2'>
                                                                 <img src={staticIconsBaseURL+"/images/ic_info_i.png"} alt="icon" className="img-fluid" style={{width:"18px",marginLeft:"15px"}}/>
@@ -488,7 +488,7 @@ const WarrantyRequestDetails = () => {
 
                         {complaintData.warrantyRaised && complaintData.warrantyRaised.length>0 && <div className="col-lg-12">
                           <div className="row">
-                            <div className="col-lg-12">
+                            <div className="col-lg-12 tooltip_box">
                               <div className='masterrecord_heading'>Warranty Request</div>
                               <div className='tooltip_box2'>
                                                                 <img src={staticIconsBaseURL+"/images/ic_info_i.png"} alt="icon" className="img-fluid" style={{width:"18px",marginLeft:"15px"}}/>
@@ -551,7 +551,11 @@ const WarrantyRequestDetails = () => {
 
                             </div>
                           </div>))}
-                        {complaintData.battery_details.length == 0 && <div className="request_list_heading mb-4 ml-3" style={{ width: "auto", margin: "0" }}>
+                        {complaintData.battery_details.length == 0 && 
+                        <div className="row">
+                          <div className="col-lg-12 tooltip_box">
+                            
+                        <div className="request_list_heading mb-4 ml-3" style={{ width: "auto", margin: "0" }}>
                           <span style={{ color: "#D93731" }}>Serial Number does not match
                             <div className='tooltip_box2'>
                                                               <img src={staticIconsBaseURL+"/images/ic_info_i.png"} alt="icon" className="img-fluid" style={{width:"18px",marginLeft:"15px"}}/>
@@ -560,7 +564,10 @@ const WarrantyRequestDetails = () => {
                                                             </div>
                                                             </div>
                           </span>
-                        </div>}
+                        </div>
+                        </div>
+                        </div>
+                        }
 
                       </div>
                       {complaintData.addressedData && complaintData.addressedData.length > 0 && complaintData.complaint_data[0].status_id != status_Pending ?
