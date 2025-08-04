@@ -489,13 +489,14 @@ const WarrantyRequestDetails = () => {
                         {complaintData.warrantyRaised && complaintData.warrantyRaised.length>0 && <div className="col-lg-12">
                           <div className="row">
                             <div className="col-lg-12 tooltip_box">
-                              <div className='masterrecord_heading'>Warranty Request</div>
+                              <div className='masterrecord_heading'>Warranty Request
                               <div className='tooltip_box2'>
                                                                 <img src={staticIconsBaseURL+"/images/ic_info_i.png"} alt="icon" className="img-fluid" style={{width:"18px",marginLeft:"15px"}}/>
                                                                 <div className="tooltip_inner">
                                                                 These records represent warranty requests made by the user using the same battery serial number.
                                                               </div>
                                                               </div>
+                            </div>
                             </div>
                           </div>
                         </div>}
