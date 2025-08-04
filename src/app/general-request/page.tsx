@@ -129,7 +129,7 @@ const LeadRequestListing = () => {
 
   // const fetchData = async (date: any, request_id: any, phone_no: any, name: any, status: any, page: any, limit: any) => {
   const fetchData = async (filter: DataFilters) => {
-    sessionStorage.setItem(LEAD_FILTER_KEY, JSON.stringify(filter));
+    sessionStorage.setItem(GENERAL_FILTER_KEY, JSON.stringify(filter));
     setLoading(true);
     try {
       const statusRes = await fetch("/api/get_status_master", {
@@ -241,8 +241,8 @@ const LeadRequestListing = () => {
   const resetFilter = async () => {
 
     window.location.reload();
-    sessionStorage.removeItem(LEAD_FILTER_KEY);
-setGlobalState({
+    sessionStorage.removeItem(GENERAL_FILTER_KEY);
+    setGlobalState({
                   selectedViewID: '',
                   auth_id: auth_id,
                   userName: userName,
