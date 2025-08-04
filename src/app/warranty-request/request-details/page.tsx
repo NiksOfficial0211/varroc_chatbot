@@ -491,7 +491,7 @@ const WarrantyRequestDetails = () => {
                               <div className="request_list ">
                                 Manufacturing Date
                                 <span>{warrantyRequestData.battery_details
-                                  && warrantyRequestData.battery_details.length > 0 ? formatDate(warrantyRequestData.battery_details[0].manufacturing_date) : "--"}</span>
+                                  && warrantyRequestData.battery_details.length > 0 ? formatDateDDMMYYYY(warrantyRequestData.battery_details[0].manufacturing_date) : "--"}</span>
                               </div>
                             </div>
                             <div className="col-lg-4 mb-3">
